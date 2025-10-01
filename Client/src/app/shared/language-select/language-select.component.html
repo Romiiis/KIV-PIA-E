@@ -16,7 +16,6 @@
   <!-- dropdown -->
   <ul class="dropdown" *ngIf="showDropdown && filteredLanguages.length > 0">
     <li *ngFor="let lang of filteredLanguages" (click)="selectLanguage(lang)">
-      <span class="flag">{{ getFlag(lang.code) }}</span>
       <span class="name">{{ lang.name }}</span>
       <span class="code">({{ lang.code }})</span>
     </li>

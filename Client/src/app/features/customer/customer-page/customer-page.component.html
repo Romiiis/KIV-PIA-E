@@ -28,12 +28,9 @@
 </nav>
 
 <div class="content">
-  <!--<app-customer-projects-list
-    *ngIf="mode === 'list'"
-    [projects]="projects"
-    (approve)="approveProject($event)"
-    (reject)="rejectProject($event.project, $event.feedback)">
-  </app-customer-projects-list>-->
+  <app-projects-list
+    *ngIf="mode === 'list'">
+  </app-projects-list>
 
   <app-customer-new-project
     *ngIf="mode === 'new'"

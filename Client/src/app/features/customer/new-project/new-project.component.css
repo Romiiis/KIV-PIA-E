@@ -61,15 +61,7 @@
   font-size: 1.2rem;
 }
 
-/* Inputs */
-input[type="text"],
-select {
-  padding: 0.7rem;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  transition: all 0.25s ease;
-}
+
 
 input:focus,
 select:focus {

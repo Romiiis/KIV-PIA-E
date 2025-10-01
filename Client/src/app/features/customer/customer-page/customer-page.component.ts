@@ -1,13 +1,15 @@
 import { Component, HostListener } from '@angular/core';
 import {NgIf} from '@angular/common';
 import {NewProjectComponent} from '@features/customer/new-project/new-project.component';
+import {ProjectsListComponent} from '@features/customer/projects-list/projects-list.component';
 
 @Component({
   selector: 'app-customer-page',
   templateUrl: './customer-page.component.html',
   imports: [
     NgIf,
-    NewProjectComponent
+    NewProjectComponent,
+    ProjectsListComponent
   ],
   styleUrls: ['./customer-page.component.css']
 })
@@ -54,6 +56,6 @@ export class CustomerPageComponent {
   }
 
   addProject($event: any) {
-    
+
   }
 }

@@ -1,7 +1,5 @@
 .language-select {
-  position: relative;
   width: 100%;
-  max-width: 420px;
   font-family: 'Inter', sans-serif;
 }
 
@@ -9,8 +7,8 @@
   display: block;
   font-size: 0.85rem;
   font-weight: 600;
-  margin-bottom: 0.4rem;
-  color: #444;
+  margin-bottom: 0.5rem;
+  color: #333;
 }
 
 .input-wrapper {
@@ -18,23 +16,24 @@
 }
 
 .language-select input {
-  width: 100%;
-  padding: 0.8rem 2.2rem 0.8rem 0.8rem;
-  border-radius: 10px;
-  border: 1px solid #ccc;
+  width: 92%;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  padding: 0.6rem 1.2rem;
   font-size: 0.95rem;
   transition: all 0.25s ease;
+  background: #fff;
 }
 
 .language-select input:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+  border-color: transparent;
+  box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px rgba(59,130,246,0.2);
   outline: none;
 }
 
 .caret {
   position: absolute;
-  right: 0.8rem;
+  right: 1.2rem;
   top: 50%;
   transform: translateY(-50%);
   color: #666;
@@ -43,62 +42,54 @@
 }
 
 .dropdown {
-  position: absolute;
-  top: 105%;
-  left: 0;
-  right: 0;
+  margin-top: 0.4rem;
   background: #fff;
-  border: 1px solid #eee;
-  border-radius: 10px;
-  max-height: 260px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  max-height: 280px;
   overflow-y: auto;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   z-index: 100;
   animation: fadeIn 0.15s ease-in;
 }
 
 .dropdown li {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto; /* jméno zabere vše, kód vpravo */
   align-items: center;
-  gap: 0.6rem;
   padding: 0.7rem 1rem;
   cursor: pointer;
   transition: background 0.2s;
+  border-bottom: 1px solid #f3f4f6;
 }
+
+
 
 .dropdown li:hover {
-  background: #f1f5ff;
-}
-
-.flag {
-  width: 1.4rem;
-  text-align: center;
-  font-size: 1.2rem;
+  background: #f9fafb;
 }
 
 .name {
-  flex: 1;
   font-weight: 500;
   color: #333;
 }
 
 .code {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: #777;
 }
 
+
 .no-results {
-  position: absolute;
-  top: 105%;
-  left: 0;
-  right: 0;
+  margin-top: 0.4rem;
   background: #fff;
   border: 1px solid #eee;
-  border-radius: 10px;
-  padding: 0.7rem;
-  color: #888;
+  border-radius: 12px;
+  padding: 0.8rem;
+  color: #777;
   text-align: center;
   font-size: 0.9rem;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.05);
 }
 
 @keyframes fadeIn {

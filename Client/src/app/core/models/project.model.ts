@@ -4,5 +4,5 @@ export interface Project {
   translatorId?: string;
   sourceFileUrl: string;
   targetLanguage: string;
-  status?: 'created' | 'assigned' | 'completed' | 'approved' | 'rejected' | 'closed';
+  status?: 'created' | 'assigned' | 'completed' | 'approved' | 'closed';
 }
