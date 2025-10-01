@@ -1,0 +1,24 @@
+<div class="new-project-card">
+  <h2>Create New Project</h2>
+  <p class="subtitle">Upload your file in English and select the target language</p>
+
+  <form [formGroup]="projectForm" (ngSubmit)="submitProject()">
+    <!-- File upload -->
+    <div class="form-group file-upload">
+      <label for="fileInput" class="file-label">
+        <span class="icon">📄</span>
+        <span>{{ projectForm.value.file?.name || 'Choose a file' }}</span>
+      </label>
+      <input id="fileInput" type="file" (change)="onFileSelected($event)" hidden />
+    </div>
+
+    <!-- Target language -->
+    <div class="form-group">
+      <label for="targetLang">Target Language</label>
+      <app-language-select></app-language-select>
+    </div>
+
+    <!-- Submit -->
+    <button type="submit" [disabled]="projectForm.invalid">🚀 Submit Project</button>
+  </form>
+</div>

@@ -1,0 +1,42 @@
+<nav class="navbar">
+  <!-- Logo -->
+  <div class="brand">🌍 LinguaFlow</div>
+
+  <!-- Navigation tabs -->
+  <div class="nav-links">
+    <a (click)="switchMode('list')" [class.active]="mode === 'list'">My Projects</a>
+    <a (click)="switchMode('new')" [class.active]="mode === 'new'">New Project</a>
+  </div>
+
+  <!-- User menu -->
+  <div class="user-menu"
+       (mouseenter)="openMenu()"
+       (mouseleave)="closeMenu()">
+    <div class="avatar-name" (click)="toggleMenu()">
+      <img class="avatar" src="https://www.svgrepo.com/show/452030/avatar-default.svg" alt="User"/>
+      <span class="username">{{ fullName }}</span>
+      <span class="caret">▾</span>
+    </div>
+
+    <div class="dropdown" *ngIf="showMenu">
+      <div class="role">
+        <p class="roleLabel">Role:&nbsp;</p><p> {{ role }}</p>
+      </div>
+      <button (click)="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="content">
+  <!--<app-customer-projects-list
+    *ngIf="mode === 'list'"
+    [projects]="projects"
+    (approve)="approveProject($event)"
+    (reject)="rejectProject($event.project, $event.feedback)">
+  </app-customer-projects-list>-->
+
+  <app-customer-new-project
+    *ngIf="mode === 'new'"
+    (create)="addProject($event)">
+  </app-customer-new-project>
+</div>

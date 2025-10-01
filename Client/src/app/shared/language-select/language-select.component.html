@@ -1,0 +1,29 @@
+<div class="language-select">
+  <label class="label">Target Language</label>
+
+  <!-- input -->
+  <div class="input-wrapper" (click)="showDropdown = true">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (input)="onSearch()"
+      placeholder="Type to search..."
+      (focus)="showDropdown = true"
+    />
+    <span class="caret">▾</span>
+  </div>
+
+  <!-- dropdown -->
+  <ul class="dropdown" *ngIf="showDropdown && filteredLanguages.length > 0">
+    <li *ngFor="let lang of filteredLanguages" (click)="selectLanguage(lang)">
+      <span class="flag">{{ getFlag(lang.code) }}</span>
+      <span class="name">{{ lang.name }}</span>
+      <span class="code">({{ lang.code }})</span>
+    </li>
+  </ul>
+
+  <!-- no results -->
+  <div class="no-results" *ngIf="showDropdown && filteredLanguages.length === 0">
+    No matching languages
+  </div>
+</div>
