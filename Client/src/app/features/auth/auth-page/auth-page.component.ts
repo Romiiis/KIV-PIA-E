@@ -53,8 +53,8 @@ export class AuthPageComponent implements OnInit {
 
   submitLogin() {
     if (this.loginForm.valid) {
-      const { username, password } = this.loginForm.value;
-      this.auth.login(username!, password!).subscribe(() => {
+      const { email, password } = this.loginForm.value;
+      this.auth.login(email!, password!).subscribe(() => {
         const role = this.auth.getRole();
         this.router.navigate([`/${role}`]);
       });

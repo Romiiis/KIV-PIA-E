@@ -1,0 +1,32 @@
+
+<nav class="navbar">
+  <!-- Logo -->
+  <div class="brand">🌍 LinguaFlow</div>
+
+  <!-- Navigation tabs -->
+  <div class="nav-links">
+  </div>
+
+  <!-- User menu -->
+  <div class="user-menu"
+       (mouseenter)="openMenu()"
+       (mouseleave)="closeMenu()">
+    <div class="avatar-name" (click)="toggleMenu()">
+      <img class="avatar" src="https://www.svgrepo.com/show/452030/avatar-default.svg" alt="User"/>
+      <span class="username">{{ this.loggedUser.name }}</span>
+      <span class="caret">▾</span>
+    </div>
+
+    <div class="dropdown" *ngIf="showMenu">
+      <div class="role">
+        <p class="roleLabel">Role:&nbsp;</p><p> {{ loggedUser.role }}</p>
+      </div>
+      <button (click)="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Obsah stránky -->
+<main class="content">
+  <router-outlet></router-outlet>
+</main>

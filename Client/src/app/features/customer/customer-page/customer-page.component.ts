@@ -1,61 +1,67 @@
-import { Component, HostListener } from '@angular/core';
-import {NgIf} from '@angular/common';
+import {Component} from '@angular/core';
+import {FilterByStatusPipe} from '@shared/pipes/filter-by-status-pipe';
+import {LengthPipe} from '@shared/pipes/length-pipe';
 import {NewProjectComponent} from '@features/customer/new-project/new-project.component';
-import {ProjectsListComponent} from '@features/customer/projects-list/projects-list.component';
+import {NgIf} from '@angular/common';
+import {Project} from '@core/models/project.model';
 
 @Component({
   selector: 'app-customer-page',
   templateUrl: './customer-page.component.html',
   imports: [
-    NgIf,
+    FilterByStatusPipe,
+    LengthPipe,
     NewProjectComponent,
-    ProjectsListComponent
+    NgIf
   ],
   styleUrls: ['./customer-page.component.css']
 })
 export class CustomerPageComponent {
-  mode: 'new' | 'list' = 'list';
-  fullName = 'John Doe';
-  role = 'Customer';
-  email = 'rpejs@students.zcu.cz';
-  showMenu = false;
-  closeTimeout: any;
 
-  switchMode(mode: 'new' | 'list') {
-    this.mode = mode;
-  }
 
-  toggleMenu() {
-    this.showMenu = !this.showMenu;
-  }
-
-  openMenu() {
-    if (this.closeTimeout) {
-      clearTimeout(this.closeTimeout);
+  projects: Project[] = [
+    {
+      id: 'p1',
+      customerId: 'cust001',
+      sourceFileUrl: '/files/documents/contract-en.pdf',
+      targetLanguage: 'de',
+      status: 'created'
+    },
+    {
+      id: 'p2',
+      customerId: 'cust002',
+      translatorId: 'trans001',
+      sourceFileUrl: '/files/articles/news-fr.docx',
+      targetLanguage: 'en',
+      status: 'assigned'
+    },
+    {
+      id: 'p3',
+      customerId: 'cust003',
+      translatorId: 'trans002',
+      sourceFileUrl: '/files/presentations/marketing-es.pptx',
+      targetLanguage: 'cs',
+      status: 'completed'
+    },
+    {
+      id: 'p4',
+      customerId: 'cust004',
+      translatorId: 'trans003',
+      sourceFileUrl: '/files/manuals/product-it.pdf',
+      targetLanguage: 'pl',
+      status: 'completed'
+    },
+    {
+      id: 'p5',
+      customerId: 'cust005',
+      translatorId: 'trans004',
+      sourceFileUrl: '/files/letters/letter-ru.txt',
+      targetLanguage: 'en',
+      status: 'completed'
     }
-    this.showMenu = true;
-  }
+  ];
+
+  showNewProject!: boolean
 
 
-  closeMenu() {
-    this.closeTimeout = setTimeout(() => {
-      this.showMenu = false;
-    }, 250); // 250 ms delay
-  }
-
-  @HostListener('document:click', ['$event'])
-  clickOutside(event: Event) {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.user-menu')) {
-      this.showMenu = false;
-    }
-  }
-
-  logout() {
-    console.log('Logging out...');
-  }
-
-  addProject($event: any) {
-
-  }
 }
