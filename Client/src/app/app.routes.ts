@@ -3,6 +3,7 @@ import {LayoutComponent} from './layout/layout.component';
 import {RoleRedirectGuard} from '@core/auth/role.guard';
 import {AuthPageComponent} from '@features/auth/auth-page/auth-page.component';
 import {CustomerPageComponent} from '@features/customer/customer-page/customer-page.component';
+import {TranslatorPageComponent} from '@features/translator/translator-page/translator-page.component';
 
 export const routes: Routes = [
   {
@@ -16,7 +17,8 @@ export const routes: Routes = [
     component: LayoutComponent,
     canActivate: [RoleRedirectGuard],
     children: [
-      {path: 'customers', component: CustomerPageComponent}
+      {path: 'customer', component: CustomerPageComponent},
+      {path: 'translator',component: TranslatorPageComponent},
     ]
   },
   {path: 'auth', component: AuthPageComponent},

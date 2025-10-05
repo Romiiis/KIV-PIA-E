@@ -7,31 +7,37 @@ export class RoleRedirectGuard implements CanActivate {
   constructor(private auth: AuthService, private router: Router) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree {
+
+    // Get the role of the current user
     const role = this.auth.getRole();
+
+    // TODO - remove it after testing
     console.log(role)
-    // není přihlášený -> na login, ALE pokud už je na /auth, tak ho nech tam
+
+    // If no role (not logged in) -> just route to login page
     if (!role) {
       if (state.url === '/auth') {
-        return true; // už je na login page, necyklit
+        return true; // If already going to auth page, allow it (do not redirect in a loop)
       }
+      // Otherwise, redirect to auth page
       return this.router.parseUrl('/auth');
     }
 
-    // role známá -> pustíme ho jen na správnou stránku
-    if (role === 'customer' && state.url.startsWith('/customers')) return true;
-    if (role === 'translator' && state.url.startsWith('/dashboard')) return true;
+    // If user has a role, check if they are going to the right place
+    if (role === 'customer' && state.url.startsWith('/customer')) return true;
+    if (role === 'translator' && state.url.startsWith('/translator')) return true;
     // if (role === 'admin' && state.url.startsWith('/admin')) return true;
 
-    // root nebo fallback -> přesměruj podle role
+    // If user is going to root or wildcard, redirect based on role
     if (state.url === '/' || route.routeConfig?.path === '**') {
       switch (role) {
-        case 'customer': return this.router.parseUrl('/customers');
-        case 'translator': return this.router.parseUrl('/dashboard');
+        case 'customer': return this.router.parseUrl('/customer');
+        case 'translator': return this.router.parseUrl('/translator');
         // case 'admin': return this.router.parseUrl('/admin');
       }
     }
 
-    // cokoliv jiného -> fallback na login
+    // If none of the above, redirect to auth page (could also show a "not authorized" page)
     return this.router.parseUrl('/auth');
   }
 }

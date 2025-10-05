@@ -1,17 +1,18 @@
-<button class="fab-full" (click)="showNewProject = true">
-  <span class="icon">➕</span>
-  <span class="label">Create New Project</span>
-</button>
+
 <div class="dashboard">
+  <div class="stat-card">✅ {{ projects | filterByStatus:'closed' | length }} completed overall </div>
+
   <div class="header">
-    <div class="stat-card">📄 {{ projects | filterByStatus:'created' | length }} to translate</div>
-    <div class="stat-card">📝 {{ projects | filterByStatus:'completed' | length }} feedback</div>
-    <div class="stat-card">✅ {{ projects | filterByStatus:'approved' | length }} done</div>
+    <div class="stat-card">📄 {{ projects | filterByStatus:'assigned' | length }} for translation</div>
+    <!-- TODO Assigned + with feedback -->
+    <div class="stat-card">📝 {{ projects | filterByStatus:'assigned' | length }} for customer feedback </div>
+
+    <div class="stat-card">❌ {{ projects | filterByStatus:'approved' | length }} rejected </div>
   </div>
 
   <div class="timeline-board">
     <div class="stage created">
-      <h3>Waiting for translation</h3>
+      <h3>Waiting for your translation</h3>
       @for (p of projects | filterByStatus:'created'; track p.id) {
         <div class="project-card">
           <div class="title">{{ p.customerId }}</div>
@@ -31,7 +32,7 @@
     </div>
 
     <div class="stage approved">
-      <h3>Completed</h3>
+      <h3>Rejected</h3>
       @for (p of projects | filterByStatus:'approved'; track p.id) {
         <div class="project-card">
           <div class="title">{{ p.customerId }}</div>
@@ -43,10 +44,4 @@
 </div>
 
 
-<!-- Modal -->
-<div class="modal-backdrop" *ngIf="showNewProject" (click)="showNewProject = false"></div>
-<div class="modal" *ngIf="showNewProject">
-  <app-customer-new-project></app-customer-new-project>
-  <button class="close-btn" (click)="showNewProject = false">✖</button>
-</div>
 
