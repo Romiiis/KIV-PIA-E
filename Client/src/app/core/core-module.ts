@@ -6,7 +6,6 @@ import { AuthService } from './auth/auth.service';
 import { AuthGuard } from './auth/auth.guard';
 import { ApiService } from './services/api.service';
 import { NotificationService } from './services/notification.service';
-import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
 
 @NgModule({
@@ -16,7 +15,6 @@ import { ErrorInterceptor } from './interceptors/error.interceptor';
     ApiService,
     NotificationService,
     AuthGuard,
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
   ]
 })

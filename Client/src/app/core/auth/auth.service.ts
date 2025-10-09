@@ -34,9 +34,6 @@ const MOCKS = [
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
-  private tokenKey = 'auth_token';
-  private roleKey = 'auth_role';
-
 
   loggedUser: User | undefined
 
@@ -44,19 +41,15 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<boolean> {
-    console.log(email, password)
 
     const found = MOCKS.find(
       m => m.username == email && m.password == password
     );
 
-    console.log(found)
+    console.log('Login attempt:', {email, password, found});
 
     if (found) {
       this.loggedUser = found.user as User;
-
-      localStorage.setItem(this.tokenKey, 'fake-jwt-token');
-      localStorage.setItem(this.roleKey, this.loggedUser.role);
       return of(true);
     }
 
@@ -66,22 +59,20 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem(this.roleKey);
     this.router.navigate(['/auth']);
   }
 
-  getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
-  }
 
   getRole(): string | null {
-    return localStorage.getItem(this.roleKey);
+    return this.loggedUser?.role || null;
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return !!this.loggedUser;
   }
 
 
+  getUser() {
+    return this.loggedUser;
+  }
 }

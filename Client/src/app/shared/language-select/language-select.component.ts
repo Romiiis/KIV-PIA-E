@@ -10,7 +10,6 @@ interface Language {
 
 @Component({
   selector: 'app-language-select',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './language-select.component.html',
   styleUrls: ['./language-select.component.css']

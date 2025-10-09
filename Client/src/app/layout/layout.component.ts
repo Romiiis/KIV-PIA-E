@@ -14,19 +14,13 @@ import {AuthService} from '@core/auth/auth.service';
   styleUrl: './layout.component.css'
 })
 export class LayoutComponent {
-  @Input() loggedUser!: User
+  loggedUser!: User
   showMenu = false;
   closeTimeout: any;
 
   constructor(
-     public authService: AuthService) {
-
-    this.loggedUser = {
-      name: "Jon Doe",
-      emailAddress: "JD@gmail.com",
-      role: "customer",
-      id: "jd"
-    }
+    public authService: AuthService) {
+    this.loggedUser = this.authService.getUser()!;
   }
 
 

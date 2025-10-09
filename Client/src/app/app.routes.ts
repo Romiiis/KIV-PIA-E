@@ -4,6 +4,7 @@ import {RoleRedirectGuard} from '@core/auth/role.guard';
 import {AuthPageComponent} from '@features/auth/auth-page/auth-page.component';
 import {CustomerPageComponent} from '@features/customer/customer-page/customer-page.component';
 import {TranslatorPageComponent} from '@features/translator/translator-page/translator-page.component';
+import {AdminPageComponent} from '@features/admin/admin-page/admin-page.component';
 
 export const routes: Routes = [
   {
@@ -19,6 +20,7 @@ export const routes: Routes = [
     children: [
       {path: 'customer', component: CustomerPageComponent},
       {path: 'translator',component: TranslatorPageComponent},
+      {path: 'admin',component: AdminPageComponent},
     ]
   },
   {path: 'auth', component: AuthPageComponent},

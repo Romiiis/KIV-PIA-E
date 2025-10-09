@@ -1,33 +1,18 @@
 import {Component} from '@angular/core';
 import {FilterByStatusPipe} from '@shared/pipes/filter-by-status-pipe';
 import {LengthPipe} from '@shared/pipes/length-pipe';
-import {NewProjectComponent} from '@features/customer/new-project/new-project.component';
-import {NgIf} from '@angular/common';
 import {Project} from '@core/models/project.model';
 
 @Component({
-  selector: 'app-customer-page',
-  templateUrl: './customer-page.component.html',
+  selector: 'app-admin-page.component',
   imports: [
     FilterByStatusPipe,
-    LengthPipe,
-    NewProjectComponent,
-    NgIf
+    LengthPipe
   ],
-  styleUrls: ['./customer-page.component.css']
+  templateUrl: './admin-page.component.html',
+  styleUrl: './admin-page.component.css'
 })
-export class CustomerPageComponent {
-
-  showNewProject!: boolean
-
-  openNewProject() {
-    console.log('clicked!');
-    this.showNewProject = true;
-  }
-
-  closeNewProject() {
-    this.showNewProject = false;
-  }
+export class AdminPageComponent {
 
 
   projects: Project[] = [
@@ -71,7 +56,5 @@ export class CustomerPageComponent {
       status: 'completed'
     }
   ];
-
-
 
 }

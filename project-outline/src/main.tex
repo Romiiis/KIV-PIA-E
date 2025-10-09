@@ -1,0 +1,74 @@
+%! Author = romis
+%! Date = 08/10/2025
+
+% Preamble
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage{amsmath}
+
+
+
+% Document
+\begin{document}
+    \title{PIE - návrh řešení}
+    \author{Roman Pejs}
+    \date{\today}
+    \maketitle
+
+    \section{Forma řešení}
+    Projekt bude rozdělen na client-server architekturu.
+    Server bude poskytovat REST API pro komunikaci s klientem.
+
+    \section{Rozdělení do modulů}
+    \begin{itemize}
+        \item \textbf{Core module} - základní funkce a datové struktury
+        \item \textbf{UI module} - uživatelské rozhraní
+        \item \textbf{Storage module} - správa dat a připojení
+        \item \textbf{Auth module} - autentizace a autorizace uživatelů
+    \end{itemize}
+
+    \section{Moduly detailně}
+    \subsection{Core module}
+    \begin{itemize}
+        \item Obsahuje datové struktury (doménové) viz Github
+        \item Services - logika aplikace
+        \item Obsahuje Interface pro komunikaci s databází
+    \end{itemize}
+
+    \subsection{UI module}
+    \begin{itemize}
+        \item Komunikace s uživatelem (vybrané API)
+        \item Zpracování požadavků a odpovědí
+        \item Mapování DTO objektů  $\leftrightarrow$ doménové objekty  (např. pomocí MapStruct)
+    \end{itemize}
+
+    \subsection{Storage module}
+    \begin{itemize}
+        \item Implementace Interface pro komunikaci s databází
+        \item MongoDB připojení a operace
+        \item Přidání databázových modelů a \\ (domain $\leftrightarrow$ db model) mapování
+    \end{itemize}
+
+    \subsection{Auth module}
+    \begin{itemize}
+        \item Security filter chain pro zabezpečení API
+        \item Kontrola JWT tokenů
+        \item Správa uživatelů a rolí
+    \end{itemize}
+
+
+    \section{Flow aplikace}
+
+    \begin{itemize}
+        \item Uživatelský požadavek přijde na UI modul
+        \item Security filter chain z Auth modulu ověří požadavek + token + uživatele
+        \item UI modul zavolá Core modul (services) pro zpracování logiky
+        \item Core modul může komunikovat se Storage modulem pro přístup k datům
+        \item Výsledek je vrácen zpět UI modulu, který odpoví uživateli
+    \end{itemize}
+
+
+
+
+\end{document}

@@ -1,4 +1,4 @@
-<button class="fab-full" (click)="showNewProject = true">
+<button class="fab-full" (click)="openNewProject()">
   <span class="icon">➕</span>
   <span class="label">Create New Project</span>
 </button>
@@ -44,9 +44,9 @@
 
 
 <!-- Modal -->
-<div class="modal-backdrop" *ngIf="showNewProject" (click)="showNewProject = false"></div>
-<div class="modal" *ngIf="showNewProject">
+<div class="modal-backdrop" *ngIf="showNewProject" (click)="closeNewProject()"></div>
+<div class="mymodal" *ngIf="showNewProject" >
   <app-customer-new-project></app-customer-new-project>
-  <button class="close-btn" (click)="showNewProject = false">✖</button>
+  <button class="close-btn" (click)="closeNewProject()">✖</button>
 </div>
 
