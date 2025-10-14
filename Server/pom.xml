@@ -2,27 +2,40 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Project coordinates -->
     <groupId>com.romiiis</groupId>
     <artifactId>pia-e-server</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+
+    <!-- Submodules -->
     <modules>
         <module>core-module</module>
-        <module>ui-module</module>
         <module>storage-module</module>
+        <module>rest-api-module</module>
     </modules>
 
+    <!-- Common project properties -->
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <app.version>1.0.0-SNAPSHOT</app.version>
     </properties>
 
-
+    <!--
+        Dependency management:
+        Defines versions for libraries that will be used in child modules.
+        This allows child POMs to omit <version> for these dependencies.
+    -->
     <dependencyManagement>
         <dependencies>
+
+            <!-- Spring Boot BOM (for dependency version alignment) -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -31,6 +44,7 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- JUnit BOM -->
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
@@ -38,12 +52,112 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <!-- Common version definitions -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>2.0.17</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.40</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
+
+    <!--
+        Shared dependencies:
+        These libraries are automatically available to all child modules.
+    -->
+    <dependencies>
+
+        <!-- Lombok (compile-time code generation) -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.13</version>
+        </dependency>
+
+        <!-- JUnit (testing) -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <!--
+        Plugin management:
+        Defines versions and common configurations for Maven plugins.
+        Child modules can simply declare <plugin> without specifying versions.
+    -->
+    <build>
+        <pluginManagement>
+            <plugins>
+
+                <!-- Spring Boot plugin for packaging and running the application -->
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>3.5.6</version>
+                </plugin>
+
+                <!-- Compiler plugin configuration for MapStruct + Lombok -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                    <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+
+                        <!-- Annotation processors -->
+                        <annotationProcessorPaths>
+
+                            <!-- MapStruct processor -->
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${mapstruct.version}</version>
+                            </path>
+
+                            <!-- Lombok + MapStruct integration -->
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok-mapstruct-binding</artifactId>
+                                <version>0.2.0</version>
+                            </path>
+
+                            <!-- Lombok processor -->
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>1.18.40</version>
+                            </path>
+
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>

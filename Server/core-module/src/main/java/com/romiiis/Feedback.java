@@ -10,6 +10,10 @@ public class Feedback {
     private String text;
     private Instant createdAt;
 
+    public Feedback(){
+
+    }
+
     // constructor used when referencing the object in other domain objects where only ID is known
     public Feedback(UUID id) {
         this.id = id;

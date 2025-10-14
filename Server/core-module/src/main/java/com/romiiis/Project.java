@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
 
-// NOTE: setters are intentionally not provided for the sake of encapsulation
 @Slf4j
 public class Project {
     private UUID id;
@@ -20,6 +19,10 @@ public class Project {
 
     // MAX 5MB
     public static final int MAX_FILE_SIZE = 1024 * 1024 * 5;
+
+    public Project() {
+
+    }
 
     // constructor used when referencing the object in other domain objects where only ID is known
     public Project(UUID id) {

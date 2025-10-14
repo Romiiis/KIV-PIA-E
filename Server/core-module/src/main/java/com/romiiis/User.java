@@ -10,7 +10,6 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Slf4j
-// NOTE: setters are intentionally not provided for the sake of encapsulation
 public class User {
     private UUID id;
     private String name;
