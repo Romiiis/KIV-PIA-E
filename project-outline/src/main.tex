@@ -36,7 +36,7 @@
         \item Obsahuje Interface pro komunikaci s databází
     \end{itemize}
 
-    \subsection{UI module}
+    \subsection{RestApi module}
     \begin{itemize}
         \item Komunikace s uživatelem (vybrané API)
         \item Zpracování požadavků a odpovědí
@@ -50,12 +50,14 @@
         \item Přidání databázových modelů a \\ (domain $\leftrightarrow$ db model) mapování
     \end{itemize}
 
-    \subsection{Auth module}
+    \subsection{Auth module ?? }
     \begin{itemize}
         \item Security filter chain pro zabezpečení API
         \item Kontrola JWT tokenů
         \item Správa uživatelů a rolí
     \end{itemize}
+
+    ⚠ \textbf{Poznámka:} Auth modul může být integrován přímo do RestApi modulu a core, pokud je to jednodušší.
 
 
     \section{Flow aplikace}
