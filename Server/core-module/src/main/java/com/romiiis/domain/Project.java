@@ -10,6 +10,12 @@ import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
 
+/**
+ * Project domain object
+ * Represents a translation project
+ *
+ * @author Roman Pejs
+ */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @Builder
@@ -57,9 +63,6 @@ public class Project {
      * @throws IllegalArgumentException if the user is not a translator
      */
     public void assignTranslator(User user) {
-        // TODO: check that user is a TRANSLATOR
-        // TODO: check that project state is CREATED
-
         if (user == null || user.getRole() != UserRole.TRANSLATOR) {
             log.error("User is not a translator");
             throw new IllegalArgumentException("Invalid user role");
@@ -87,8 +90,6 @@ public class Project {
      *
      */
     public void close() {
-        // TODO: check that project state is CREATED or APPROVED
-
         if (this.getState() != ProjectState.CREATED && this.getState() != ProjectState.APPROVED) {
             log.error("Project is not CREATED or ASSIGNED");
             throw new IllegalStateException("Project cannot be closed");
@@ -110,9 +111,6 @@ public class Project {
      * @throws IllegalStateException if the project is not in the correct state or if the translated file is invalid
      */
     public void complete(byte[] translatedFile) {
-        // TODO: check that project state is ASSIGNED
-        // TODO: check that translatedFile is not empty but also not too big
-
         if (this.getState() != ProjectState.ASSIGNED) {
             log.error("Project is not in state ASSIGNED");
             throw new IllegalStateException("Project cannot be completed");
@@ -140,7 +138,6 @@ public class Project {
      * @throws IllegalStateException if the project is not in the correct state
      */
     public void approve() {
-        // TODO: check that project state is COMPLETED
         if (this.getState() != ProjectState.COMPLETED) {
             log.error("Project is not in state COMPLETED");
             throw new IllegalStateException("Project cannot be approved");
@@ -163,9 +160,6 @@ public class Project {
      * @throws IllegalStateException if the project is not in the correct state or if the feedback text is empty
      */
     public Feedback reject(String feedbackText) {
-        // TODO: check that project state is COMPLETED
-        // TODO: check that feedbackText is not empty
-
         if (this.getState() != ProjectState.COMPLETED) {
             log.error("Project is not in state COMPLETED");
             throw new IllegalStateException("Project cannot be rejected");
@@ -181,34 +175,4 @@ public class Project {
         return new Feedback(this, feedbackText);
     }
 
-    //<editor-fold desc="getters" defaultstate="collapsed">
-    public User getCustomer() {
-        return customer;
-    }
-
-    public User getTranslator() {
-        return translator;
-    }
-
-    public Locale getTargetLanguage() {
-        return targetLanguage;
-    }
-
-    public byte[] getSourceFile() {
-        return sourceFile;
-    }
-
-    public byte[] getTranslatedFile() {
-        return translatedFile;
-    }
-
-    public ProjectState getState() {
-        return state;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    //</editor-fold>
 }

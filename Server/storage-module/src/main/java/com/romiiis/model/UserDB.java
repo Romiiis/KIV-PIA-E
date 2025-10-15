@@ -1,6 +1,7 @@
 package com.romiiis.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,8 +10,14 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * User database entity
+ *
+ * @author Roman Pejs
+ */
 @Document(collection = "users")
 @Data
+@NoArgsConstructor
 public class UserDB {
 
     @Id
@@ -22,10 +29,5 @@ public class UserDB {
     private Set<Locale> languages;
     private Instant createdAt;
 
-    private String passwordHash;
-
-    public UserDB() {
-    }
-
-
+    private String hashedPassword;
 }

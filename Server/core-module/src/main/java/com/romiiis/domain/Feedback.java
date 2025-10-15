@@ -8,6 +8,12 @@ import lombok.Getter;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Feedback domain object
+ * Represents feedback given by a customer for a completed project
+ *
+ * @author Roman Pejs
+ */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @Builder

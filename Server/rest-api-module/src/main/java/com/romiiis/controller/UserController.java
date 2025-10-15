@@ -5,6 +5,11 @@ import com.romiiis.service.interfaces.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 
+/**
+ * Controller for handling user-related API requests.
+ *
+ * @author Roman Pejs
+ */
 @Controller
 @RequiredArgsConstructor
 public class UserController implements UsersApi {

@@ -4,6 +4,10 @@ import com.romiiis.domain.User;
 import com.romiiis.model.UserDB;
 import org.mapstruct.Mapper;
 
+/**
+ * Mapper interface for converting between User and UserDB objects.
+ * Uses MapStruct for automatic mapping.
+ */
 @Mapper(componentModel = "spring")
 public interface MongoUserMapper {
     /**

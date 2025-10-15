@@ -4,7 +4,11 @@ import com.romiiis.domain.Project;
 import com.romiiis.model.ProjectDB;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+/**
+ * Mapper interface for converting between Project and ProjectDB objects.
+ * Uses MongoUserMapper for nested user mappings.
+ */
+@Mapper(componentModel = "spring", uses = {MongoUserMapper.class})
 public interface MongoProjectMapper {
 
     /**

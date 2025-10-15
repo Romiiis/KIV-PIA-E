@@ -6,7 +6,13 @@ import com.romiiis.domain.Project;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Service interface for managing projects.
+ *
+ * @author Roman Pejs
+ */
 public interface IProjectService {
+
     /**
      * Creates a new project for the current user
      * @param targetLanguage target language for translation
@@ -14,13 +20,4 @@ public interface IProjectService {
      * @return newly created project
      */
     Project createProject(Locale targetLanguage, byte[] sourceFile);
-
-    /**
-     * Fetches all projects, no matter their state
-     *
-     * @return all projects
-     */
-    List<Project> getAllProjects();
-
-    // other service methods here
 }

@@ -14,18 +14,24 @@ tags:
   - name: Users
     description: API endpoints used for management of users (customers, translators, admins).
 paths:
-  /login:
+
+  # ----- Auth Endpoints -----
+  /auth/login:
     post:
       tags:
         - "Auth"
       summary: Authenticates a user and returns a JWT token.
+      description: >
+        Takes user credentials (email and password) and returns
+        a JWT access token if the credentials are valid.
       operationId: loginUser
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/LoginUserRequest'
-              required: true
+
       responses:
         '200':
           description: Successful authentication
@@ -34,7 +40,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  token:
+                  accessToken:
                     type: string
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         '400':
@@ -43,35 +49,180 @@ paths:
           description: Invalid email or password.
         '500':
           description: Server error.
-  /register:
+  /auth/register:
     post:
       tags:
         - "Auth"
       summary: Register a user and returns a JWT token.
       operationId: registerUser
+      description: >
+        Registers a new user (customer or translator) and returns
+        a JWT access token upon successful registration.
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RegisterUserRequest'
-              required: true
       responses:
-        '200':
-          description: Successful authentication
+        '201':
+          description: Registered successfully and created a new user.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  token:
+                  accessToken:
                     type: string
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         '400':
           description: Request body is not formatted correctly.
-        '401':
-          description: Invalid email or password.
+        '409':
+          description: Email address is already in use.
         '500':
           description: Server error.
+  /auth/refresh:
+    post:
+      tags:
+        - Auth
+      summary: Refreshes a JWT token
+      description: >
+        Takes a valid refresh token (usually from HttpOnly cookie)
+        and issues a new access token. The refresh token itself
+        is verified server-side.
+      operationId: refreshToken
+      security:
+        - cookieAuth: [ ]   # nebo např. bearerAuth, pokud používáš header
+      responses:
+        '200':
+          description: Token refreshed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: The new JWT access token.
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Invalid or expired refresh token.
+        '500':
+          description: Server error.
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logs out the current user
+      description: >
+        Invalidates the current refresh token (server-side) and clears
+        any authentication cookies. On the client side, the access token
+        should also be deleted.
+      operationId: logoutUser
+      security:
+        - bearerAuth: [ ]
+        - cookieAuth: [ ]
+      responses:
+        '204':
+          description: Logged out successfully (no content returned).
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '500':
+          description: Server error.
+  /me:
+    get:
+      tags:
+        - Users
+      summary: Get the currently authenticated user's details
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Current user details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '500':
+          description: Server error.
+
+
+    # ------ END Auth Endpoints ------
+
+
+
+
+
+    # ----- Project Endpoints -----
+
+
+  # ----- User Endpoints -----
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Get all users
+      description: >
+        Retrieves a list of all users in the system. Using provided filters.
+      parameters:
+        - name: role
+          in: query
+          description: Filter users by their role (CUSTOMER, TRANSLATOR, ADMIN)
+          required: false
+          schema:
+            $ref: '#/components/schemas/UserRole'
+        - name: languages
+          in: query
+          description: Filter users by a language they know (ISO code, e.g., "en" for English)
+          required: false
+          schema:
+            type: string
+            example: en
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '403':
+          description: Forbidden - insufficient permissions to access this resource.
+        '500':
+          description: Server error
+
+
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+
+
+
+
   /projects:
     post:
       tags:
@@ -101,28 +252,39 @@ paths:
           description: Not acceptable response representation.
         '500':
           description: Server error.
-  /users/{id}:
-    get:
-      tags:
-        - Users
-      summary: Get user by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: User found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '404':
-          description: User not found
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: refreshToken
+
   schemas:
     #----- Project Schemas -----
     CreateProjectRequest:
@@ -212,10 +374,10 @@ components:
         - ADMIN
 
     #----- Auth Schemas -----
-
     LoginUserRequest:
       type: object
       required: [ emailAddress, password ]
+      additionalProperties: false
       properties:
         emailAddress:
           type: string
@@ -223,7 +385,6 @@ components:
         password:
           type: string
           format: password
-
     RegisterUserRequest:
       oneOf:
         - $ref: '#/components/schemas/RegisterCustomerRequest'
@@ -233,10 +394,10 @@ components:
         mapping:
           customer: '#/components/schemas/RegisterCustomerRequest'
           translator: '#/components/schemas/RegisterTranslatorRequest'
-
     RegisterCustomerRequest:
       type: object
-      required: [name, emailAddress, password]
+      required: [ name, emailAddress, password ]
+      additionalProperties: false
       properties:
         type:
           type: string
@@ -250,10 +411,10 @@ components:
           type: string
           format: password
           minLength: 8
-
     RegisterTranslatorRequest:
       type: object
-      required: [name, emailAddress, password, languages]
+      required: [ name, emailAddress, password, languages ]
+      additionalProperties: false
       properties:
         type:
           type: string
@@ -271,5 +432,8 @@ components:
           type: array
           items:
             type: string
+
+
+    #
 
 

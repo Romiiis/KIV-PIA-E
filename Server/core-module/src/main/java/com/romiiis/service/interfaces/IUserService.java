@@ -5,7 +5,13 @@ import com.romiiis.domain.User;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * Service interface for managing users.
+ *
+ * @author Roman Pejs
+ */
 public interface IUserService {
+
     /**
      * Finds a user by their email address.
      *
@@ -16,6 +22,7 @@ public interface IUserService {
 
     /**
      * Creates a new customer with the given details.
+     * Saves the customer to the database and returns the created User object.
      *
      * @param name     the name of the customer
      * @param email    the email address of the customer
@@ -26,6 +33,7 @@ public interface IUserService {
 
     /**
      * Creates a new user with the given details.
+     * Saves the user to the database and returns the created User object.
      *
      * @param name     the name of the user
      * @param email    the email address of the user

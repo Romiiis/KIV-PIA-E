@@ -1,0 +1,103 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+
+% užší okraje, aby se vešly dlouhé cesty
+\geometry{margin=1.5cm}
+
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    frame=single,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=flexible,
+    keepspaces=true,
+    backgroundcolor=\color{gray!5},
+    captionpos=b
+}
+
+\begin{document}
+
+    \section*{REST API Endpoint Overview}
+
+    \subsection*{Base Information}
+    \begin{description}
+        \item[Base URL:] \texttt{/api/v1}
+        \item[Format:] \texttt{application/json}
+        \item[Authentication:] Bearer JWT (\texttt{Authorization: Bearer <token>})
+    \end{description}
+
+    \subsection*{Authentication}
+    \begin{lstlisting}
+POST   /auth/register         - Register new user (CUSTOMER or TRANSLATOR)
+POST   /auth/login            - Login user, returns access + refresh token
+POST   /auth/refresh          - Refresh access token
+POST   /auth/logout           - Logout, invalidate refresh token
+GET    /me                    - Get current logged-in user info
+    \end{lstlisting}
+
+    \subsection*{Users}
+    \begin{lstlisting}
+GET    /users                 - (ADMIN) List all users (filters: role, languageCode)
+GET    /users/{id}            - (ADMIN or SELF) Get user details
+PATCH  /users/{id}            - (ADMIN or SELF) Update user info
+    \end{lstlisting}
+
+    \subsection*{Translator Languages}
+    \begin{lstlisting}
+GET    /users/{id}/languages                     - (ADMIN or SELF) Get translator's languages
+PUT    /users/{id}/languages                     - (ADMIN or SELF) Replace all languages
+POST   /users/{id}/languages                     - (ADMIN or SELF) Add a new language
+DELETE /users/{id}/languages/{languageCode}      - (ADMIN or SELF) Remove a language
+    \end{lstlisting}
+
+    \subsection*{Projects}
+    \begin{lstlisting}
+POST   /projects                                 - (CUSTOMER) Create new project
+GET    /projects                                 - (CUSTOMER/TRANSLATOR/ADMIN) List projects
+GET    /projects/{id}                            - Get project details
+GET    /projects/{id}/original                   - Download original file
+GET    /projects/{id}/translation                - Download translated file
+PUT    /projects/{id}/translation                - (TRANSLATOR) Upload translated file (state → COMPLETED)
+POST   /projects/{id}/approval                   - (CUSTOMER) Approve translation (state → APPROVED)
+POST   /projects/{id}/rejection                  - (CUSTOMER) Reject translation + feedback
+POST   /projects/{id}/assignment                 - (ADMIN) Assign translator manually
+POST   /projects/{id}/messages                   - (ADMIN) Send message to customer/translator
+POST   /projects/{id}/close                      - (ADMIN) Close project (state → CLOSED)
+    \end{lstlisting}
+
+    \subsection*{Feedback}
+    \begin{lstlisting}
+GET    /projects/{id}/feedback                   - (CUSTOMER/TRANSLATOR/ADMIN) Get feedback
+GET    /feedbacks                                - (ADMIN) List all feedbacks (for review)
+    \end{lstlisting}
+
+    \subsection*{System}
+    \begin{lstlisting}
+GET    /health                                   - Health check
+GET    /api-docs                                 - OpenAPI spec (JSON)
+GET    /swagger-ui                               - Swagger UI
+    \end{lstlisting}
+
+    \subsection*{Project State Flow}
+    \begin{verbatim}
+CREATED → ASSIGNED → COMPLETED → APPROVED → CLOSED
+             ↓                 ↓
+          (no translator)     (rejected)
+             ↓                 ↓
+           CLOSED             CLOSED (after admin review)
+    \end{verbatim}
+
+    \subsection*{Common Query Parameters}
+    \begin{lstlisting}
+?state=ASSIGNED|COMPLETED|...
+?languageCode=es
+?hasFeedback=true
+?sort=-createdAt
+?page[size]=20&page[number]=1
+    \end{lstlisting}
+
+\end{document}

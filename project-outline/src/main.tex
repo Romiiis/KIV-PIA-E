@@ -6,7 +6,8 @@
 
 % Packages
 \usepackage{amsmath}
-
+\usepackage{listings}
+\usepackage{tabularx}
 
 
 % Document
@@ -16,9 +17,11 @@
     \date{\today}
     \maketitle
 
+
     \section{Forma řešení}
     Projekt bude rozdělen na client-server architekturu.
     Server bude poskytovat REST API pro komunikaci s klientem.
+
 
     \section{Rozdělení do modulů}
     \begin{itemize}
@@ -28,7 +31,9 @@
         \item \textbf{Auth module} - autentizace a autorizace uživatelů
     \end{itemize}
 
+
     \section{Moduly detailně}
+
     \subsection{Core module}
     \begin{itemize}
         \item Obsahuje datové struktury (doménové) viz Github
@@ -69,6 +74,11 @@
         \item Core modul může komunikovat se Storage modulem pro přístup k datům
         \item Výsledek je vrácen zpět UI modulu, který odpoví uživateli
     \end{itemize}
+
+
+
+    \newpage
+
 
 
 

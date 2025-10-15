@@ -13,6 +13,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+/**
+ * User domain object
+ * Represents a user of the system, either a customer or a translator
+ *
+ * @author Roman Pejs
+ */
 @Slf4j
 @Getter
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
@@ -152,8 +158,5 @@ public class User {
         this.hashedPassword = hashedPassword;
         return this;
     }
-
-
-
 
 }

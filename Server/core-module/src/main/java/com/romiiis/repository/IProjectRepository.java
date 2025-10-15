@@ -6,6 +6,11 @@ import com.romiiis.domain.Project;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Repository interface for managing Project entities.
+ *
+ * @author Roman Pejs
+ */
 public interface IProjectRepository {
     /**
      * Stores a project in the repository

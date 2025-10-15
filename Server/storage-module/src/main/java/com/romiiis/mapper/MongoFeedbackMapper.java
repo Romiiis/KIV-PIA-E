@@ -4,6 +4,10 @@ import com.romiiis.domain.Feedback;
 import com.romiiis.model.FeedbackDB;
 import org.mapstruct.Mapper;
 
+/**
+ * Mapper interface for converting between Feedback and FeedbackDB objects.
+ * Uses MapStruct for automatic implementation generation.
+ */
 @Mapper(componentModel = "spring")
 public interface MongoFeedbackMapper {
 
