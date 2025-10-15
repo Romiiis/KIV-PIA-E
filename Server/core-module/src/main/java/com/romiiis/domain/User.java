@@ -1,5 +1,9 @@
-package com.romiiis;
+package com.romiiis.domain;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
@@ -10,6 +14,9 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Slf4j
+@Getter
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@Builder
 public class User {
     private UUID id;
     private String name;
@@ -18,6 +25,8 @@ public class User {
     private Set<Locale> languages;
     private Instant createdAt;
 
+    private String hashedPassword;
+
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
@@ -25,6 +34,7 @@ public class User {
     public User(UUID id) {
         this.id = id;
     }
+
 
     // constructor used when referencing the full object
     private User(String name, String emailAddress, UserRole role, Set<Locale> languages) {
@@ -36,6 +46,9 @@ public class User {
         this.createdAt = Instant.now();
     }
 
+
+
+
     /**
      * Creates a new customer user.
      * <br><br>
@@ -45,7 +58,7 @@ public class User {
      *     <li>emailAddress must not be empty and it must be a valid email address</li>
      * </ol>
      *
-     * @param name Name of the customer
+     * @param name         Name of the customer
      * @param emailAddress Email address of the customer
      * @return New customer user
      */
@@ -76,9 +89,9 @@ public class User {
      *     <li>there must be at least one language</li>
      * </ol>
      *
-     * @param name Name of the translator
+     * @param name         Name of the translator
      * @param emailAddress Email address of the translator
-     * @param languages Set of languages the translator can translate to
+     * @param languages    Set of languages the translator can translate to
      * @return New translator user
      */
     public static User createTranslator(String name, String emailAddress, Set<Locale> languages) {
@@ -114,7 +127,7 @@ public class User {
      * </ol>
      *
      * @param targetLanguage Language to translate to
-     * @param sourceFile File to be translated
+     * @param sourceFile     File to be translated
      * @return New project
      */
     public Project createProject(Locale targetLanguage, byte[] sourceFile) {
@@ -134,29 +147,13 @@ public class User {
         return new Project(this, targetLanguage, sourceFile);
     }
 
-    //<editor-fold desc="getters" defaultstate="collapsed">
-    public UUID getId() {
-        return id;
+
+    public User withHashedPassword(String hashedPassword) {
+        this.hashedPassword = hashedPassword;
+        return this;
     }
 
-    public String getName() {
-        return name;
-    }
 
-    public String getEmailAddress() {
-        return emailAddress;
-    }
 
-    public UserRole getRole() {
-        return role;
-    }
 
-    public Set<Locale> getLanguages() {
-        return languages;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-    //</editor-fold>
 }

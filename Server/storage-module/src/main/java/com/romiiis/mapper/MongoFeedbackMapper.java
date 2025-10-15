@@ -1,11 +1,11 @@
-package com.romiiis.mappers;
+package com.romiiis.mapper;
 
-import com.romiiis.Feedback;
+import com.romiiis.domain.Feedback;
 import com.romiiis.model.FeedbackDB;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface FeedbackMapper {
+public interface MongoFeedbackMapper {
 
     /**
      * Maps a FeedbackDB object to a Feedback object.

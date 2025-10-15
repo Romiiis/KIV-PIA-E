@@ -14,6 +14,10 @@
 
     <artifactId>rest-api-module</artifactId>
     <packaging>jar</packaging>
+    <properties>
+        <openapi-generator.version>7.16.0</openapi-generator.version>
+        <swagger-annotations.version>2.2.38</swagger-annotations.version>
+    </properties>
 
     <dependencies>
 
@@ -21,6 +25,12 @@
         <dependency>
             <groupId>com.romiiis</groupId>
             <artifactId>core-module</artifactId>
+            <version>${app.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.romiiis</groupId>
+            <artifactId>storage-module</artifactId>
             <version>${app.version}</version>
         </dependency>
 
@@ -36,6 +46,21 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
+            <version>${swagger-annotations.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-core</artifactId>
+            <version>2.2.25</version>
+        </dependency>
+
 
     </dependencies>
 
@@ -45,6 +70,37 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${openapi-generator.version}</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/static/api.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <generateModelTests>false</generateModelTests>
+                            <generateModelDocumentation>false</generateModelDocumentation>
+                            <generateApiTests>false</generateApiTests>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <apiPackage>com.romiiis.controller</apiPackage>
+                            <modelNameSuffix>DTO</modelNameSuffix>
+                            <modelPackage>com.romiiis.model</modelPackage>
+
+                            <configOptions>
+                                <interfaceOnly>true</interfaceOnly>
+                                <openApiNullable>false</openApiNullable>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

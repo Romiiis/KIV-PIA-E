@@ -1,11 +1,11 @@
-package com.romiiis.mappers;
+package com.romiiis.mapper;
 
-import com.romiiis.User;
+import com.romiiis.domain.User;
 import com.romiiis.model.UserDB;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper {
+public interface MongoUserMapper {
     /**
      * Maps a UserDB object to a User object.
      *

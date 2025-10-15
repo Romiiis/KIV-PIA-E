@@ -1,18 +1,21 @@
-package com.romiiis;
+package com.romiiis.domain;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.time.Instant;
 import java.util.UUID;
 
-// NOTE: setters are intentionally not provided for the sake of encapsulation
+@Getter
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@Builder
 public class Feedback {
     private UUID id;
     private Project project;
     private String text;
     private Instant createdAt;
-
-    public Feedback(){
-
-    }
 
     // constructor used when referencing the object in other domain objects where only ID is known
     public Feedback(UUID id) {
@@ -26,18 +29,4 @@ public class Feedback {
         this.text = text;
         this.createdAt = Instant.now();
     }
-
-    //<editor-fold desc="getters" defaultstate="collapsed">
-    public Project getProject() {
-        return project;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-    //</editor-fold>
 }

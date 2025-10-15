@@ -1,0 +1,275 @@
+openapi: 3.0.3
+info:
+  title: KIV/PIA REST API
+  description: blah
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080/
+    description: Local development server
+tags:
+  - name: "Auth"
+    description: API endpoints used for authentication and user registration.
+  - name: Projects
+    description: API endpoints used for management of translation projects.
+  - name: Users
+    description: API endpoints used for management of users (customers, translators, admins).
+paths:
+  /login:
+    post:
+      tags:
+        - "Auth"
+      summary: Authenticates a user and returns a JWT token.
+      operationId: loginUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUserRequest'
+              required: true
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: Request body is not formatted correctly.
+        '401':
+          description: Invalid email or password.
+        '500':
+          description: Server error.
+  /register:
+    post:
+      tags:
+        - "Auth"
+      summary: Register a user and returns a JWT token.
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUserRequest'
+              required: true
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: Request body is not formatted correctly.
+        '401':
+          description: Invalid email or password.
+        '500':
+          description: Server error.
+  /projects:
+    post:
+      tags:
+        - Projects
+      summary: Creates a new project using the current user as the customer.
+      operationId: createProject
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProjectRequest"
+        required: true
+      responses:
+        '201':
+          description: Project was successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateProjectResponse"
+        '400':
+          description: Request body is not formatted correctly.
+        '403':
+          description: Current user is not authorized to create projects.
+        '405':
+          description: Unsupported HTTP method.
+        '406':
+          description: Not acceptable response representation.
+        '500':
+          description: Server error.
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+components:
+  schemas:
+    #----- Project Schemas -----
+    CreateProjectRequest:
+      type: object
+      properties:
+        languageCode:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: DE
+        originalFile:
+          type: string
+          format: binary
+      required:
+        - languageCode
+        - originalFile
+    CreateProjectResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        languageCode:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: DE
+        originalFile:
+          type: string
+          format: binary
+        state:
+          type: string
+          enum:
+            - CREATED
+            - ASSIGNED
+            - COMPLETED
+            - APPROVED
+            - CLOSED
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - languageCode
+        - originalFile
+        - state
+        - createdAt
+
+    #----- User Schemas -----
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        name:
+          type: string
+          example: "John Doe"
+        emailAddress:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+        role:
+          $ref: '#/components/schemas/UserRole'
+        languages:
+          type: array
+          items:
+            type: string
+            example: "en"
+          description: ISO language codes
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-10-15T09:33:20Z"
+      required:
+        - id
+        - name
+        - emailAddress
+        - role
+        - createdAt
+    UserRole:
+      type: string
+      enum:
+        - CUSTOMER
+        - TRANSLATOR
+        - ADMIN
+
+    #----- Auth Schemas -----
+
+    LoginUserRequest:
+      type: object
+      required: [ emailAddress, password ]
+      properties:
+        emailAddress:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    RegisterUserRequest:
+      oneOf:
+        - $ref: '#/components/schemas/RegisterCustomerRequest'
+        - $ref: '#/components/schemas/RegisterTranslatorRequest'
+      discriminator:
+        propertyName: type
+        mapping:
+          customer: '#/components/schemas/RegisterCustomerRequest'
+          translator: '#/components/schemas/RegisterTranslatorRequest'
+
+    RegisterCustomerRequest:
+      type: object
+      required: [name, emailAddress, password]
+      properties:
+        type:
+          type: string
+          example: customer
+        name:
+          type: string
+        emailAddress:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+
+    RegisterTranslatorRequest:
+      type: object
+      required: [name, emailAddress, password, languages]
+      properties:
+        type:
+          type: string
+          example: translator
+        name:
+          type: string
+        emailAddress:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+        languages:
+          type: array
+          items:
+            type: string
+
+

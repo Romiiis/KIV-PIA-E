@@ -1,4 +1,4 @@
-package com.romiiis;
+package com.romiiis.domain;
 
 /**
  * Possible roles of a {@link User}. Do not change the order!

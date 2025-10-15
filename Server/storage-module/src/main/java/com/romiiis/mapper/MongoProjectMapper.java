@@ -1,11 +1,11 @@
-package com.romiiis.mappers;
+package com.romiiis.mapper;
 
-import com.romiiis.Project;
+import com.romiiis.domain.Project;
 import com.romiiis.model.ProjectDB;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface ProjectMapper {
+public interface MongoProjectMapper {
 
     /**
      * Maps a ProjectDB object to a Project object.

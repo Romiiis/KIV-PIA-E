@@ -1,11 +1,18 @@
-package com.romiiis;
+package com.romiiis.domain;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
 
+@Getter
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@Builder
 @Slf4j
 public class Project {
     private UUID id;
@@ -19,10 +26,6 @@ public class Project {
 
     // MAX 5MB
     public static final int MAX_FILE_SIZE = 1024 * 1024 * 5;
-
-    public Project() {
-
-    }
 
     // constructor used when referencing the object in other domain objects where only ID is known
     public Project(UUID id) {

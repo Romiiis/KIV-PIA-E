@@ -1,4 +1,4 @@
-package com.romiiis;
+package com.romiiis.domain;
 
 /**
  * Possible states of a {@link Project}. Do not change the order!
