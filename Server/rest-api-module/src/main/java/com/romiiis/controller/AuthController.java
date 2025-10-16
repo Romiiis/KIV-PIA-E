@@ -39,7 +39,7 @@ public class AuthController implements AuthApi {
      * @return a ResponseEntity containing the login response with a JWT token if successful
      */
     @Override
-    public ResponseEntity<LoginUser200ResponseDTO> loginUser(LoginUserRequestDTO loginUserRequestDTO) {
+    public ResponseEntity<AuthJWTResponseDTO> loginUser(LoginUserRequestDTO loginUserRequestDTO) {
         String token;
         try {
 
@@ -56,7 +56,7 @@ public class AuthController implements AuthApi {
         }
 
         // return the generated token in the response
-        var responseDTO = new LoginUser200ResponseDTO().token(token);
+        var responseDTO = new AuthJWTResponseDTO().accessToken(token);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
@@ -73,7 +73,7 @@ public class AuthController implements AuthApi {
      * or an error status if registration fails
      */
     @Override
-    public ResponseEntity<LoginUser200ResponseDTO> registerUser(RegisterUserRequestDTO registerUserRequestDTO) {
+    public ResponseEntity<AuthJWTResponseDTO> registerUser(RegisterUserRequestDTO registerUserRequestDTO) {
 
         // variable to hold the generated token
         String token;
@@ -108,7 +108,17 @@ public class AuthController implements AuthApi {
         }
 
         // return the generated token in the response
-        var responseDTO = new LoginUser200ResponseDTO().token(token);
+        var responseDTO = new AuthJWTResponseDTO().accessToken(token);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<Void> logoutUser() {
+        return AuthApi.super.logoutUser();
+    }
+
+    @Override
+    public ResponseEntity<AuthJWTResponseDTO> refreshToken() {
+        return AuthApi.super.refreshToken();
     }
 }

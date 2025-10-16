@@ -38,11 +38,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  accessToken:
-                    type: string
-                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                $ref: '#/components/schemas/AuthJWTResponse'
         '400':
           description: Request body is not formatted correctly.
         '401':
@@ -70,11 +66,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  accessToken:
-                    type: string
-                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                $ref: '#/components/schemas/AuthJWTResponse'
         '400':
           description: Request body is not formatted correctly.
         '409':
@@ -92,19 +84,14 @@ paths:
         is verified server-side.
       operationId: refreshToken
       security:
-        - cookieAuth: [ ]   # nebo např. bearerAuth, pokud používáš header
+        - cookieAuth: [ ]
       responses:
         '200':
           description: Token refreshed successfully.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  accessToken:
-                    type: string
-                    description: The new JWT access token.
-                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                $ref: '#/components/schemas/AuthJWTResponse'
         '401':
           description: Invalid or expired refresh token.
         '500':
@@ -285,6 +272,10 @@ components:
       in: cookie
       name: refreshToken
 
+
+
+
+
   schemas:
     #----- Project Schemas -----
     CreateProjectRequest:
@@ -301,6 +292,8 @@ components:
       required:
         - languageCode
         - originalFile
+
+
     CreateProjectResponse:
       type: object
       properties:
@@ -433,7 +426,15 @@ components:
           items:
             type: string
 
+    ### AUTH RESPONSES ###
 
-    #
-
+    AuthJWTResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      required:
+        - accessToken
 
