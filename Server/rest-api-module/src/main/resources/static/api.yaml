@@ -152,6 +152,7 @@ paths:
       tags:
         - Users
       summary: Get all users
+      operationId: listAllUsers
       description: >
         Retrieves a list of all users in the system. Using provided filters.
       parameters:
@@ -174,22 +175,19 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/ListUsersResponse'
         '401':
           description: Unauthorized - no valid authentication token provided.
         '403':
           description: Forbidden - insufficient permissions to access this resource.
         '500':
           description: Server error
-
-
   /users/{id}:
     get:
       tags:
         - Users
       summary: Get user by ID
+      operationId: getUserDetails
       parameters:
         - name: id
           in: path
@@ -204,9 +202,85 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '403':
+          description: Forbidden - insufficient permissions to access this resource.
         '404':
           description: User not found
 
+  /users/{id}/languages:
+    get:
+      tags:
+        - Users
+      summary: Get languages known by a user
+      operationId: listUserLanguages
+      description: >
+        Retrieves the list of languages known by the specified user.
+        Accessible by ADMIN or the user themself (SELF).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Languages retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListLanguagesResponse'
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '403':
+          description: Forbidden - insufficient permissions to access this resource.
+        '404':
+          description: User not found
+
+    put:
+      tags:
+        - Users
+      summary: Replace all languages of a user
+      operationId: replaceUserLanguages
+      description: >
+        Replaces all existing languages of the specified user with a new set.
+        Accessible by ADMIN or the user themself (SELF).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplaceLanguagesRequest'
+      responses:
+        '200':
+          description: Languages replaced successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListLanguagesResponse'
+        '400':
+          description: Invalid input data.
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '403':
+          description: Forbidden - insufficient permissions to modify this resource.
+        '404':
+          description: User not found.
+        '405':
+          description: Unsupported HTTP method.
+        '500':
+          description: Internal server error.
 
 
 
@@ -228,7 +302,49 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateProjectResponse"
+                $ref: "#/components/schemas/Project"
+        '400':
+          description: Request body is not formatted correctly.
+        '403':
+          description: Current user is not authorized to create projects.
+        '405':
+          description: Unsupported HTTP method.
+        '406':
+          description: Not acceptable response representation.
+        '500':
+          description: Server error.
+    get:
+      tags:
+        - Projects
+      summary: List all projects with optional filters.
+      operationId: listAllProjects
+      parameters:
+        - in: query
+          name: state
+          schema:
+            $ref: '#/components/schemas/ProjectState'
+          description: Filter projects by their state.
+        - in: query
+          name: languageCode
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 2
+            description: Filter projects by target language (ISO 639-1 code).
+        - in: query
+          name: hasFeedback
+          schema:
+            type: boolean
+            description: Filter projects based on whether they have feedback.
+
+
+      responses:
+        '201':
+          description: Project was successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
         '400':
           description: Request body is not formatted correctly.
         '403':
@@ -277,55 +393,6 @@ components:
 
 
   schemas:
-    #----- Project Schemas -----
-    CreateProjectRequest:
-      type: object
-      properties:
-        languageCode:
-          type: string
-          minLength: 2
-          maxLength: 2
-          example: DE
-        originalFile:
-          type: string
-          format: binary
-      required:
-        - languageCode
-        - originalFile
-
-
-    CreateProjectResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        languageCode:
-          type: string
-          minLength: 2
-          maxLength: 2
-          example: DE
-        originalFile:
-          type: string
-          format: binary
-        state:
-          type: string
-          enum:
-            - CREATED
-            - ASSIGNED
-            - COMPLETED
-            - APPROVED
-            - CLOSED
-        createdAt:
-          type: string
-          format: date-time
-      required:
-        - id
-        - languageCode
-        - originalFile
-        - state
-        - createdAt
-
     #----- User Schemas -----
     User:
       type: object
@@ -365,6 +432,45 @@ components:
         - CUSTOMER
         - TRANSLATOR
         - ADMIN
+    
+    #??? MAYBE HEADERS ???
+    UserHeader:
+      type: object
+      description: A lightweight user representation for headers
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        name:
+          type: string
+          example: "John Doe"
+        role:
+          $ref: '#/components/schemas/UserRole'
+      required:
+        - id
+        - name
+        - role
+    ### USER REQUESTS ###
+    ReplaceLanguagesRequest:
+      type: array
+      items:
+        type: string
+        example: en
+    ### USER RESPONSES ###
+    ListUsersResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
+    ListLanguagesResponse:
+      type: array
+      items:
+        type: string
+        example: en
+
+
+
+
 
     #----- Auth Schemas -----
     LoginUserRequest:
@@ -425,9 +531,7 @@ components:
           type: array
           items:
             type: string
-
     ### AUTH RESPONSES ###
-
     AuthJWTResponse:
       type: object
       properties:
@@ -437,4 +541,69 @@ components:
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
       required:
         - accessToken
+
+
+
+    #----- Project Schemas -----
+    Project:
+      type: object
+      properties:
+        projectId:
+          type: string
+          format: uuid
+          description: Unique identifier of the created project
+        languageCode:
+          type: string
+          example: "de"
+        customer:
+          $ref:
+            '#/components/schemas/User'
+        translator:
+          $ref:
+            '#/components/schemas/User'
+        state:
+          $ref: '#/components/schemas/ProjectState'
+        createdAt:
+          type: string
+          format: date-time
+
+
+
+    ProjectState:
+      type: string
+      enum:
+        - CREATED
+        - ASSIGNED
+        - COMPLETED
+        - APPROVED
+        - CLOSED
+
+    ### PROJECT REQUESTS ###
+    CreateProjectRequest:
+      type: object
+      required: [ languageCode, content ]
+      additionalProperties: false
+      properties:
+        customerId:
+          type: string
+          format: uuid
+          description: >
+            ID of the customer creating the project.  
+            Optional — will use the authenticated user if omitted.
+        languageCode:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: "de"
+          description: Target language ISO 639-1 code.
+        content:
+          type: string
+          format: binary
+          description: Source file or text content to translate.
+
+    ### PROJECT RESPONSES ###
+    ListProjectsResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Project'
 

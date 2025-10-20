@@ -1,4 +1,4 @@
-package com.romiiis.security.jwt;
+package com.romiiis.service.interfaces;
 
 import java.time.Instant;
 import java.util.Optional;
