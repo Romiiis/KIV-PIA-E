@@ -162,7 +162,7 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/UserRole'
-        - name: languages
+        - name: language
           in: query
           description: Filter users by a language they know (ISO code, e.g., "en" for English)
           required: false
@@ -292,7 +292,7 @@ paths:
       operationId: createProject
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: "#/components/schemas/CreateProjectRequest"
         required: true
@@ -324,6 +324,7 @@ paths:
           schema:
             $ref: '#/components/schemas/ProjectState'
           description: Filter projects by their state.
+          required: false
         - in: query
           name: languageCode
           schema:
@@ -331,24 +332,24 @@ paths:
             minLength: 2
             maxLength: 2
             description: Filter projects by target language (ISO 639-1 code).
+          required: false
         - in: query
           name: hasFeedback
           schema:
             type: boolean
             description: Filter projects based on whether they have feedback.
+          required: false
 
 
       responses:
-        '201':
-          description: Project was successfully created.
+        '200':
+          description: Projects retrieved successfully.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Project"
-        '400':
-          description: Request body is not formatted correctly.
+                $ref: "#/components/schemas/ListProjectsResponse"
         '403':
-          description: Current user is not authorized to create projects.
+          description: Current user is not authorized to list projects.
         '405':
           description: Unsupported HTTP method.
         '406':
@@ -548,11 +549,11 @@ components:
     Project:
       type: object
       properties:
-        projectId:
+        id:
           type: string
           format: uuid
           description: Unique identifier of the created project
-        languageCode:
+        targetLanguage:
           type: string
           example: "de"
         customer:
@@ -599,7 +600,7 @@ components:
         content:
           type: string
           format: binary
-          description: Source file or text content to translate.
+          description: Text content to be translated.
 
     ### PROJECT RESPONSES ###
     ListProjectsResponse:

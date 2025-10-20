@@ -1,6 +1,7 @@
 package com.romiiis.repository;
 
 
+import com.romiiis.configuration.ProjectsFilter;
 import com.romiiis.domain.Project;
 
 import java.util.List;
@@ -16,14 +17,14 @@ public interface IProjectRepository {
      * Stores a project in the repository
      * @param project project to store
      */
-    void store(Project project);
+    void save(Project project);
 
     /**
      * Fetches all projects, no matter their state
      *
      * @return all projects
      */
-    List<Project> getAll();
+    List<Project> getAll(ProjectsFilter filter);
 
     /**
      * Finds a project by its ID

@@ -4,6 +4,8 @@ import com.romiiis.domain.Project;
 import com.romiiis.model.ProjectDB;
 import org.mapstruct.Mapper;
 
+import java.util.List;
+
 /**
  * Mapper interface for converting between Project and ProjectDB objects.
  * Uses MongoUserMapper for nested user mappings.
@@ -24,6 +26,14 @@ public interface MongoProjectMapper {
      * @return the mapped ProjectDB object
      */
     ProjectDB mapDomainToDB(Project project);
+
+
+    /**
+     * Maps a list of ProjectDB objects to a list of Project objects.
+     * @param projectDBs the list of ProjectDB objects to be mapped
+     * @return the list of mapped Project objects
+     */
+    List<Project> mapDBListToDomain(List<ProjectDB> projectDBs);
 
 
 }

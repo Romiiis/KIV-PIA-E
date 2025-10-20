@@ -1,10 +1,16 @@
 package com.romiiis.repository.impl;
 
+import com.romiiis.configuration.ProjectMongoFilter;
+import com.romiiis.configuration.ProjectsFilter;
 import com.romiiis.domain.Project;
 import com.romiiis.mapper.MongoProjectMapper;
+import com.romiiis.model.ProjectDB;
 import com.romiiis.repository.IProjectRepository;
 import com.romiiis.repository.mongo.MongoProjectRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,6 +31,8 @@ public class ProjectRepositoryImpl implements IProjectRepository {
      */
     private final MongoProjectRepository mongoRepo;
     private final MongoProjectMapper mapper;
+    private final MongoTemplate mongoTemplate;
+
 
     /**
      * Stores a project in the MongoDB database.
@@ -32,7 +40,7 @@ public class ProjectRepositoryImpl implements IProjectRepository {
      * @param project the project to be stored
      */
     @Override
-    public void store(Project project) {
+    public void save(Project project) {
         mongoRepo.save(mapper.mapDomainToDB(project));
     }
 
@@ -42,11 +50,12 @@ public class ProjectRepositoryImpl implements IProjectRepository {
      * @return a list of all projects
      */
     @Override
-    public List<Project> getAll() {
-        return mongoRepo.findAll()
-                .stream()
-                .map(mapper::mapDBToDomain)
-                .collect(Collectors.toList());
+    public List<Project> getAll(ProjectsFilter filter) {
+        Criteria criteria = ProjectMongoFilter.toCriteria(filter);
+        Query query = new Query(criteria);
+
+        List<ProjectDB> dbProjects = mongoTemplate.find(query, ProjectDB.class);
+        return mapper.mapDBListToDomain(dbProjects);
     }
 
     /**

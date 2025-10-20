@@ -4,6 +4,8 @@ import com.romiiis.domain.User;
 import com.romiiis.model.UserDB;
 import org.mapstruct.Mapper;
 
+import java.util.List;
+
 /**
  * Mapper interface for converting between User and UserDB objects.
  * Uses MapStruct for automatic mapping.
@@ -25,4 +27,12 @@ public interface MongoUserMapper {
      * @return the mapped UserDB object
      */
     UserDB mapDomainToDB(User user);
+
+    /**
+     * Maps a list of UserDB objects to a list of User objects.
+     *
+     * @param userDBs the list of UserDB objects to be mapped
+     * @return the mapped list of User objects
+     */
+    List<User> mapDBListToDomain(List<UserDB> userDBs);
 }

@@ -1,8 +1,12 @@
 package com.romiiis.repository;
 
+import com.romiiis.configuration.UsersFilter;
 import com.romiiis.domain.User;
 import com.romiiis.domain.UserRole;
 
+import java.awt.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -15,14 +19,14 @@ public interface IUserRepository {
      * @param id user ID
      * @return user with the given ID, or null if not found
      */
-    User getUserById(UUID id);
+    Optional<User> getUserById(UUID id);
 
     /**
      * Fetches a user by their email
      * @param email user email
      * @return user with the given email, or null if not found
      */
-    User getUserByEmail(String email);
+    Optional<User> getUserByEmail(String email);
 
     /**
      * Saves a user to the repository
@@ -54,4 +58,11 @@ public interface IUserRepository {
      */
     boolean emailInUse(String email);
 
+
+    /**
+     * Fetches all users with optional filtering
+     * @param filter filter criteria
+     * @return list of users matching the filter
+     */
+    List<User> getAllUsers(UsersFilter filter);
 }

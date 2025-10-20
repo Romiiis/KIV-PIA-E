@@ -28,11 +28,15 @@ public class DefaultAuthServiceImpl implements IAuthService {
 
     @Override
     public String login(String email, String hashPassword) throws EmailInUseException {
+
         // validate credentials
         validateEmailForm(email);
 
+
         boolean exists = userRepository.userExists(email, hashPassword);
+
         if (!exists) {
+
             log.warn("Auth failed: Invalid credentials for email {}", email);
             throw new InvalidAuthCredentialsException();
         } else {

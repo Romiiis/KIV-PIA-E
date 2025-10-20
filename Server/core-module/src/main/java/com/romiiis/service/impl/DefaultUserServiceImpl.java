@@ -1,15 +1,16 @@
 package com.romiiis.service.impl;
 
 
+import com.romiiis.configuration.UsersFilter;
 import com.romiiis.domain.User;
+import com.romiiis.exception.UserNotFoundException;
 import com.romiiis.repository.IUserRepository;
 import com.romiiis.service.interfaces.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Default implementation of the IUserService interface.
@@ -33,8 +34,16 @@ public class DefaultUserServiceImpl implements IUserService {
      * @return the User with the given email, or null if not found
      */
     @Override
-    public User getUserByEmail(String email) {
-        return userRepository.getUserByEmail(email);
+    public User getUserByEmail(String email) throws UserNotFoundException {
+
+        Optional<User> userOpt = userRepository.getUserByEmail(email);
+
+        if (userOpt.isEmpty()) {
+            log.warn("User with email {} not found", email);
+            throw new UserNotFoundException("User with email " + email + " not found");
+
+        }
+        return userOpt.get();
     }
 
 
@@ -48,12 +57,20 @@ public class DefaultUserServiceImpl implements IUserService {
      * @return the created User object
      */
     @Override
-    public User createNewCustomer(String name, String email, String password) {
+    public User createNewCustomer(String name, String email, String password) throws UserNotFoundException {
 
         User newUser = User.createCustomer(name, email).withHashedPassword(password);
         userRepository.saveUser(newUser);
+
+        // Try to fetch the user back to ensure it was saved correctly
+        Optional<User> savedUserOpt = userRepository.getUserByEmail(email);
+
+        if (savedUserOpt.isEmpty()) {
+            log.error("Failed to retrieve newly created customer with email {}", email);
+            throw new UserNotFoundException("Failed to retrieve newly created customer");
+        }
         log.info("New customer created: {}", newUser.getEmailAddress());
-        return newUser;
+        return savedUserOpt.get();
     }
 
 
@@ -68,12 +85,40 @@ public class DefaultUserServiceImpl implements IUserService {
      * @return the created User object
      */
     @Override
-    public User createNewTranslator(String name, String email, Set<Locale> langs, String password) {
+    public User createNewTranslator(String name, String email, Set<Locale> langs, String password) throws UserNotFoundException {
         User newUser = User.createTranslator(name, email, langs).withHashedPassword(password);
         userRepository.saveUser(newUser);
+
+        Optional<User> savedUserOpt = userRepository.getUserByEmail(email);
+        if (savedUserOpt.isEmpty()) {
+            log.error("Failed to retrieve newly created translator with email {}", email);
+            throw new UserNotFoundException("Failed to retrieve newly created translator");
+        }
         log.info("New translator created: {}", newUser.getEmailAddress());
-        return newUser;
+        return savedUserOpt.get();
     }
 
 
+    /**
+     * Retrieves a user by their unique identifier.
+     *
+     * @param userId the UUID of the user to retrieve
+     * @return the User with the given ID, or null if not found
+     */
+    @Override
+    public User getUserById(UUID userId) {
+        Optional<User> userOpt = userRepository.getUserById(userId);
+        if (userOpt.isEmpty()) {
+            log.warn("User with ID {} not found", userId);
+            throw new UserNotFoundException("User with ID " + userId + " not found");
+        }
+        return userOpt.get();
+
+    }
+
+
+    @Override
+    public List<User> getAllUsers(UsersFilter filter) {
+        return userRepository.getAllUsers(filter);
+    }
 }

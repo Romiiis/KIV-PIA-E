@@ -1,0 +1,21 @@
+meta {
+  name: GetAllProjects
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{host}}/projects
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~languageCode: 
+  ~state: CREATED
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

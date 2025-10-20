@@ -1,4 +1,4 @@
-package com.romiiis.config;
+package com.romiiis.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;

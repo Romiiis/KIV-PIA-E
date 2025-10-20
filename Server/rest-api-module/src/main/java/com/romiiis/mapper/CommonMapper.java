@@ -1,6 +1,8 @@
 package com.romiiis.mapper;
 
+import com.romiiis.domain.ProjectState;
 import com.romiiis.domain.UserRole;
+import com.romiiis.model.ProjectStateDTO;
 import com.romiiis.model.UserRoleDTO;
 import org.mapstruct.Mapper;
 
@@ -87,4 +89,17 @@ public interface CommonMapper {
                 .collect(Collectors.toList());
 
     }
+
+    default String mapLocaleToString(Locale locale) {
+        return locale != null ? locale.toLanguageTag() : null;
+    }
+
+    default Locale mapStringToLocale(String code) {
+        return code != null ? Locale.forLanguageTag(code) : null;
+    }
+
+
+    ProjectState mapProjectStateDTOToDomain(ProjectStateDTO dto);
+
+    ProjectStateDTO mapDomainToProjectStateDTO(ProjectState domain);
 }

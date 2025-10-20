@@ -1,9 +1,11 @@
 package com.romiiis.repository.mongo;
 
+import com.romiiis.domain.User;
 import com.romiiis.model.UserDB;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -32,4 +34,11 @@ public interface MongoUserRepository extends MongoRepository<UserDB, UUID> {
      */
     boolean existsByEmailAddress(String emailAddress);
 
+    /**
+     * Finds a user by their email address.
+     * (AUTO IMPLEMENTED by Spring Data MongoDB)
+     * @param email the email address of the user
+     * @return an Optional containing the UserDB if found, or empty if not found
+     */
+    Optional<UserDB> findByEmailAddress(String email);
 }
