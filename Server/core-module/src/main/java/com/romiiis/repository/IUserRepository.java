@@ -1,11 +1,11 @@
 package com.romiiis.repository;
 
-import com.romiiis.configuration.UsersFilter;
+import com.romiiis.filter.UsersFilter;
 import com.romiiis.domain.User;
 import com.romiiis.domain.UserRole;
 
-import java.awt.*;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,7 +32,7 @@ public interface IUserRepository {
      * Saves a user to the repository
      * @param user user to save
      */
-    void saveUser(User user);
+    void save(User user);
 
 
     /**
@@ -65,4 +65,13 @@ public interface IUserRepository {
      * @return list of users matching the filter
      */
     List<User> getAllUsers(UsersFilter filter);
+
+
+    /**
+     * Retrieves the list of languages associated with a user.
+     *
+     * @param userId the UUID of the user
+     * @return a list of language codes associated with the user
+     */
+    List<Locale> getUsersLanguages(UUID userId);
 }

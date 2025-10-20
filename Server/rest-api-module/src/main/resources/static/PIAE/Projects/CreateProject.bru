@@ -1,0 +1,30 @@
+meta {
+  name: CreateProject
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/projects
+  body: multipartForm
+  auth: inherit
+}
+
+body:json {
+  {
+    "customerId": "dc8a6f81-ed8e-4dee-ad2c-a42915e0b5b6",
+    "languageCode": "cz",
+    "content": "string"
+  }
+}
+
+body:multipart-form {
+  customerId: f9bf4d60-96a7-47f3-b624-ba273030b52e
+  languageCode: en
+  content: @file(bruno.json)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

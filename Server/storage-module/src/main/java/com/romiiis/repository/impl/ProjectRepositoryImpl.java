@@ -1,7 +1,7 @@
 package com.romiiis.repository.impl;
 
 import com.romiiis.configuration.ProjectMongoFilter;
-import com.romiiis.configuration.ProjectsFilter;
+import com.romiiis.filter.ProjectsFilter;
 import com.romiiis.domain.Project;
 import com.romiiis.mapper.MongoProjectMapper;
 import com.romiiis.model.ProjectDB;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of the IProjectRepository interface using MongoDB as the data store.

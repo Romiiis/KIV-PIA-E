@@ -1,0 +1,19 @@
+meta {
+  name: UploadTranslatedContent
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/projects/:id/translated
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+settings {
+  encodeUrl: true
+}

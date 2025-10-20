@@ -1,0 +1,20 @@
+meta {
+  name: GetProjectDetail
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{host}}/projects/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 72d0c756-7e49-4680-92d2-f04f376c487e
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

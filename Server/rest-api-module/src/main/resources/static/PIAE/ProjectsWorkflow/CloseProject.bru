@@ -1,0 +1,19 @@
+meta {
+  name: CloseProject
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/projects/:id/close
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+settings {
+  encodeUrl: true
+}

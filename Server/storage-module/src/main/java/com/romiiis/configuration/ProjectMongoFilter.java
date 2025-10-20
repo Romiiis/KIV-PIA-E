@@ -1,5 +1,6 @@
 package com.romiiis.configuration;
 
+import com.romiiis.filter.ProjectsFilter;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 /**

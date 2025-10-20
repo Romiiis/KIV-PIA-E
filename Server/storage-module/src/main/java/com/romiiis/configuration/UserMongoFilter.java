@@ -1,5 +1,6 @@
 package com.romiiis.configuration;
 
+import com.romiiis.filter.UsersFilter;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 public class UserMongoFilter {
@@ -16,7 +17,7 @@ public class UserMongoFilter {
             finalCriteria = finalCriteria.and("role").is(filter.getRole());
         }
 
-        if (filter.getLanguageCode() != null) {
+        if (filter.getLanguageCode() != null && !filter.getLanguageCode().isEmpty()) {
             finalCriteria = finalCriteria.and("languages").is(filter.getLanguageCode());
         }
 

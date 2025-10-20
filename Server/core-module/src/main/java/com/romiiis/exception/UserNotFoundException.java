@@ -4,6 +4,8 @@ import com.romiiis.configuration.ErrorCode;
 
 /**
  * Exception thrown when a user is not found in the system.
+ *
+ * @author Roman Pejs
  */
 public class UserNotFoundException extends BaseException {
     public UserNotFoundException(String message) {

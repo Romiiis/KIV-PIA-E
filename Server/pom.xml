@@ -16,6 +16,7 @@
         <module>core-module</module>
         <module>storage-module</module>
         <module>rest-api-module</module>
+        <module>filesystem-module</module>
     </modules>
 
     <!-- Common project properties -->

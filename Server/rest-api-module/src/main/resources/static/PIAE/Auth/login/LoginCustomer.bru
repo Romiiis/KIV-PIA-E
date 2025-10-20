@@ -1,0 +1,23 @@
+meta {
+  name: LoginCustomer
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "emailAddress":"MB@seznam.cz",
+      "password": "NIGGA"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,7 +1,7 @@
 package com.romiiis.repository;
 
 
-import com.romiiis.configuration.ProjectsFilter;
+import com.romiiis.filter.ProjectsFilter;
 import com.romiiis.domain.Project;
 
 import java.util.List;

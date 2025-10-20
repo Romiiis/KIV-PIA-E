@@ -1,0 +1,26 @@
+meta {
+  name: ReplaceUserLanguages
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{host}}/users/:id/languages
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 471c0673-b3ad-41f5-8947-df7e77fec0a7
+}
+
+body:json {
+  [
+    "en"
+  ]
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

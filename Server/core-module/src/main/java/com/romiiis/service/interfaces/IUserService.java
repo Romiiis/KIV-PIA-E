@@ -1,6 +1,6 @@
 package com.romiiis.service.interfaces;
 
-import com.romiiis.configuration.UsersFilter;
+import com.romiiis.filter.UsersFilter;
 import com.romiiis.domain.User;
 import com.romiiis.exception.UserNotFoundException;
 
@@ -62,5 +62,17 @@ public interface IUserService {
      * @return a list of users matching the filter criteria
      */
     List<User> getAllUsers(UsersFilter filter);
+
+
+    /**
+     * Retrieves the list of languages associated with a user.
+     *
+     * @param userId the UUID of the user
+     * @return a list of language codes associated with the user
+     */
+    List<Locale> getUsersLanguages(UUID userId) throws IllegalArgumentException;
+
+
+    Set<Locale> updateUserLanguages(UUID userId, Set<Locale> languages) throws UserNotFoundException;
 
 }

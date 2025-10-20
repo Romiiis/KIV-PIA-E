@@ -34,6 +34,12 @@
             <version>${app.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.romiiis</groupId>
+            <artifactId>filesystem-module</artifactId>
+            <version>${app.version}</version>
+        </dependency>
+
         <!-- Spring Boot Web (REST controllers, embedded server, etc.) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

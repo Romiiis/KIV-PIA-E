@@ -1,0 +1,27 @@
+meta {
+  name: RegisterTranslator
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/auth/register
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "name":"Miloš Barborka",
+      "emailAddress":"MB@seznam.cz",
+      "password": "NIGGA",
+      "languages": ["CZ","EN"],
+      "type": "translator"
+  
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

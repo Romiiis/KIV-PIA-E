@@ -1,13 +1,15 @@
 package com.romiiis.service.impl;
 
+import com.romiiis.domain.User;
 import com.romiiis.exception.EmailInUseException;
 import com.romiiis.exception.InvalidAuthCredentialsException;
+import com.romiiis.exception.UserNotFoundException;
 import com.romiiis.repository.IUserRepository;
 import com.romiiis.service.interfaces.IAuthService;
+import com.romiiis.service.interfaces.IJwtService;
 import com.romiiis.service.interfaces.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import java.util.Locale;
 import java.util.Set;
@@ -17,30 +19,40 @@ import java.util.Set;
  *
  * @author Roman Pejs
  */
-@Service
 @Slf4j
 @RequiredArgsConstructor
 public class DefaultAuthServiceImpl implements IAuthService {
 
-    /** Repositories & Services */
+    /**
+     * Repositories & Services
+     */
     private final IUserService userService;
     private final IUserRepository userRepository;
+    private final IJwtService jwtService;
 
+    /**
+     * Logs in a user with the given email and hashed password.
+     *
+     * @param email        the email address of the user
+     * @param hashPassword hashed password
+     * @return JWT token for the logged-in user
+     * @throws InvalidAuthCredentialsException if the credentials are invalid
+     * @throws EmailInUseException             if the email is already in use
+     */
     @Override
     public String login(String email, String hashPassword) throws EmailInUseException {
 
         // validate credentials
         validateEmailForm(email);
 
-
         boolean exists = userRepository.userExists(email, hashPassword);
 
         if (!exists) {
-
             log.warn("Auth failed: Invalid credentials for email {}", email);
             throw new InvalidAuthCredentialsException();
         } else {
-            return "JWT_TOKEN";
+            User user = userService.getUserByEmail(email);
+            return jwtService.generateToken(user.getId());
         }
     }
 
@@ -53,12 +65,11 @@ public class DefaultAuthServiceImpl implements IAuthService {
      * @return JWT token for the registered customer
      */
     @Override
-    public String registerCustomer(String name, String email, String hashPassword) throws InvalidAuthCredentialsException, EmailInUseException {
+    public String registerCustomer(String name, String email, String hashPassword) throws InvalidAuthCredentialsException, EmailInUseException, UserNotFoundException {
         validateEmailForm(email);
         validateEmailUsage(email);
-        userService.createNewCustomer(name, email, hashPassword);
-        return "JWT_TOKEN";
-
+        User u = userService.createNewCustomer(name, email, hashPassword);
+        return jwtService.generateToken(u.getId());
     }
 
     /**
@@ -71,7 +82,7 @@ public class DefaultAuthServiceImpl implements IAuthService {
      * @return JWT token for the registered translator
      */
     @Override
-    public String registerTranslator(String name, String email, Set<Locale> langs, String hashPassword) {
+    public String registerTranslator(String name, String email, Set<Locale> langs, String hashPassword) throws InvalidAuthCredentialsException, EmailInUseException, UserNotFoundException {
         validateEmailForm(email);
         validateEmailUsage(email);
         userService.createNewTranslator(name, email, langs, hashPassword);
@@ -84,22 +95,25 @@ public class DefaultAuthServiceImpl implements IAuthService {
      *
      * @param email the email address to validate
      * @throws InvalidAuthCredentialsException if the email format is invalid
-     * @throws EmailInUseException                     if the email is already in use
+     * @throws EmailInUseException             if the email is already in use
      */
-    private void validateEmailForm(String email) throws InvalidAuthCredentialsException, EmailInUseException {
+    private void validateEmailForm(String email) throws InvalidAuthCredentialsException {
         if (!email.contains("@") || email.trim().isEmpty()) {
             log.warn("Auth failed: Email {} is not valid", email);
             throw new InvalidAuthCredentialsException();
         }
     }
 
+    /**
+     * Validates if the email is already in use.
+     *
+     * @param email the email address to check
+     * @throws EmailInUseException if the email is already in use
+     */
     private void validateEmailUsage(String email) throws EmailInUseException {
         if (userRepository.emailInUse(email)) {
             log.warn("Registration failed: Email {} is already in use", email);
             throw new EmailInUseException();
         }
     }
-
-
-
 }

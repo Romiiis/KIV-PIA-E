@@ -1,0 +1,26 @@
+meta {
+  name: RegisterCustomer
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/auth/register
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "name":"Roman Pejs",
+      "emailAddress":"RP@seznam.cz",
+      "password": "NIGGA",
+      "type": "customer"
+  
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

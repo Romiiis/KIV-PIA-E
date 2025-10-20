@@ -1,14 +1,12 @@
 package com.romiiis.repository.impl;
 
-import com.romiiis.configuration.ProjectMongoFilter;
 import com.romiiis.configuration.UserMongoFilter;
-import com.romiiis.configuration.UsersFilter;
+import com.romiiis.filter.UsersFilter;
 import com.romiiis.domain.User;
 import com.romiiis.domain.UserRole;
-import com.romiiis.exception.UserNotFoundException;
 import com.romiiis.mapper.MongoUserMapper;
-import com.romiiis.model.ProjectDB;
 import com.romiiis.model.UserDB;
+import com.romiiis.model.UserRoleDB;
 import com.romiiis.repository.IUserRepository;
 import com.romiiis.repository.mongo.MongoUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +15,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Implementation of the IUserRepository interface using MongoDB.
@@ -71,7 +67,7 @@ public class UserRepositoryImpl implements IUserRepository {
      * @param user the User to save
      */
     @Override
-    public void saveUser(User user) {
+    public void save(User user) {
         mongoRepo.save(mapper.mapDomainToDB(user));
 
     }
@@ -84,7 +80,8 @@ public class UserRepositoryImpl implements IUserRepository {
      */
     @Override
     public UserRole getRoleById(UUID id) {
-        return null;
+        Optional<UserDB> userDBOpt = mongoRepo.findById(id);
+        return userDBOpt.map(db -> mapper.mapDBToDomain(db.getRole())).orElse(null);
     }
 
 
@@ -124,5 +121,21 @@ public class UserRepositoryImpl implements IUserRepository {
 
         List<UserDB> dbProjects = mongoTemplate.find(query, UserDB.class);
         return mapper.mapDBListToDomain(dbProjects);
+    }
+
+    /**
+     * Get the list of languages associated with a user.
+     * MUST be a translator.
+     * @param userId the UUID of the user
+     * @return a list of language codes associated with the user
+     */
+    @Override
+    public List<Locale> getUsersLanguages(UUID userId) {
+        Query query = new Query(Criteria.where("id").is(userId)
+                .and("role").is(UserRoleDB.TRANSLATOR));
+        query.fields().include("languages");
+
+        UserDB user = mongoTemplate.findOne(query, UserDB.class);
+        return user != null ? new ArrayList<>(user.getLanguages()) : List.of();
     }
 }

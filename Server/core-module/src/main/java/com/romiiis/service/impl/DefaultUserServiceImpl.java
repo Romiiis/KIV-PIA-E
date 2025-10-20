@@ -1,14 +1,14 @@
 package com.romiiis.service.impl;
 
 
-import com.romiiis.configuration.UsersFilter;
 import com.romiiis.domain.User;
+import com.romiiis.domain.UserRole;
 import com.romiiis.exception.UserNotFoundException;
+import com.romiiis.filter.UsersFilter;
 import com.romiiis.repository.IUserRepository;
 import com.romiiis.service.interfaces.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 
@@ -17,7 +17,6 @@ import java.util.*;
  *
  * @author Roman Pejs
  */
-@Service
 @RequiredArgsConstructor
 @Slf4j
 public class DefaultUserServiceImpl implements IUserService {
@@ -60,7 +59,7 @@ public class DefaultUserServiceImpl implements IUserService {
     public User createNewCustomer(String name, String email, String password) throws UserNotFoundException {
 
         User newUser = User.createCustomer(name, email).withHashedPassword(password);
-        userRepository.saveUser(newUser);
+        userRepository.save(newUser);
 
         // Try to fetch the user back to ensure it was saved correctly
         Optional<User> savedUserOpt = userRepository.getUserByEmail(email);
@@ -87,7 +86,7 @@ public class DefaultUserServiceImpl implements IUserService {
     @Override
     public User createNewTranslator(String name, String email, Set<Locale> langs, String password) throws UserNotFoundException {
         User newUser = User.createTranslator(name, email, langs).withHashedPassword(password);
-        userRepository.saveUser(newUser);
+        userRepository.save(newUser);
 
         Optional<User> savedUserOpt = userRepository.getUserByEmail(email);
         if (savedUserOpt.isEmpty()) {
@@ -117,8 +116,55 @@ public class DefaultUserServiceImpl implements IUserService {
     }
 
 
+    /**
+     * Fetches all users with optional filtering.
+     *
+     * @param filter the filter criteria for fetching users
+     * @return a list of users matching the filter criteria
+     */
     @Override
     public List<User> getAllUsers(UsersFilter filter) {
         return userRepository.getAllUsers(filter);
+    }
+
+    /**
+     * Retrieves the list of languages associated with a user.
+     *
+     * @param userId the UUID of the user
+     * @return a list of language codes associated with the user
+     */
+    @Override
+    public List<Locale> getUsersLanguages(UUID userId) throws IllegalArgumentException {
+
+        if (userRepository.getRoleById(userId) != UserRole.TRANSLATOR) {
+            log.error("User with ID {} is not a translator and has no associated languages", userId);
+            throw new IllegalArgumentException("User with ID " + userId + " is not a translator");
+        }
+
+        return userRepository.getUsersLanguages(userId);
+    }
+
+    /**
+     * Updates the set of languages associated with a user.
+     *
+     * @param userId    the UUID of the user
+     * @param languages the new set of languages to associate with the user
+     * @return the updated set of languages
+     * @throws UserNotFoundException if the user with the given ID does not exist
+     */
+    @Override
+    public Set<Locale> updateUserLanguages(UUID userId, Set<Locale> languages) throws UserNotFoundException {
+        User user = getUserById(userId);
+
+        if (user == null) {
+            log.error("User with ID {} not found for language update", userId);
+            throw new UserNotFoundException("User with ID " + userId + " not found");
+        }
+        user.setLanguages(languages);
+        userRepository.save(user);
+        log.info("Updated languages for user ID {}: {}", userId, languages);
+
+        user = getUserById(userId);
+        return user.getLanguages();
     }
 }

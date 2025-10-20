@@ -1,6 +1,6 @@
 package com.romiiis.controller;
 
-import com.romiiis.exception.BaseException;
+
 import com.romiiis.mapper.CommonMapper;
 import com.romiiis.model.*;
 import com.romiiis.service.interfaces.IAuthService;
@@ -40,24 +40,13 @@ public class AuthController implements AuthApi {
      */
     @Override
     public ResponseEntity<AuthJWTResponseDTO> loginUser(LoginUserRequestDTO loginUserRequestDTO) {
-        String token;
-        try {
+        String token = authService.login(
+                loginUserRequestDTO.getEmailAddress(),
+                loginUserRequestDTO.getPassword()
+        );
 
-            // authenticate user and generate token
-            token = authService.login(loginUserRequestDTO.getEmailAddress(), loginUserRequestDTO.getPassword());
-        } catch (BaseException e) {
-
-            // handle known exceptions
-            return new ResponseEntity<>(HttpStatus.valueOf(e.getHttpStatus().getCode()));
-        } catch (Exception e) {
-            // handle unexpected exceptions
-            log.error("Error during user login (500): {}", e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        // return the generated token in the response
         var responseDTO = new AuthJWTResponseDTO().accessToken(token);
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        return ResponseEntity.ok(responseDTO);
     }
 
     /**
@@ -74,51 +63,43 @@ public class AuthController implements AuthApi {
      */
     @Override
     public ResponseEntity<AuthJWTResponseDTO> registerUser(RegisterUserRequestDTO registerUserRequestDTO) {
-
-        // variable to hold the generated token
         String token;
-        try {
 
-            // determine the type of registration and call the appropriate service method
-            if (registerUserRequestDTO instanceof RegisterCustomerRequestDTO data) {
+        if (registerUserRequestDTO instanceof RegisterCustomerRequestDTO data) {
+            token = authService.registerCustomer(
+                    data.getName(),
+                    data.getEmailAddress(),
+                    data.getPassword()
+            );
 
-                // register customer
-                token = authService.registerCustomer(data.getName(), data.getEmailAddress(), data.getPassword());
+        } else if (registerUserRequestDTO instanceof RegisterTranslatorRequestDTO data) {
+            token = authService.registerTranslator(
+                    data.getName(),
+                    data.getEmailAddress(),
+                    commonMapper.mapListStringToSetLocale(data.getLanguages()),
+                    data.getPassword()
+            );
 
-            } else if (registerUserRequestDTO instanceof RegisterTranslatorRequestDTO data) {
-
-                // register translator
-                token = authService.registerTranslator(data.getName(), data.getEmailAddress(), commonMapper.mapListLanguages(data.getLanguages()), data.getPassword());
-
-            } else {
-
-                // unknown type
-                log.error("Unknown registration type (400): {}", registerUserRequestDTO.getClass().getName());
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-        } catch(BaseException e) {
-            // handle known exceptions
-            return new ResponseEntity<>(HttpStatus.valueOf(e.getHttpStatus().getCode()));
-        }
-        catch (Exception e) {
-            // handle unexpected exceptions
-            log.error("Error during user registration (500): {}", e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            log.warn("Unknown registration type: {}", registerUserRequestDTO.getClass().getName());
+            throw new IllegalArgumentException("Unknown registration type: " + registerUserRequestDTO.getClass().getSimpleName());
         }
 
-        // return the generated token in the response
         var responseDTO = new AuthJWTResponseDTO().accessToken(token);
-        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-    }
-
-    @Override
-    public ResponseEntity<Void> logoutUser() {
-        return AuthApi.super.logoutUser();
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
     @Override
     public ResponseEntity<AuthJWTResponseDTO> refreshToken() {
+        //TODO implement refresh token logic
         return AuthApi.super.refreshToken();
     }
+
+    @Override
+    public ResponseEntity<Void> logoutUser() {
+        //TODO implement logout logic
+        return AuthApi.super.logoutUser();
+    }
+
+
 }

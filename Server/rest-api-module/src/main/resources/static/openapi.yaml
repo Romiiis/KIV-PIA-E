@@ -7,19 +7,27 @@ servers:
   - url: http://localhost:8080/
     description: Local development server
 tags:
-  - name: "Auth"
+  - name: Auth
     description: API endpoints used for authentication and user registration.
   - name: Projects
     description: API endpoints used for management of translation projects.
   - name: Users
     description: API endpoints used for management of users (customers, translators, admins).
+  - name: Me
+    description: API endpoint to get details of the currently authenticated user.
+  - name: TranslatorsLanguage
+    description: API endpoints used for management of translator languages.
+  - name: ProjectsFeedback
+    description: API endpoints used for management of project feedback.
+  - name: ProjectsWorkflow
+    description: API endpoints used for managing project workflow (assignments, state transitions).
 paths:
 
   # ----- Auth Endpoints -----
   /auth/login:
     post:
       tags:
-        - "Auth"
+        - Auth
       summary: Authenticates a user and returns a JWT token.
       description: >
         Takes user credentials (email and password) and returns
@@ -48,7 +56,7 @@ paths:
   /auth/register:
     post:
       tags:
-        - "Auth"
+        - Auth
       summary: Register a user and returns a JWT token.
       operationId: registerUser
       description: >
@@ -116,10 +124,12 @@ paths:
           description: Unauthorized - no valid authentication token provided.
         '500':
           description: Server error.
+
+  # ---- Me Endpoint -----
   /me:
     get:
       tags:
-        - Users
+        - Me
       summary: Get the currently authenticated user's details
       operationId: getCurrentUser
       security:
@@ -209,10 +219,11 @@ paths:
         '404':
           description: User not found
 
+  # ----- Translator Language Endpoints -----
   /users/{id}/languages:
     get:
       tags:
-        - Users
+        - TranslatorsLanguage
       summary: Get languages known by a user
       operationId: listUserLanguages
       description: >
@@ -239,10 +250,9 @@ paths:
           description: Forbidden - insufficient permissions to access this resource.
         '404':
           description: User not found
-
     put:
       tags:
-        - Users
+        - TranslatorsLanguage
       summary: Replace all languages of a user
       operationId: replaceUserLanguages
       description: >
@@ -283,7 +293,7 @@ paths:
           description: Internal server error.
 
 
-
+  # ------ Project Endpoints -----
   /projects:
     post:
       tags:
@@ -356,6 +366,237 @@ paths:
           description: Not acceptable response representation.
         '500':
           description: Server error.
+  /projects/{id}:
+    get:
+      tags:
+        - Projects
+      summary: Get project by ID
+      operationId: getProjectDetails
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Project found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '403':
+          description: Forbidden - insufficient permissions to access this resource.
+        '404':
+          description: Project not found
+        '500':
+          description: Server error.
+  /projects/{id}/original:
+    get:
+      tags:
+        - Projects
+      summary: Download the original content of a project
+      operationId: downloadOriginalContent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Original content retrieved successfully.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '403':
+          description: Forbidden - insufficient permissions to access this resource.
+        '404':
+          description: Project not found.
+        '500':
+          description: Server error.
+  /projects/{id}/translated:
+    get:
+      tags:
+        - Projects
+      summary: Download the translated content of a project (customer, admin, or assigned translator can perform this)
+      operationId: downloadTranslatedContent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Translated content retrieved successfully.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '403':
+          description: Forbidden - insufficient permissions to access this resource.
+        '404':
+          description: Project not found.
+        '500':
+          description: Server error.
+    put:
+      tags:
+        - ProjectsWorkflow
+      summary: Upload translated content for a project (Only translator for this project can perform this )
+      operationId: uploadTranslatedContent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: Translated content uploaded successfully.
+        '400':
+          description: Invalid input data.
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '403':
+          description: Forbidden - insufficient permissions to modify this resource.
+        '404':
+          description: Project not found.
+        '500':
+          description: Server error.
+
+  /projects/{id}/approve:
+    post:
+      tags:
+        - ProjectsWorkflow
+      summary: Approve the translated content of a project (only customer who created the project can perform this)
+      operationId: approveTranslatedContent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Translated content approved successfully.
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '403':
+          description: Forbidden - insufficient permissions to modify this resource.
+        '404':
+          description: Project not found.
+        '500':
+          description: Server error.
+  /projects/{id}/reject:
+    post:
+      tags:
+        - ProjectsWorkflow
+      summary: Reject the translated content of a project (only customer who created the project can perform this)
+      operationId: rejectTranslatedContent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectFeedbackRequest'
+      responses:
+        '200':
+          description: Translated content rejected successfully.
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '403':
+          description: Forbidden - insufficient permissions to modify this resource.
+        '404':
+          description: Project not found.
+        '500':
+          description: Server error.
+  /projects/{id}/close:
+    post:
+      tags:
+        - ProjectsWorkflow
+      summary: Close a project (only admin can perform this)
+      operationId: closeProject
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Project closed successfully.
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '403':
+          description: Forbidden - insufficient permissions to modify this resource.
+        '404':
+          description: Project not found.
+        '500':
+          description: Server error.
+
+
+  # ------ Feedback Endpoints -----
+  /projects/{id}/feedback:
+    get:
+      tags:
+        - ProjectsFeedback
+      summary: Get feedback for a project
+      operationId: getProjectFeedback
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Feedback retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectFeedback'
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '403':
+          description: Forbidden - insufficient permissions to access this resource.
+        '404':
+          description: Project or feedback not found.
+        '500':
+          description: Server error.
+
+
+
 
 
 
@@ -496,7 +737,7 @@ components:
           translator: '#/components/schemas/RegisterTranslatorRequest'
     RegisterCustomerRequest:
       type: object
-      required: [ name, emailAddress, password ]
+      required: [ type, name, emailAddress, password ]
       additionalProperties: false
       properties:
         type:
@@ -513,7 +754,7 @@ components:
           minLength: 8
     RegisterTranslatorRequest:
       type: object
-      required: [ name, emailAddress, password, languages ]
+      required: [ type, name, emailAddress, password, languages ]
       additionalProperties: false
       properties:
         type:
@@ -556,6 +797,12 @@ components:
         targetLanguage:
           type: string
           example: "de"
+        originalFileName:
+          type: string
+          example: "document.txt"
+        translatedFileName:
+          type: string
+          example: "document_de.txt"
         customer:
           $ref:
             '#/components/schemas/User'
@@ -607,4 +854,31 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Project'
+
+
+    #------ Project Feedback Schemas -----
+    ProjectFeedback:
+      type: object
+      properties:
+        projectId:
+          type: string
+          format: uuid
+        text:
+          type: string
+          example: "This is horrible"
+        createdAt:
+          type: string
+          format: date-time
+      required: [ projectId, text ]
+
+    ### PROJECT FEEDBACK REQUESTS ###
+    ProjectFeedbackRequest:
+      type: object
+      required: [ text ]
+      additionalProperties: false
+      properties:
+        text:
+          type: string
+          example: "This is horrible"
+
 

@@ -1,9 +1,6 @@
 package com.romiiis.domain;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
@@ -28,6 +25,7 @@ public class User {
     private String name;
     private String emailAddress;
     private UserRole role;
+    @Setter
     private Set<Locale> languages;
     private Instant createdAt;
 
@@ -123,40 +121,10 @@ public class User {
         return new User(name, emailAddress, UserRole.TRANSLATOR, languages);
     }
 
-    /**
-     * Creates a new project.
-     * <br><br>
-     * REQUIREMENTS:
-     * <ol>
-     *     <li>this user must have the CUSTOMER role</li>
-     *     <li>sourceFile must not be empty and it must not be too big</li>
-     * </ol>
-     *
-     * @param targetLanguage Language to translate to
-     * @param sourceFile     File to be translated
-     * @return New project
-     */
-    public Project createProject(Locale targetLanguage, byte[] sourceFile) {
-        // TODO: check that this user is a CUSTOMER
-        // TODO: check that sourceFile is not empty but also not too big
-
-        if (this.getRole() != UserRole.CUSTOMER) {
-            log.error("User is not a customer");
-            throw new IllegalArgumentException("Only customers can create projects");
-        }
-
-        if (sourceFile == null || sourceFile.length == 0 || sourceFile.length > Project.MAX_FILE_SIZE) {
-            log.error("Source file is empty");
-            throw new IllegalArgumentException("Source file cannot be empty");
-        }
-
-        return new Project(this, targetLanguage, sourceFile);
-    }
-
-
     public User withHashedPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
         return this;
     }
+
 
 }

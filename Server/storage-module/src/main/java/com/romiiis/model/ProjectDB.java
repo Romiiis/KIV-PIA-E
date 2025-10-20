@@ -29,8 +29,8 @@ public class ProjectDB {
     private UserDB translator;
 
     private Locale targetLanguage;
-    private byte[] sourceFile;
-    private byte[] translatedFile;
+    private String originalFileName;
+    private String translatedFileName;
     private ProjectStateDB state;
     private Instant createdAt;
 

@@ -1,7 +1,9 @@
 package com.romiiis.mapper;
 
 import com.romiiis.domain.User;
+import com.romiiis.domain.UserRole;
 import com.romiiis.model.UserDB;
+import com.romiiis.model.UserRoleDB;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -35,4 +37,25 @@ public interface MongoUserMapper {
      * @return the mapped list of User objects
      */
     List<User> mapDBListToDomain(List<UserDB> userDBs);
+
+    /**
+     * Maps a UserRoleDB object to a UserRole object.
+     *
+     * @param userRoleDB the UserRoleDB object to be mapped
+     * @return the mapped UserRole object
+     */
+    UserRole mapDBToDomain(UserRoleDB userRoleDB);
+
+
+    /**
+     * Maps a UserRole object to a UserRoleDB object.
+     *
+     * @param userRole the UserRole object to be mapped
+     * @return the mapped UserRoleDB object
+     */
+    UserRoleDB mapDomainToDB(UserRole userRole);
+
+
+
+
 }

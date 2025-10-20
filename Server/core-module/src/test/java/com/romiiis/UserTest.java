@@ -97,46 +97,5 @@ class UserTest {
 
     }
 
-    @Nested
-    class createProject {
-
-        @DisplayName("Create project successfully")
-        @Test
-        void success() {
-            var user = User.createCustomer("John Doe", "john.doe@example.com");
-
-            var project = user.createProject(Locale.CHINESE, "Hello World!".getBytes(StandardCharsets.UTF_8));
-
-            assertAll(() -> {
-                assertEquals(user, project.getCustomer());
-                assertEquals(Locale.CHINESE, project.getTargetLanguage());
-                assertNotNull(project.getSourceFile());
-                assertNotNull(project.getCreatedAt());
-            });
-        }
-
-        // TODO: implement tests for unhappy scenarios
-        @DisplayName("Creating project unsuccessfully - user is not a customer")
-        @Test
-        void unsuccess_1() {
-            var user = User.createTranslator("Jane Doe", "jdoe@email.com", Set.of(Locale.GERMAN, Locale.FRENCH));
-
-            assertThrows(IllegalArgumentException.class, () -> user.createProject(Locale.CHINESE, "Hello World!".getBytes(StandardCharsets.UTF_8)));
-
-        }
-
-        @DisplayName("Creating project unsuccessfully - invalid source file")
-        @Test
-        void unsuccess_2() {
-            var user = User.createCustomer("John Doe", "jdoe@email.com");
-            assertThrows(IllegalArgumentException.class, () -> user.createProject(Locale.CHINESE, new byte[0]));
-
-            // Source file is null
-            assertThrows(IllegalArgumentException.class, () -> user.createProject(Locale.CHINESE, null));
-
-            // Source file is too big
-            assertThrows(IllegalArgumentException.class, () -> user.createProject(Locale.CHINESE, new byte[Project.MAX_FILE_SIZE + 1]));
-        }
-    }
 
 }

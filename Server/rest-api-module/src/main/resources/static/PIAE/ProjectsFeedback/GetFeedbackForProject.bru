@@ -1,0 +1,19 @@
+meta {
+  name: GetFeedbackForProject
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/projects/:id/feedback
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+settings {
+  encodeUrl: true
+}

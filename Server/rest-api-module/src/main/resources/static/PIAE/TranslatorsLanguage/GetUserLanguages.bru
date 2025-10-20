@@ -1,0 +1,20 @@
+meta {
+  name: GetUserLanguages
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/users/:id/languages
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 471c0673-b3ad-41f5-8947-df7e77fec0a7
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

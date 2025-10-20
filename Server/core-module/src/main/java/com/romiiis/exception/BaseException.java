@@ -3,6 +3,11 @@ package com.romiiis.exception;
 import com.romiiis.configuration.ErrorCode;
 import lombok.Getter;
 
+/**
+ * Base exception class for custom exceptions in the application.
+ *
+ * @author Roman Pejs
+ */
 @Getter
 public abstract class BaseException extends RuntimeException {
 

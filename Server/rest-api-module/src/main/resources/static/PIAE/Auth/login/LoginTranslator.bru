@@ -1,0 +1,23 @@
+meta {
+  name: LoginTranslator
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "emailAddress":"RP@seznam.cz",
+      "password": "NIGGA"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

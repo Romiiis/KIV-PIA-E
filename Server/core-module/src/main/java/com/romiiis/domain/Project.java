@@ -25,13 +25,11 @@ public class Project {
     private User customer;
     private User translator;
     private Locale targetLanguage;
-    private byte[] sourceFile;
-    private byte[] translatedFile;
+    private String originalFileName;
+    private String translatedFileName;
     private ProjectState state;
     private Instant createdAt;
 
-    // MAX 5MB
-    public static final int MAX_FILE_SIZE = 1024 * 1024 * 5;
 
     // constructor used when referencing the object in other domain objects where only ID is known
     public Project(UUID id) {
@@ -39,13 +37,12 @@ public class Project {
     }
 
     // constructor used when referencing the full object
-    public Project(User customer, Locale targetLanguage, byte[] sourceFile) {
+    public Project(User customer, Locale targetLanguage, String originalFileName) {
         this.id = UUID.randomUUID();
         this.customer = customer;
         this.translator = null;
         this.targetLanguage = targetLanguage;
-        this.sourceFile = sourceFile;
-        this.translatedFile = null;
+        this.originalFileName = originalFileName;
         this.state = ProjectState.CREATED;
         this.createdAt = Instant.now();
     }
@@ -107,22 +104,22 @@ public class Project {
      *     <li>translatedFile must not be empty and it must not be too big.</li>
      * </ol>
      *
-     * @param translatedFile The translated file to be uploaded
+     * @param translatedFileName The translated file to be uploaded
      * @throws IllegalStateException if the project is not in the correct state or if the translated file is invalid
      */
-    public void complete(byte[] translatedFile) {
+    public void complete(String translatedFileName) {
         if (this.getState() != ProjectState.ASSIGNED) {
             log.error("Project is not in state ASSIGNED");
             throw new IllegalStateException("Project cannot be completed");
         }
 
-        if (translatedFile == null || translatedFile.length > MAX_FILE_SIZE || translatedFile.length == 0) {
+        if (translatedFileName == null) {
 
-            log.error("Translated file is empty or too big");
-            throw new IllegalStateException("Translated file is empty or too big");
+            log.error("Translated file name is empty");
+            throw new IllegalStateException("Translated file name is empty");
         }
 
-        this.translatedFile = translatedFile;
+        this.translatedFileName = translatedFileName;
         this.state = ProjectState.COMPLETED;
     }
 

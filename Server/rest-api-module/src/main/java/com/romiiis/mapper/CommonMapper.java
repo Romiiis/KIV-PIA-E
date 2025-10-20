@@ -60,22 +60,10 @@ public interface CommonMapper {
      * @param domain the UserRole to be mapped
      * @return the mapped UserRoleDTO, or null if the input is null
      */
-    default UserRoleDTO mapDomainToUserRoleDTO(UserRole domain) {
+    default UserRoleDTO mapUserRoleToUserRoleDTO(UserRole domain) {
         return domain == null ? null : UserRoleDTO.valueOf(domain.name());
     }
 
-
-    /**
-     * Maps a list of language tags (String) to a set of Locale objects.
-     *
-     * @param languages the list of language tags to be mapped
-     * @return the mapped set of Locale objects
-     */
-    default Set<Locale> mapListLanguages(List<String> languages) {
-        return languages.stream()
-                .map(Locale::forLanguageTag)
-                .collect(Collectors.toSet());
-    }
 
     /**
      * Maps a set of Locale objects to a list of language tags (String).
@@ -83,12 +71,27 @@ public interface CommonMapper {
      * @param languages the set of Locale objects to be mapped
      * @return the mapped list of language tags
      */
-    default List<String> mapSetLanguages(Set<Locale> languages) {
+    default List<String> mapListLocale(List<Locale> languages) {
         return languages.stream()
                 .map(Locale::toLanguageTag)
                 .collect(Collectors.toList());
 
     }
+
+    default Set<Locale> mapListStringToSetLocale(List<String> languages) {
+        return languages.stream()
+                .map(Locale::forLanguageTag)
+                .collect(Collectors.toSet());
+    }
+
+    default List<String> mapSetLocaleToListString(Set<Locale> languages) {
+        return languages.stream()
+                .map(Locale::toLanguageTag)
+                .collect(Collectors.toList());
+
+    }
+
+
 
     default String mapLocaleToString(Locale locale) {
         return locale != null ? locale.toLanguageTag() : null;
