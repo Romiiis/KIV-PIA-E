@@ -85,8 +85,8 @@ public class DefaultAuthServiceImpl implements IAuthService {
     public String registerTranslator(String name, String email, Set<Locale> langs, String hashPassword) throws InvalidAuthCredentialsException, EmailInUseException, UserNotFoundException {
         validateEmailForm(email);
         validateEmailUsage(email);
-        userService.createNewTranslator(name, email, langs, hashPassword);
-        return "JWT_TOKEN";
+        User u = userService.createNewTranslator(name, email, langs, hashPassword);
+        return jwtService.generateToken(u.getId());
     }
 
 

@@ -2,14 +2,12 @@ package com.romiiis.mapper;
 
 import com.romiiis.domain.Project;
 import com.romiiis.model.ProjectDTO;
-import com.romiiis.model.ProjectStateDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;
 
 /**
  * Mapper interface for Project-related data transformations.
- *
  * This interface is intended to define methods for mapping between
  * Project entities and their corresponding Data Transfer Objects (DTOs).
  *

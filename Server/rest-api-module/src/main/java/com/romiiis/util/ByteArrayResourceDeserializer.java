@@ -15,6 +15,7 @@ import java.util.Base64;
 public class ByteArrayResourceDeserializer extends JsonDeserializer<ByteArrayResource> {
     @Override
     public ByteArrayResource deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException {
+
         String binaryString = parser.getText();
 
         byte[] bytes = Base64.getDecoder().decode(binaryString);

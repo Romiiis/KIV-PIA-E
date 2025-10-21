@@ -10,8 +10,17 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 public class JwtProperties {
+
+
+    // Secret key for signing JWT tokens
     private String secret;
+
+    // Expiration time for access tokens in milliseconds
     private long accessExpirationMs;
+
+    // Expiration time for refresh tokens in milliseconds
     private long refreshExpirationMs;
+
+    // Issuer of the JWT tokens
     private String issuer;
 }

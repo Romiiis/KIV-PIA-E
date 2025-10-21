@@ -78,12 +78,24 @@ public interface CommonMapper {
 
     }
 
+    /**
+     * Maps a list of language tags (String) to a set of Locale objects.
+     *
+     * @param languages the list of language tags to be mapped
+     * @return the mapped set of Locale objects
+     */
     default Set<Locale> mapListStringToSetLocale(List<String> languages) {
         return languages.stream()
                 .map(Locale::forLanguageTag)
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Maps a set of Locale objects to a list of language tags (String).
+     *
+     * @param languages the set of Locale objects to be mapped
+     * @return the mapped list of language tags
+     */
     default List<String> mapSetLocaleToListString(Set<Locale> languages) {
         return languages.stream()
                 .map(Locale::toLanguageTag)
@@ -92,17 +104,41 @@ public interface CommonMapper {
     }
 
 
-
+    /**
+     * Maps a list of language tags (String) to a set of Locale objects.
+     *
+     * @param locale the language tag to be mapped
+     * @return the mapped Locale object
+     */
     default String mapLocaleToString(Locale locale) {
         return locale != null ? locale.toLanguageTag() : null;
     }
 
+    /**
+     * Maps a language tag (String) to a Locale object.
+     *
+     * @param code the language tag to be mapped
+     * @return the mapped Locale object
+     */
     default Locale mapStringToLocale(String code) {
         return code != null ? Locale.forLanguageTag(code) : null;
     }
 
 
+    /**
+     * Maps a ProjectStateDTO to a ProjectState.
+     *
+     * @param dto the ProjectStateDTO to be mapped
+     * @return the mapped ProjectState
+     */
     ProjectState mapProjectStateDTOToDomain(ProjectStateDTO dto);
 
+
+    /**
+     * Maps a ProjectState to a ProjectStateDTO.
+     *
+     * @param domain the ProjectState to be mapped
+     * @return the mapped ProjectStateDTO
+     */
     ProjectStateDTO mapDomainToProjectStateDTO(ProjectState domain);
 }

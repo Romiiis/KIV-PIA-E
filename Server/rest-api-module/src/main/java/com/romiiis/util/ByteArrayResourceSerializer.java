@@ -15,6 +15,7 @@ import java.util.Base64;
 public class ByteArrayResourceSerializer extends JsonSerializer<ByteArrayResource> {
     @Override
     public void serialize(ByteArrayResource value, JsonGenerator generator, SerializerProvider serializers) throws IOException {
+
         byte[] bytes = value.getByteArray();
 
         String base64String = Base64.getEncoder().encodeToString(bytes);
