@@ -1,0 +1,16 @@
+rules:
+  - path: /auth/**
+    method: "*"
+    access: permitAll
+
+  - path: /projects/**
+    method: GET
+    roles: [CUSTOMER, ADMIN]
+
+  - path: /projects/**
+    method: POST
+    roles: [CUSTOMER]
+
+  - path: /admin/**
+    method: "*"
+    roles: [ADMIN]
