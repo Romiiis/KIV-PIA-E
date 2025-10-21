@@ -7,12 +7,16 @@ meta {
 get {
   url: {{host}}/projects
   body: none
-  auth: inherit
+  auth: bearer
 }
 
 params:query {
   ~languageCode: 
   ~state: CREATED
+}
+
+auth:bearer {
+  token: {{bearer}}
 }
 
 settings {

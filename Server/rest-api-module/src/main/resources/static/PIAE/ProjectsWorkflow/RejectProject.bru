@@ -7,11 +7,15 @@ meta {
 post {
   url: {{host}}/projects/:id/reject
   body: json
-  auth: inherit
+  auth: bearer
 }
 
 params:path {
   id: 
+}
+
+auth:bearer {
+  token: {{bearer}}
 }
 
 body:json {

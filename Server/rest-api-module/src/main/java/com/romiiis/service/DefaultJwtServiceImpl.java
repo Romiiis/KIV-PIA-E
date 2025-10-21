@@ -9,16 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Default implementation of the IJwtService interface.
- * JWT (JSON Web Token) service for generating, validating, and managing JWT tokens.
- * JTI (JWT ID) blacklist is maintained to invalidate tokens when needed.
+ * Supports a single user role per JWT token.
+ *
  * @author Roman Pejs
  */
 @Slf4j
@@ -32,61 +29,56 @@ public class DefaultJwtServiceImpl implements IJwtService {
      */
     private final Map<String, Instant> blacklist = new ConcurrentHashMap<>();
 
-
-    /**
-     * Constructor initializing the JWT service with the given properties.
-     * @param props JWT configuration properties
-     */
     public DefaultJwtServiceImpl(JwtProperties props) {
         this.props = props;
         this.secretKey = Keys.hmacShaKeyFor(props.getSecret().getBytes(StandardCharsets.UTF_8));
     }
 
     /**
-     * Generates an access token for the given user ID.
+     * Generates an access token for the given user ID and role.
      *
-     * @param userId the user ID
-     * @return the generated JWT access token
+     * @param userId user identifier (UUID)
+     * @param role   single role (e.g. "ADMIN", "CUSTOMER", "TRANSLATOR")
+     * @return signed JWT access token
+     */
+    public String generateToken(UUID userId, String role) {
+        String jti = UUID.randomUUID().toString();
+        Instant expiresAt = Instant.now().plusMillis(props.getAccessExpirationMs());
+        return generateAccessToken(userId.toString(), jti, expiresAt, role);
+    }
+
+    /**
+     * Backward-compatible method (no role).
      */
     @Override
     public String generateToken(UUID userId) {
-
-        String jti = UUID.randomUUID().toString();
-        Instant expiresAt = Instant.now().plusMillis(props.getAccessExpirationMs());
-
-        return generateAccessToken(userId.toString(), jti, expiresAt);
+        return generateToken(userId, null);
     }
-
 
     /**
      * Generates an access token with the specified parameters.
      *
-     * @param subject   Subject of the token (e.g., user ID)
+     * @param subject   Subject of the token (user ID)
      * @param jti       Unique token identifier
-     * @param expiresAt Expiration time of the token
-     * @return the generated JWT access token
+     * @param expiresAt Expiration time
+     * @param role      single user role (nullable)
      */
-    private String generateAccessToken(String subject, String jti, Instant expiresAt) {
-        return Jwts.builder()
+    private String generateAccessToken(String subject, String jti, Instant expiresAt, String role) {
+        JwtBuilder builder = Jwts.builder()
                 .setSubject(subject)
                 .setId(jti)
                 .setIssuer(props.getIssuer())
                 .setIssuedAt(Date.from(Instant.now()))
                 .setExpiration(Date.from(expiresAt))
-                .claim("type", "access")
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
+                .claim("type", "access");
+
+        if (role != null) {
+            builder.claim("role", role);
+        }
+
+        return builder.signWith(secretKey, SignatureAlgorithm.HS256).compact();
     }
 
-    /**
-     * Generates a refresh token with the specified parameters.
-     *
-     * @param subject   Subject of the token (e.g., user ID)
-     * @param jti       Unique token identifier
-     * @param parentJti JTI of the parent access token (can be null)
-     * @param expiresAt Expiration time of the token
-     * @return the generated JWT refresh token
-     */
     @Override
     public String generateRefreshToken(String subject, String jti, String parentJti, Instant expiresAt) {
         JwtBuilder builder = Jwts.builder()
@@ -103,12 +95,6 @@ public class DefaultJwtServiceImpl implements IJwtService {
         return builder.signWith(secretKey, SignatureAlgorithm.HS256).compact();
     }
 
-    /**
-     * Validates the given JWT token.
-     *
-     * @param token the token to validate
-     * @return true if the token is valid, false otherwise
-     */
     @Override
     public boolean validateToken(String token) {
         try {
@@ -126,12 +112,6 @@ public class DefaultJwtServiceImpl implements IJwtService {
         }
     }
 
-    /**
-     * Parses the JWT token and returns the claims.
-     *
-     * @param token the token to parse
-     * @return the parsed JWS claims
-     */
     private Jws<Claims> parse(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
@@ -140,24 +120,27 @@ public class DefaultJwtServiceImpl implements IJwtService {
                 .parseClaimsJws(token);
     }
 
-
-    /**
-     * Retrieves the subject from the JWT token.
-     *
-     * @param token the JWT token
-     * @return the subject of the token
-     */
     @Override
     public String getSubjectFromToken(String token) {
         return parse(token).getBody().getSubject();
     }
 
     /**
-     * Retrieves the JTI (JWT ID) from the JWT token.
+     * Extracts the user role from a JWT token.
      *
-     * @param token the JWT token
-     * @return an Optional containing the JTI if present, otherwise an empty Optional
+     * @param token JWT token
+     * @return the role (e.g. "ADMIN"), or empty if missing
      */
+    public Optional<String> getRoleFromToken(String token) {
+        try {
+            Claims claims = parse(token).getBody();
+            return Optional.ofNullable(claims.get("role", String.class));
+        } catch (Exception e) {
+            log.warn("Cannot extract role from token: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
     @Override
     public Optional<String> getJti(String token) {
         try {
@@ -167,34 +150,16 @@ public class DefaultJwtServiceImpl implements IJwtService {
         }
     }
 
-    /**
-     * Retrieves the expiration time from the JWT token.
-     *
-     * @param token the JWT token
-     * @return the expiration time as an Instant
-     */
     @Override
     public Instant getExpiration(String token) {
         return parse(token).getBody().getExpiration().toInstant();
     }
 
-    /**
-     * Checks if the JWT token is expired.
-     *
-     * @param token the JWT token
-     * @return true if the token is expired, false otherwise
-     */
     @Override
     public boolean isExpired(String token) {
         return getExpiration(token).isBefore(Instant.now());
     }
 
-
-    /**
-     * Invalidates the given JWT token by adding its JTI to the blacklist.
-     *
-     * @param token the JWT token to invalidate
-     */
     @Override
     public void invalidateToken(String token) {
         getJti(token).ifPresent(jti -> {
@@ -204,12 +169,6 @@ public class DefaultJwtServiceImpl implements IJwtService {
         });
     }
 
-    /**
-     * Checks if the token with the given JTI is invalidated.
-     *
-     * @param jti the JTI of the token
-     * @return true if the token is invalidated, false otherwise
-     */
     @Override
     public boolean isTokenInvalidated(String jti) {
         Instant exp = blacklist.get(jti);
@@ -219,16 +178,9 @@ public class DefaultJwtServiceImpl implements IJwtService {
             blacklist.remove(jti);
             return false;
         }
-
         return true;
     }
 
-    /**
-     * Retrieves the remaining lifetime of the JWT token in milliseconds.
-     *
-     * @param token the JWT token
-     * @return the remaining lifetime in milliseconds, or 0 if the token is invalid
-     */
     @Override
     public long getRemainingLifetime(String token) {
         try {

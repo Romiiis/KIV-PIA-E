@@ -31,7 +31,7 @@ paths:
       summary: Authenticates a user and returns a JWT token.
       description: >
         Takes user credentials (email and password) and returns
-        a JWT access token if the credentials are valid.
+        a JWT access token if the credentials are valid. (ANYBODY CAN ACCESS permitAll)
       operationId: loginUser
       requestBody:
         required: true
@@ -61,7 +61,7 @@ paths:
       operationId: registerUser
       description: >
         Registers a new user (customer or translator) and returns
-        a JWT access token upon successful registration.
+        a JWT access token upon successful registration. (ANYBODY CAN ACCESS permitAll)
       requestBody:
         required: true
         content:
@@ -89,7 +89,7 @@ paths:
       description: >
         Takes a valid refresh token (usually from HttpOnly cookie)
         and issues a new access token. The refresh token itself
-        is verified server-side.
+        is verified server-side. (ANYBODY CAN ACCESS permitAll)
       operationId: refreshToken
       security:
         - cookieAuth: [ ]
@@ -112,7 +112,7 @@ paths:
       description: >
         Invalidates the current refresh token (server-side) and clears
         any authentication cookies. On the client side, the access token
-        should also be deleted.
+        should also be deleted. (ALL ROLES USERS CAN ACCESS)
       operationId: logoutUser
       security:
         - bearerAuth: [ ]
@@ -131,6 +131,9 @@ paths:
       tags:
         - Me
       summary: Get the currently authenticated user's details
+      description: >
+        Retrieves the details of the currently authenticated user
+        based on the provided JWT access token. (ALL ROLES USERS CAN ACCESS)
       operationId: getCurrentUser
       security:
         - bearerAuth: [ ]
@@ -165,6 +168,7 @@ paths:
       operationId: listAllUsers
       description: >
         Retrieves a list of all users in the system. Using provided filters.
+        (ADMIN only can access this endpoint.)
       parameters:
         - name: role
           in: query
@@ -197,6 +201,9 @@ paths:
       tags:
         - Users
       summary: Get user by ID
+      description: >
+        Retrieves the details of a user by their unique ID.
+        (ADMIN can see any user; SELF can see their own details -> Every role can access this endpoint.)
       operationId: getUserDetails
       parameters:
         - name: id
@@ -228,7 +235,7 @@ paths:
       operationId: listUserLanguages
       description: >
         Retrieves the list of languages known by the specified user.
-        Accessible by ADMIN or the user themself (SELF).
+        (ADMIN or the translators themself (TRANSLATOR) can access this endpoint.)
       parameters:
         - name: id
           in: path
@@ -257,7 +264,7 @@ paths:
       operationId: replaceUserLanguages
       description: >
         Replaces all existing languages of the specified user with a new set.
-        Accessible by ADMIN or the user themself (SELF).
+        (Accessible by TRANSLATOR themselves)
       parameters:
         - name: id
           in: path
@@ -299,6 +306,9 @@ paths:
       tags:
         - Projects
       summary: Creates a new project using the current user as the customer.
+      description: >
+        Creates a new translation project with the provided target language and content.
+        The authenticated user is set as the customer for the project. (Only CUSTOMER can access this endpoint.)
       operationId: createProject
       requestBody:
         content:
@@ -327,6 +337,10 @@ paths:
       tags:
         - Projects
       summary: List all projects with optional filters.
+      description: >
+        Retrieves a list of all projects in the system, with optional filtering
+        by state, target language, and feedback presence. (ALL ROLES USERS CAN ACCESS)
+        Every user sees only projects they are authorized to view.
       operationId: listAllProjects
       parameters:
         - in: query
@@ -371,6 +385,9 @@ paths:
       tags:
         - Projects
       summary: Get project by ID
+      description: >
+        Retrieves the details of a project by its unique ID.
+        (ALL ROLES USERS CAN ACCESS this endpoint; user sees only projects they are authorized to view.)
       operationId: getProjectDetails
       parameters:
         - name: id
@@ -399,6 +416,9 @@ paths:
       tags:
         - Projects
       summary: Download the original content of a project
+      description: >
+        Retrieves the original content file of the specified project.
+        (customer  or assigned translator can perform this)
       operationId: downloadOriginalContent
       parameters:
         - name: id
@@ -428,6 +448,9 @@ paths:
       tags:
         - Projects
       summary: Download the translated content of a project (customer, admin, or assigned translator can perform this)
+      description: >
+        Retrieves the translated content file of the specified project.
+        (customer or assigned translator can perform this)
       operationId: downloadTranslatedContent
       parameters:
         - name: id
@@ -456,6 +479,9 @@ paths:
       tags:
         - ProjectsWorkflow
       summary: Upload translated content for a project (Only translator for this project can perform this )
+      description: >
+        Allows the assigned translator to upload the translated content file
+        for the specified project. (Only translator for this project can perform this )
       operationId: uploadTranslatedContent
       parameters:
         - name: id
@@ -490,6 +516,9 @@ paths:
       tags:
         - ProjectsWorkflow
       summary: Approve the translated content of a project (only customer who created the project can perform this)
+      description: >
+        Allows the customer who created the project to approve
+        the translated content, marking the project as approved. (only customer who created the project can perform this)
       operationId: approveTranslatedContent
       parameters:
         - name: id
@@ -514,6 +543,9 @@ paths:
       tags:
         - ProjectsWorkflow
       summary: Reject the translated content of a project (only customer who created the project can perform this)
+      description: >
+        Allows the customer who created the project to reject
+        the translated content, providing feedback for improvements. (only customer who created the project can perform this)
       operationId: rejectTranslatedContent
       parameters:
         - name: id
@@ -544,6 +576,9 @@ paths:
       tags:
         - ProjectsWorkflow
       summary: Close a project (only admin can perform this)
+      description: >
+        Close the project ultimately, marking it as closed.
+        (only admin can perform this)
       operationId: closeProject
       parameters:
         - name: id
@@ -571,6 +606,9 @@ paths:
       tags:
         - ProjectsFeedback
       summary: Get feedback for a project
+      description: >
+        Get the feedback associated with a specific project.
+        (EVERY ROLE can access this endpoint; user sees feedback only for projects they are authorized to view.)
       operationId: getProjectFeedback
       parameters:
         - name: id

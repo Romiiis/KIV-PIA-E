@@ -7,11 +7,15 @@ meta {
 get {
   url: {{host}}/users/:id
   body: none
-  auth: inherit
+  auth: bearer
 }
 
 params:path {
   id: 471c0673-b3ad-41f5-8947-df7e77fec0a7
+}
+
+auth:bearer {
+  token: {{bearer}}
 }
 
 settings {

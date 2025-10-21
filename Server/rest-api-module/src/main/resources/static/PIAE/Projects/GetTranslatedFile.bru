@@ -7,11 +7,15 @@ meta {
 get {
   url: {{host}}/projects/:id/translated
   body: none
-  auth: inherit
+  auth: bearer
 }
 
 params:path {
   id: 37a5e6c7-4219-4d67-b8da-20d210cbc63f
+}
+
+auth:bearer {
+  token: {{bearer}}
 }
 
 settings {

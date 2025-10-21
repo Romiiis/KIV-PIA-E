@@ -52,7 +52,7 @@ public class DefaultAuthServiceImpl implements IAuthService {
             throw new InvalidAuthCredentialsException();
         } else {
             User user = userService.getUserByEmail(email);
-            return jwtService.generateToken(user.getId());
+            return jwtService.generateToken(user.getId(), user.getRole().name());
         }
     }
 
@@ -69,7 +69,7 @@ public class DefaultAuthServiceImpl implements IAuthService {
         validateEmailForm(email);
         validateEmailUsage(email);
         User u = userService.createNewCustomer(name, email, hashPassword);
-        return jwtService.generateToken(u.getId());
+        return jwtService.generateToken(u.getId(), u.getRole().name());
     }
 
     /**
@@ -86,7 +86,7 @@ public class DefaultAuthServiceImpl implements IAuthService {
         validateEmailForm(email);
         validateEmailUsage(email);
         User u = userService.createNewTranslator(name, email, langs, hashPassword);
-        return jwtService.generateToken(u.getId());
+        return jwtService.generateToken(u.getId(), u.getRole().name());
     }
 
 

@@ -7,13 +7,18 @@ meta {
 get {
   url: {{host}}/projects/:id/feedback
   body: none
-  auth: inherit
+  auth: bearer
 }
 
 params:path {
   id: 
 }
 
+auth:bearer {
+  token: {{bearer}}
+}
+
 settings {
   encodeUrl: true
+  timeout: 0
 }

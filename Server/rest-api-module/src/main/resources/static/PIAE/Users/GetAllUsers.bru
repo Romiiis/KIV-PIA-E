@@ -7,12 +7,16 @@ meta {
 get {
   url: {{host}}/users
   body: none
-  auth: inherit
+  auth: bearer
 }
 
 params:query {
   ~role: CUSTOMER
   ~language: cz
+}
+
+auth:bearer {
+  token: {{bearer}}
 }
 
 settings {
