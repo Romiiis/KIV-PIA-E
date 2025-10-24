@@ -40,6 +40,7 @@ public class AuthController implements AuthApi {
      */
     @Override
     public ResponseEntity<AuthJWTResponseDTO> loginUser(LoginUserRequestDTO loginUserRequestDTO) {
+
         String token = authService.login(
                 loginUserRequestDTO.getEmailAddress(),
                 loginUserRequestDTO.getPassword()

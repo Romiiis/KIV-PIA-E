@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.io.IOException;
 
+/**
+ * Global exception handler for REST API.
+ *
+ * Handles various exceptions and maps them to appropriate HTTP responses.
+ */
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {

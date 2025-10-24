@@ -19,9 +19,11 @@ import java.util.UUID;
 @Builder
 public class Feedback {
     private UUID id;
-    private Project project;
+    private UUID projectId;
     private String text;
     private Instant createdAt;
+
+
 
     // constructor used when referencing the object in other domain objects where only ID is known
     public Feedback(UUID id) {
@@ -29,10 +31,12 @@ public class Feedback {
     }
 
     // constructor used when referencing the full object
-    public Feedback(Project project, String text) {
+    public Feedback(UUID projectId, String text) {
         this.id = UUID.randomUUID();
-        this.project = project;
+        this.projectId = projectId;
         this.text = text;
         this.createdAt = Instant.now();
     }
+
+
 }

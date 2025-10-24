@@ -69,4 +69,13 @@ public class ProjectRepositoryImpl implements IProjectRepository {
                 .map(mapper::mapDBToDomain)
                 .orElse(null);
     }
+
+    @Override
+    public List<String> getAllProjectIdsAsString() {
+        return mongoRepo.findAllIds()
+                .stream()
+                .map(p -> p.getId().toString())
+                .toList();
+    }
+
 }

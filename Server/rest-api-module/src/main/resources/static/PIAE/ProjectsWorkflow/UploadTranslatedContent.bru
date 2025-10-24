@@ -4,18 +4,26 @@ meta {
   seq: 1
 }
 
-post {
+put {
   url: {{host}}/projects/:id/translated
-  body: none
+  body: file
   auth: bearer
 }
 
 params:path {
-  id: 
+  id: dbdde8c7-1c14-47c2-a311-86fd2f801823
 }
 
 auth:bearer {
   token: {{bearer}}
+}
+
+body:multipart-form {
+  content: @file(C:\Users\romis\Documents\iPad Software License.rtf)
+}
+
+body:file {
+  file: @file(C:\Users\romis\Documents\iPad Software License.rtf) @contentType(application/rtf)
 }
 
 settings {

@@ -5,6 +5,10 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configuration properties for JWT (JSON Web Token) settings.
+ * This class maps properties prefixed with "app.jwt" from the application configuration.
+ */
 @Configuration
 @ConfigurationProperties(prefix = "app.jwt")
 @Getter

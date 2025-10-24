@@ -42,14 +42,13 @@ public interface IUserRepository {
      */
     UserRole getRoleById(UUID id);
 
-
     /**
-     * Checks if a user exists with the given email and hashed password
-     * @param email user email
-     * @param hashedPassword user's hashed password
-     * @return true if a user exists with the given email and hashed password, false otherwise
+     * Retrieves the password hash for a user by their email.
+     *
+     * @param email email of the user
+     * @return password hash of the user
      */
-    boolean userExists(String email, String hashedPassword);
+    Optional<String> getUserPasswordHash(String email);
 
     /**
      * Checks if an email is already in use by another user

@@ -1,13 +1,13 @@
 package com.romiiis.service.interfaces;
 
 
+import com.romiiis.configuration.ResourceHeader;
 import com.romiiis.domain.Project;
 import com.romiiis.exception.FileNotFoundException;
 import com.romiiis.exception.FileStorageException;
 import com.romiiis.exception.ProjectNotFoundException;
 import com.romiiis.exception.UserNotFoundException;
 import com.romiiis.filter.ProjectsFilter;
-import org.springframework.core.io.Resource;
 
 import java.util.List;
 import java.util.Locale;
@@ -44,7 +44,7 @@ public interface IProjectService {
      * @param sourceFile     source file to translate
      * @return newly created project
      */
-    Project createProject(UUID customerId, Locale targetLanguage, Resource sourceFile) throws ProjectNotFoundException, UserNotFoundException, FileStorageException, IllegalArgumentException;
+    Project createProject(UUID customerId, Locale targetLanguage, ResourceHeader sourceFile) throws ProjectNotFoundException, UserNotFoundException, FileStorageException, IllegalArgumentException;
 
 
     /**
@@ -53,11 +53,24 @@ public interface IProjectService {
      * @param projectId The ID of the project.
      * @return The byte array of the original file data.
      */
-    Resource getOriginalFile(UUID projectId) throws ProjectNotFoundException, FileStorageException;
+    ResourceHeader getOriginalFile(UUID projectId) throws ProjectNotFoundException, FileStorageException;
 
 
 
-    Resource getTranslatedFile(UUID projectId) throws ProjectNotFoundException, FileStorageException, FileNotFoundException;
+    ResourceHeader getTranslatedFile(UUID projectId) throws ProjectNotFoundException, FileStorageException, FileNotFoundException;
+
+    /**
+     * Updates an existing project.
+     *
+     * @param project the project to be updated
+     */
+    void updateProject(Project project) throws ProjectNotFoundException;
 
 
+    /**
+     * Retrieves all project IDs as strings.
+     *
+     * @return A list of all project IDs in string format.
+     */
+    List<String> getAllProjectIdsAsString();
 }

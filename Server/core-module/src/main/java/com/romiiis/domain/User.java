@@ -67,18 +67,8 @@ public class User {
      * @return New customer user
      */
     public static User createCustomer(String name, String emailAddress) {
-        // TODO: check that name is not empty
-        // TODO: check that emailAddress is not empty and it is a valid email address
 
-        if (name == null || name.isBlank()) {
-            log.error("Name is empty");
-            throw new IllegalArgumentException("Name cannot be empty");
-        }
-
-        if (emailAddress == null || emailAddress.isBlank() || !VALID_EMAIL_ADDRESS_REGEX.matcher(emailAddress).matches()) {
-            log.error("Email address is empty or invalid");
-            throw new IllegalArgumentException("Email address cannot be empty or invalid");
-        }
+        validateName(name, emailAddress);
 
         return new User(name, emailAddress, UserRole.CUSTOMER, Collections.emptySet());
     }
@@ -99,19 +89,8 @@ public class User {
      * @return New translator user
      */
     public static User createTranslator(String name, String emailAddress, Set<Locale> languages) {
-        // TODO: check that name is not empty
-        // TODO: check that emailAddress is not empty and it is a valid email address
-        // TODO: check that there is at least one language
 
-        if (name == null || name.isBlank()) {
-            log.error("Name is empty");
-            throw new IllegalArgumentException("Name cannot be empty");
-        }
-
-        if (emailAddress == null || emailAddress.isBlank() || !VALID_EMAIL_ADDRESS_REGEX.matcher(emailAddress).matches()) {
-            log.error("Email address is empty or invalid");
-            throw new IllegalArgumentException("Email address cannot be empty or invalid");
-        }
+        validateName(name, emailAddress);
 
         if (languages == null || languages.isEmpty()) {
             log.error("Languages are empty");
@@ -121,6 +100,24 @@ public class User {
         return new User(name, emailAddress, UserRole.TRANSLATOR, languages);
     }
 
+    private static void validateName(String name, String emailAddress) {
+        if (name == null || name.isBlank()) {
+            log.error("Name is empty");
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
+
+        if (emailAddress == null || emailAddress.isBlank() || !VALID_EMAIL_ADDRESS_REGEX.matcher(emailAddress).matches()) {
+            log.error("Email address is empty or invalid");
+            throw new IllegalArgumentException("Email address cannot be empty or invalid");
+        }
+    }
+
+    /**
+     * Sets the hashed password for the user.
+     *
+     * @param hashedPassword Hashed password
+     * @return User with the hashed password set
+     */
     public User withHashedPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
         return this;

@@ -1,9 +1,15 @@
 package com.romiiis.mapper;
 
+import com.romiiis.configuration.ResourceHeader;
 import com.romiiis.domain.Project;
 import com.romiiis.model.ProjectDTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -41,4 +47,27 @@ public interface ProjectMapper {
      * @return the corresponding Project entity
      */
     Project mapDTOToDomain(ProjectDTO projectDTO);
+
+    // --- Resource → ResourceHeader ---
+    @Mapping(target = "resourceName", expression = "java(resource.getFilename())")
+    @Mapping(target = "resourceData", expression = "java(readBytes(resource))")
+    ResourceHeader resourceToHeader(Resource resource);
+
+    // --- ResourceHeader → Resource ---
+    default Resource headerToResource(ResourceHeader header) {
+        return new ByteArrayResource(header.resourceData()) {
+            @Override
+            public String getFilename() {
+                return header.resourceName();
+            }
+        };
+    }
+
+    default byte[] readBytes(Resource resource) {
+        try (var input = resource.getInputStream()) {
+            return input.readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read resource bytes for " + resource.getFilename(), e);
+        }
+    }
 }

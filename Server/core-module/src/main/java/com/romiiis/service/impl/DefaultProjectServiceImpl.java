@@ -1,6 +1,7 @@
 package com.romiiis.service.impl;
 
 
+import com.romiiis.configuration.ResourceHeader;
 import com.romiiis.domain.Project;
 import com.romiiis.domain.UserRole;
 import com.romiiis.exception.FileNotFoundException;
@@ -14,7 +15,6 @@ import com.romiiis.service.interfaces.IProjectService;
 import com.romiiis.service.interfaces.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.util.List;
@@ -46,7 +46,7 @@ public class DefaultProjectServiceImpl implements IProjectService {
      * @return newly created project
      */
     @Override
-    public Project createProject(UUID customerId, Locale targetLanguage, Resource sourceFile) throws ProjectNotFoundException, UserNotFoundException, FileStorageException, IllegalArgumentException {
+    public Project createProject(UUID customerId, Locale targetLanguage, ResourceHeader sourceFile) throws ProjectNotFoundException, UserNotFoundException, FileStorageException, IllegalArgumentException {
 
         var customer = userService.getUserById(customerId);
 
@@ -60,15 +60,10 @@ public class DefaultProjectServiceImpl implements IProjectService {
             throw new IllegalArgumentException("User is not a customer");
         }
 
-        var newProject = new Project(customer, targetLanguage, sourceFile.getFilename());
+        var newProject = new Project(customer, targetLanguage, sourceFile.resourceName());
 
-        try {
-            // Store the source file in the filesystem
-            fsService.saveOriginalFile(newProject.getId(), sourceFile.getContentAsByteArray());
-        } catch (IOException ex) {
-            log.error("Failed to read source file content for project ID {}", newProject.getId(), ex);
-            throw new FileStorageException("Failed to read source file content for project ID " + newProject.getId());
-        }
+        // Store the source file in the filesystem
+        fsService.saveOriginalFile(newProject.getId(), sourceFile.resourceData());
 
         // Store the new project in the repository
         projectRepository.save(newProject);
@@ -125,16 +120,23 @@ public class DefaultProjectServiceImpl implements IProjectService {
      * @return The byte array of the original file data.
      */
     @Override
-    public Resource getOriginalFile(UUID projectId) throws ProjectNotFoundException, FileStorageException{
+    public ResourceHeader getOriginalFile(UUID projectId) throws ProjectNotFoundException, FileStorageException{
+        Project project = getProjectById(projectId);
+
+        if (project.getOriginalFileName() == null ||project.getOriginalFileName().isEmpty()) {
+            log.error("Original file for project ID {} not found", projectId);
+            throw new FileStorageException("Original file not found for project ID " + projectId);
+        }
+
         return fsService.getOriginalFile(projectId);
     }
 
     @Override
-    public Resource getTranslatedFile(UUID projectId) throws ProjectNotFoundException, FileStorageException, FileNotFoundException {
+    public ResourceHeader getTranslatedFile(UUID projectId) throws ProjectNotFoundException, FileStorageException, FileNotFoundException {
 
         Project project = getProjectById(projectId);
 
-        if (project.getTranslatedFileName().isEmpty()) {
+        if (project.getTranslatedFileName() == null ||project.getTranslatedFileName().isEmpty()) {
             log.error("Translated file for project ID {} not found", projectId);
             throw new FileNotFoundException("Translated file not found for project ID " + projectId);
         }
@@ -145,5 +147,26 @@ public class DefaultProjectServiceImpl implements IProjectService {
             log.error("Translated file for project ID {} not found in filesystem (probably not uploaded yet?!)", projectId, ex);
             throw new FileNotFoundException("Translated file not found for project ID (probably not uploaded yet?!) " + projectId);
         }
+    }
+
+    /**
+     * Updates an existing project.
+     *
+     * @param project the project to be updated
+     * @throws ProjectNotFoundException if the project is not found
+     */
+    @Override
+    public void updateProject(Project project) throws ProjectNotFoundException {
+        projectRepository.save(project);
+    }
+
+    /**
+     * Retrieves all project IDs as strings.
+     *
+     * @return a list of all project IDs in string format
+     */
+    @Override
+    public List<String> getAllProjectIdsAsString() {
+        return projectRepository.getAllProjectIdsAsString();
     }
 }

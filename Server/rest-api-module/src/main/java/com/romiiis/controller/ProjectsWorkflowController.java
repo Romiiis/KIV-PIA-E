@@ -1,6 +1,10 @@
 package com.romiiis.controller;
 
+import com.romiiis.configuration.ResourceHeader;
+import com.romiiis.mapper.ProjectMapper;
 import com.romiiis.model.ProjectFeedbackRequestDTO;
+import com.romiiis.service.interfaces.IProjectService;
+import com.romiiis.service.interfaces.IProjectWorkflowService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -17,6 +21,10 @@ import java.util.UUID;
 @Slf4j
 @RestController
 public class ProjectsWorkflowController implements ProjectsWorkflowApi {
+
+
+    private final IProjectWorkflowService projectWorkflowService;
+    private final ProjectMapper projectMapper;
 
     /**
      * Approves the translated content for a project identified by its UUID.
@@ -64,7 +72,8 @@ public class ProjectsWorkflowController implements ProjectsWorkflowApi {
      */
     @Override
     public ResponseEntity<Void> uploadTranslatedContent(UUID id, Resource body) {
-        // TODO Implement logic for uploading translated content
-        return ProjectsWorkflowApi.super.uploadTranslatedContent(id, body);
+        ResourceHeader resHeader = projectMapper.resourceToHeader(body);
+        projectWorkflowService.uploadTranslatedFile(id, resHeader);
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,5 +1,6 @@
 package com.romiiis.controller;
 
+import com.romiiis.configuration.ResourceHeader;
 import com.romiiis.domain.Project;
 import com.romiiis.filter.ProjectsFilter;
 import com.romiiis.mapper.CommonMapper;
@@ -65,7 +66,8 @@ public class ProjectController implements ProjectsApi {
     @Override
     public ResponseEntity<ProjectDTO> createProject(String languageCode, MultipartFile content, UUID customerId) {
         Locale language = Locale.forLanguageTag(languageCode);
-        var newProject = projectService.createProject(customerId, language, content.getResource());
+        ResourceHeader resHeader = projectMapper.resourceToHeader(content.getResource()) ;
+        var newProject = projectService.createProject(customerId, language, resHeader);
         var projectDTO = projectMapper.mapDomainToDTO(newProject);
         return ResponseEntity.status(HttpStatus.CREATED).body(projectDTO);
     }
@@ -92,8 +94,10 @@ public class ProjectController implements ProjectsApi {
      * @return Original project content as a Resource.
      */
     public ResponseEntity<Resource> downloadOriginalContent(UUID id) {
-        Resource resource = projectService.getOriginalFile(id);
+        ResourceHeader resHeader = projectService.getOriginalFile(id);
         Project project = projectService.getProjectById(id);
+
+        Resource resource =projectMapper.headerToResource(resHeader);
 
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=\"" + project.getOriginalFileName() + "\"")
@@ -108,8 +112,10 @@ public class ProjectController implements ProjectsApi {
      */
     @Override
     public ResponseEntity<Resource> downloadTranslatedContent(UUID id) {
-        Resource resource = projectService.getTranslatedFile(id);
+        ResourceHeader resHeader = projectService.getTranslatedFile(id);
         Project project = projectService.getProjectById(id);
+
+        Resource resource =projectMapper.headerToResource(resHeader);
 
         if (project.getTranslatedFileName().isEmpty()) {
             log.error("Translated file for project ID {} not found", id);

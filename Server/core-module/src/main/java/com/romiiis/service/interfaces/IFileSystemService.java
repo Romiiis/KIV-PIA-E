@@ -1,9 +1,10 @@
 package com.romiiis.service.interfaces;
 
+import com.romiiis.configuration.ResourceHeader;
 import com.romiiis.exception.FileNotFoundException;
 import com.romiiis.exception.FileStorageException;
-import org.springframework.core.io.Resource;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -11,23 +12,7 @@ import java.util.UUID;
  * <p>
  * Handles operations for managing files and directories.
  * </p>
- * <br>
- * <p>
- * Service saves original and translated files associated with projects,
- * and retrieves them when needed.
- * <br>
- * In root directory, each project has its own subdirectory named by its UUID.
- * Inside each project directory, there are two files:
- *     <ul>
- *         <li>"original" - contains the original file data.</li>
- *         <li>"translated" - contains the translated file data.</li>
- *     </ul>
- * <p>
- *     Original names are saved in the database associated with the project entity.
- *     After getting the files, the service returns them as Resource objects for further processing.
- *     Responsibility of handling and naming file have the API layer.
- * </p>
- *
+ * @author Roman Pejs
  */
 public interface IFileSystemService {
 
@@ -59,7 +44,7 @@ public interface IFileSystemService {
      * @throws FileNotFoundException if the translated file is not found
      * @throws FileStorageException  File storage exception during operation (custom)
      */
-    Resource getTranslatedFile(UUID projectId) throws FileNotFoundException, FileStorageException;
+    ResourceHeader getTranslatedFile(UUID projectId) throws FileNotFoundException, FileStorageException;
 
 
     /**
@@ -70,7 +55,24 @@ public interface IFileSystemService {
      * @throws FileNotFoundException if the original file is not found
      * @throws FileStorageException  File storage exception during operation (custom)
      */
-    Resource getOriginalFile(UUID projectId) throws FileNotFoundException, FileStorageException;
+    ResourceHeader getOriginalFile(UUID projectId) throws FileNotFoundException, FileStorageException;
+
+    /**
+     * Lists all project folder names in the file system.
+     *
+     * @return A list of project folder names.
+     * @throws FileStorageException File storage exception during operation (custom)
+     */
+    List<String> listAllProjectFolders() throws FileStorageException;
+
+
+    /**
+     * Deletes the project folder for a given project ID.
+     *
+     * @param projectIdString The ID of the project.
+     * @throws FileStorageException File storage exception during operation (custom)
+     */
+    void deleteProjectFolder(String projectIdString) throws FileStorageException;
 
 
 }

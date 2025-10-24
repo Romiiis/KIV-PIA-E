@@ -33,4 +33,14 @@ public interface IProjectRepository {
      */
     Project findById(UUID id);
 
+
+    /**
+     * Retrieves all project IDs as strings.
+     *
+     * @return a list of all project IDs in string format
+     */
+    List<String> getAllProjectIdsAsString();
+
+
+
 }

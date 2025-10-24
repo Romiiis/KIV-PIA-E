@@ -85,16 +85,10 @@ public class UserRepositoryImpl implements IUserRepository {
     }
 
 
-    /**
-     * Checks if a user exists with the given email and hashed password.
-     *
-     * @param email          the email address of the user
-     * @param hashedPassword the hashed password of the user
-     * @return true if a user exists with the given email and hashed password, false otherwise
-     */
     @Override
-    public boolean userExists(String email, String hashedPassword) {
-        return mongoRepo.existsByEmailAddressAndHashedPassword(email, hashedPassword);
+    public Optional<String> getUserPasswordHash(String email) {
+        Optional<UserDB> userDBOpt = mongoRepo.findByEmailAddress(email);
+        return userDBOpt.map(UserDB::getHashedPassword);
     }
 
     /**

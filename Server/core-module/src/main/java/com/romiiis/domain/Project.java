@@ -169,7 +169,7 @@ public class Project {
 
         this.state = ProjectState.ASSIGNED;
 
-        return new Feedback(this, feedbackText);
+        return new Feedback(id, feedbackText);
     }
 
 }

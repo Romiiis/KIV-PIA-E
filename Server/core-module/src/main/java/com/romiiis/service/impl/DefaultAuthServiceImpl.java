@@ -7,11 +7,13 @@ import com.romiiis.exception.UserNotFoundException;
 import com.romiiis.repository.IUserRepository;
 import com.romiiis.service.interfaces.IAuthService;
 import com.romiiis.service.interfaces.IJwtService;
+import com.romiiis.service.interfaces.IPasswordHasher;
 import com.romiiis.service.interfaces.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -29,23 +31,31 @@ public class DefaultAuthServiceImpl implements IAuthService {
     private final IUserService userService;
     private final IUserRepository userRepository;
     private final IJwtService jwtService;
+    private final IPasswordHasher passwordHasher;
 
     /**
      * Logs in a user with the given email and hashed password.
      *
-     * @param email        the email address of the user
-     * @param hashPassword hashed password
+     * @param email    the email address of the user
+     * @param password the password of the user
      * @return JWT token for the logged-in user
      * @throws InvalidAuthCredentialsException if the credentials are invalid
      * @throws EmailInUseException             if the email is already in use
      */
     @Override
-    public String login(String email, String hashPassword) throws EmailInUseException {
+    public String login(String email, String password) throws EmailInUseException {
 
         // validate credentials
         validateEmailForm(email);
 
-        boolean exists = userRepository.userExists(email, hashPassword);
+        Optional<String> passwordFromDb = userRepository.getUserPasswordHash(email);
+
+        if (passwordFromDb.isEmpty()) {
+            log.warn("Auth failed: Email {} not found", email);
+            throw new InvalidAuthCredentialsException();
+        }
+
+        boolean exists = passwordHasher.verify(password, passwordFromDb.get());
 
         if (!exists) {
             log.warn("Auth failed: Invalid credentials for email {}", email);
@@ -59,15 +69,19 @@ public class DefaultAuthServiceImpl implements IAuthService {
     /**
      * Registers a new customer and returns a JWT token.
      *
-     * @param name         the name of the customer
-     * @param email        the email address of the customer
-     * @param hashPassword hashed password
+     * @param name     the name of the customer
+     * @param email    the email address of the customer
+     * @param password hashed password
      * @return JWT token for the registered customer
      */
     @Override
-    public String registerCustomer(String name, String email, String hashPassword) throws InvalidAuthCredentialsException, EmailInUseException, UserNotFoundException {
+    public String registerCustomer(String name, String email, String password) throws InvalidAuthCredentialsException, EmailInUseException, UserNotFoundException {
         validateEmailForm(email);
         validateEmailUsage(email);
+
+        // hash password
+        String hashPassword = passwordHasher.hash(password);
+
         User u = userService.createNewCustomer(name, email, hashPassword);
         return jwtService.generateToken(u.getId(), u.getRole().name());
     }
@@ -78,13 +92,16 @@ public class DefaultAuthServiceImpl implements IAuthService {
      * @param name         the name of the translator
      * @param email        the email address of the translator
      * @param langs        the set of languages the translator is proficient in
-     * @param hashPassword hashed password
+     * @param password hashed password
      * @return JWT token for the registered translator
      */
     @Override
-    public String registerTranslator(String name, String email, Set<Locale> langs, String hashPassword) throws InvalidAuthCredentialsException, EmailInUseException, UserNotFoundException {
+    public String registerTranslator(String name, String email, Set<Locale> langs, String password) throws InvalidAuthCredentialsException, EmailInUseException, UserNotFoundException {
         validateEmailForm(email);
         validateEmailUsage(email);
+
+        String hashPassword = passwordHasher.hash(password);
+
         User u = userService.createNewTranslator(name, email, langs, hashPassword);
         return jwtService.generateToken(u.getId(), u.getRole().name());
     }
