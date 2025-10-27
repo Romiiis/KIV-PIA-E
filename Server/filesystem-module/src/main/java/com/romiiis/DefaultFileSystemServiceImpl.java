@@ -39,10 +39,11 @@ import java.util.UUID;
 @Slf4j
 public class DefaultFileSystemServiceImpl implements IFileSystemService {
 
+    private final String rootPath;
     /**
      * Root directory for file storage
      */
-    private final String rootDirectory = "/files";
+    private final String projectsDirectory = "/files";
 
     /**
      * File name prefixes
@@ -50,6 +51,9 @@ public class DefaultFileSystemServiceImpl implements IFileSystemService {
     private final String originalFileName = "original";
     private final String translatedFileName = "translated";
 
+    public DefaultFileSystemServiceImpl(String fileSystemRoot) {
+        this.rootPath = fileSystemRoot + projectsDirectory;
+    }
     /**
      * Saves the original file for a given project.
      *
@@ -133,7 +137,7 @@ public class DefaultFileSystemServiceImpl implements IFileSystemService {
     private Path getProjectDir(String projectId) throws FileStorageException {
         try {
 
-            Path basePath = Paths.get(System.getProperty("user.dir"), rootDirectory);
+            Path basePath = Paths.get(System.getProperty("user.dir"), rootPath);
 
             // if projectId is null, return root directory
             if (projectId == null) {

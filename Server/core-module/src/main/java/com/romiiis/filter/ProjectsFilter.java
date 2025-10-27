@@ -2,6 +2,9 @@ package com.romiiis.filter;
 
 import com.romiiis.domain.ProjectState;
 import lombok.Getter;
+import lombok.Setter;
+
+import java.util.UUID;
 
 /**
  * Filter class for querying projects based on various criteria.
@@ -12,6 +15,13 @@ public class ProjectsFilter {
     private ProjectState status = null;
     private String languageCode = null;
     private boolean hasFeedback = false;
+
+    // Additional filters can be added here
+    @Setter
+    private UUID translatorId = null;
+
+    @Setter
+    private UUID customerId = null;
 
     public ProjectsFilter() {
 

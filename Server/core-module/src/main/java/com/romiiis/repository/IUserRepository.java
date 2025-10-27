@@ -73,4 +73,17 @@ public interface IUserRepository {
      * @return a list of language codes associated with the user
      */
     List<Locale> getUsersLanguages(UUID userId);
+
+    /**
+     * Retrieves the list of translator IDs proficient in a specific language.
+     *
+     * @param language the target language
+     * @return a list of translator UUIDs proficient in the specified language
+     */
+    List<UUID> getTranslatorsIdsByLanguage(Locale language);
+
+    /**
+     * Deletes all users from the repository
+     */
+    void deleteAll();
 }

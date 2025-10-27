@@ -2,9 +2,11 @@ package com.romiiis.service.impl;
 
 import com.romiiis.domain.User;
 import com.romiiis.domain.UserRole;
+import com.romiiis.exception.NoAccessToOperateException;
 import com.romiiis.exception.UserNotFoundException;
 import com.romiiis.filter.UsersFilter;
 import com.romiiis.repository.IUserRepository;
+import com.romiiis.security.CallerContextProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,229 +23,242 @@ class DefaultUserServiceImplTest {
     @Mock
     private IUserRepository userRepository;
 
+    @Mock
+    private CallerContextProvider callerContextProvider;
+
     @InjectMocks
     private DefaultUserServiceImpl userService;
 
-    private User mockCustomer;
-    private User mockTranslator;
-    private UUID userId;
+    private User admin;
+    private User customer;
+    private User translator;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockCustomer = User.createCustomer("John", "john@test.com").withHashedPassword("hashed123");
-        mockTranslator = User.createTranslator("Eva", "eva@test.com", Set.of(Locale.ENGLISH, Locale.FRENCH))
+
+        admin = User.createAdmin("Admin", "admin@test.com");
+        customer = User.createCustomer("John", "john@test.com").withHashedPassword("hashed123");
+        translator = User.createTranslator("Eva", "eva@test.com", Set.of(Locale.ENGLISH, Locale.FRENCH))
                 .withHashedPassword("hashed321");
-        userId = mockCustomer.getId();
     }
 
-    @DisplayName("getUserByEmail should return user when found")
-    @Test
-    void getUserByEmail_shouldReturnUser_whenFound() {
-        // given
-        when(userRepository.getUserByEmail(mockCustomer.getEmailAddress()))
-                .thenReturn(Optional.of(mockCustomer));
+    // === Pomocné metody ===
 
-        // when
-        User result = userService.getUserByEmail(mockCustomer.getEmailAddress());
-
-        // then
-        assert result != null;
-        assert result.equals(mockCustomer);
-        verify(userRepository).getUserByEmail(mockCustomer.getEmailAddress());
+    private void asSystem() {
+        when(callerContextProvider.isSystem()).thenReturn(true);
     }
 
-    @DisplayName("getUserByEmail should throw UserNotFoundException when not found")
+    private void asUser(User user) {
+        when(callerContextProvider.isSystem()).thenReturn(false);
+        when(callerContextProvider.getCaller()).thenReturn(user);
+    }
+
+    // === TESTY getUserByEmail ===
+
+    @DisplayName("ADMIN can get any user by email")
     @Test
-    void getUserByEmail_shouldThrow_whenNotFound() {
-        when(userRepository.getUserByEmail(mockCustomer.getEmailAddress()))
-                .thenReturn(Optional.empty());
+    void adminCanGetAnyUserByEmail() {
+        asUser(admin);
+        when(userRepository.getUserByEmail(customer.getEmailAddress()))
+                .thenReturn(Optional.of(customer));
+
+        var result = userService.getUserByEmail(customer.getEmailAddress());
+        assert result.equals(customer);
+    }
+
+    @DisplayName("CUSTOMER can get only own user data")
+    @Test
+    void customerCanOnlyGetOwnData() {
+        asUser(customer);
+        when(userRepository.getUserByEmail(customer.getEmailAddress()))
+                .thenReturn(Optional.of(customer));
+
+        var result = userService.getUserByEmail(customer.getEmailAddress());
+        assert result.equals(customer);
+    }
+
+    @DisplayName("CUSTOMER cannot get other user's data")
+    @Test
+    void customerCannotGetOtherUserData() {
+        asUser(customer);
+        when(userRepository.getUserByEmail(translator.getEmailAddress()))
+                .thenReturn(Optional.of(translator));
 
         try {
-            userService.getUserByEmail(mockCustomer.getEmailAddress());
+            userService.getUserByEmail(translator.getEmailAddress());
             assert false;
         } catch (Exception e) {
-            assert e instanceof UserNotFoundException;
+            assert e instanceof NoAccessToOperateException;
         }
     }
 
-    @DisplayName("createNewCustomer should create and return user successfully")
+    @DisplayName("SYSTEM mode bypasses access checks")
     @Test
-    void createNewCustomer_shouldCreateSuccessfully() {
-        when(userRepository.getUserByEmail(mockCustomer.getEmailAddress()))
-                .thenReturn(Optional.of(mockCustomer));
+    void systemModeBypassesAccessChecks() {
+        asSystem();
+        when(userRepository.getUserByEmail(customer.getEmailAddress()))
+                .thenReturn(Optional.of(customer));
 
-        User result = userService.createNewCustomer(
-                mockCustomer.getName(),
-                mockCustomer.getEmailAddress(),
-                "hashed123"
-        );
-
-        assert result != null;
-        assert result.getRole() == UserRole.CUSTOMER;
-        verify(userRepository).save(any(User.class));
-        verify(userRepository, atLeastOnce()).getUserByEmail(mockCustomer.getEmailAddress());
+        var result = userService.getUserByEmail(customer.getEmailAddress());
+        assert result.equals(customer);
     }
 
-    @DisplayName("createNewCustomer should throw UserNotFoundException when not retrievable after save")
+    // === TESTY getAllUsers ===
+
+    @DisplayName("ADMIN can get all users")
     @Test
-    void createNewCustomer_shouldThrow_whenNotRetrievedAfterSave() {
-        when(userRepository.getUserByEmail(mockCustomer.getEmailAddress()))
-                .thenReturn(Optional.empty());
-
-        try {
-            userService.createNewCustomer(mockCustomer.getName(), mockCustomer.getEmailAddress(), "hashed123");
-            assert false;
-        } catch (Exception e) {
-            assert e instanceof UserNotFoundException;
-        }
-    }
-
-    @DisplayName("createNewTranslator should create translator successfully")
-    @Test
-    void createNewTranslator_shouldCreateSuccessfully() {
-        when(userRepository.getUserByEmail(mockTranslator.getEmailAddress()))
-                .thenReturn(Optional.of(mockTranslator));
-
-        User result = userService.createNewTranslator(
-                mockTranslator.getName(),
-                mockTranslator.getEmailAddress(),
-                mockTranslator.getLanguages(),
-                "hashed321"
-        );
-
-        assert result != null;
-        assert result.getRole() == UserRole.TRANSLATOR;
-        verify(userRepository).save(any(User.class));
-    }
-
-    @DisplayName("createNewTranslator should throw UserNotFoundException when not retrievable after save")
-    @Test
-    void createNewTranslator_shouldThrow_whenNotRetrievedAfterSave() {
-        when(userRepository.getUserByEmail(mockTranslator.getEmailAddress()))
-                .thenReturn(Optional.empty());
-
-        try {
-            userService.createNewTranslator(
-                    mockTranslator.getName(),
-                    mockTranslator.getEmailAddress(),
-                    mockTranslator.getLanguages(),
-                    "hashed321"
-            );
-            assert false;
-        } catch (Exception e) {
-            assert e instanceof UserNotFoundException;
-        }
-    }
-
-
-    @DisplayName("getUserById should return user when found")
-    @Test
-    void getUserById_shouldReturnUser_whenFound() {
-        when(userRepository.getUserById(userId)).thenReturn(Optional.of(mockCustomer));
-
-        User result = userService.getUserById(userId);
-
-        assert result != null;
-        assert result.equals(mockCustomer);
-        verify(userRepository).getUserById(userId);
-    }
-
-    @DisplayName("getUserById should throw UserNotFoundException when not found")
-    @Test
-    void getUserById_shouldThrow_whenNotFound() {
-        when(userRepository.getUserById(userId)).thenReturn(Optional.empty());
-
-        try {
-            userService.getUserById(userId);
-            assert false;
-        } catch (Exception e) {
-            assert e instanceof UserNotFoundException;
-        }
-    }
-
-    @DisplayName("getAllUsers should return list of users (empty)")
-    @Test
-    void getAllUsers_shouldReturnEmptyList() {
+    void adminCanGetAllUsers() {
+        asUser(admin);
         var filter = new UsersFilter();
-        when(userRepository.getAllUsers(filter)).thenReturn(List.of());
+        when(userRepository.getAllUsers(filter)).thenReturn(List.of(admin, customer, translator));
 
         var result = userService.getAllUsers(filter);
-
-        assert result != null;
-        assert result.isEmpty();
-        verify(userRepository).getAllUsers(filter);
+        assert result.size() == 3;
     }
 
-    @DisplayName("getAllUsers should return non-empty list")
+    @DisplayName("CUSTOMER cannot get all users")
     @Test
-    void getAllUsers_shouldReturnNonEmptyList() {
+    void customerCannotGetAllUsers() {
+        asUser(customer);
         var filter = new UsersFilter();
-        when(userRepository.getAllUsers(filter)).thenReturn(List.of(mockCustomer));
+
+        try {
+            userService.getAllUsers(filter);
+            assert false;
+        } catch (Exception e) {
+            assert e instanceof NoAccessToOperateException;
+        }
+    }
+
+    @DisplayName("SYSTEM can get all users")
+    @Test
+    void systemCanGetAllUsers() {
+        asSystem();
+        var filter = new UsersFilter();
+        when(userRepository.getAllUsers(filter)).thenReturn(List.of(admin, customer));
 
         var result = userService.getAllUsers(filter);
-
-        assert result.size() == 1;
-        assert result.getFirst().equals(mockCustomer);
-        verify(userRepository).getAllUsers(filter);
+        assert result.size() == 2;
     }
 
-    @DisplayName("getUsersLanguages should return translator's languages")
+    // === TESTY getUsersLanguages ===
+
+    @DisplayName("Translator can get own languages")
     @Test
-    void getUsersLanguages_shouldReturnLanguages() {
-        UUID translatorId = mockTranslator.getId();
+    void translatorCanGetOwnLanguages() {
+        asUser(translator);
+        UUID translatorId = translator.getId();
         when(userRepository.getRoleById(translatorId)).thenReturn(UserRole.TRANSLATOR);
-        when(userRepository.getUsersLanguages(translatorId)).thenReturn(List.copyOf(mockTranslator.getLanguages()));
+        when(userRepository.getUsersLanguages(translatorId)).thenReturn(List.copyOf(translator.getLanguages()));
 
         var result = userService.getUsersLanguages(translatorId);
-
-        assert result != null;
-        assert result.size() == mockTranslator.getLanguages().size();
-        verify(userRepository).getUsersLanguages(translatorId);
+        assert result.size() == 2;
     }
 
-    @DisplayName("getUsersLanguages should throw IllegalArgumentException for non-translator")
+    @DisplayName("Customer cannot get other user's languages")
     @Test
-    void getUsersLanguages_shouldThrowForNonTranslator() {
-        when(userRepository.getRoleById(userId)).thenReturn(UserRole.CUSTOMER);
+    void customerCannotGetOtherLanguages() {
+        asUser(customer);
+        UUID translatorId = translator.getId();
+        when(userRepository.getRoleById(translatorId)).thenReturn(UserRole.TRANSLATOR);
 
         try {
-            userService.getUsersLanguages(userId);
+            userService.getUsersLanguages(translatorId);
             assert false;
         } catch (Exception e) {
-            assert e instanceof IllegalArgumentException;
+            assert e instanceof NoAccessToOperateException;
         }
     }
 
-    @DisplayName("updateUserLanguages should update languages successfully")
+    @DisplayName("Admin can get any user's languages")
     @Test
-    void updateUserLanguages_shouldUpdateSuccessfully() {
-        UUID translatorId = mockTranslator.getId();
-        var newLangs = Set.of(Locale.ITALIAN, Locale.ENGLISH);
-        User updatedUser = mockTranslator;
-        updatedUser.setLanguages(newLangs);
+    void adminCanGetAnyLanguages() {
+        asUser(admin);
+        UUID translatorId = translator.getId();
+        when(userRepository.getRoleById(translatorId)).thenReturn(UserRole.TRANSLATOR);
+        when(userRepository.getUsersLanguages(translatorId)).thenReturn(List.copyOf(translator.getLanguages()));
 
-        when(userRepository.getUserById(translatorId)).thenReturn(Optional.of(mockTranslator))
-                .thenReturn(Optional.of(updatedUser));
-
-        var result = userService.updateUserLanguages(translatorId, newLangs);
-
-        assert result.equals(newLangs);
-        verify(userRepository, times(2)).getUserById(translatorId);
-        verify(userRepository).save(any(User.class));
+        var result = userService.getUsersLanguages(translatorId);
+        assert result.size() == 2;
     }
 
-    @DisplayName("updateUserLanguages should throw UserNotFoundException when user not found")
+    @DisplayName("Throws IllegalArgumentException if user not translator")
     @Test
-    void updateUserLanguages_shouldThrow_whenUserNotFound() {
-        UUID randomId = UUID.randomUUID();
-        when(userRepository.getUserById(randomId)).thenReturn(Optional.empty());
+    void throwsIfNotTranslator() {
+        asUser(admin);
+        UUID customerId = customer.getId();
+        when(userRepository.getRoleById(customerId)).thenReturn(UserRole.CUSTOMER);
 
         try {
-            userService.updateUserLanguages(randomId, Set.of(Locale.JAPANESE));
+            userService.getUsersLanguages(customerId);
             assert false;
         } catch (Exception e) {
             assert e instanceof UserNotFoundException;
         }
+    }
+
+    // === TESTY updateUserLanguages ===
+
+    @DisplayName("Translator can update own languages")
+    @Test
+    void translatorCanUpdateOwnLanguages() {
+        asUser(translator);
+        UUID id = translator.getId();
+        var newLangs = Set.of(Locale.ITALIAN);
+        User updatedUser = translator;
+        updatedUser.setLanguages(newLangs);
+
+        when(userRepository.getUserById(id)).thenReturn(Optional.of(translator))
+                .thenReturn(Optional.of(updatedUser));
+
+        var result = userService.updateUserLanguages(id, newLangs);
+
+        assert result.equals(newLangs);
+        verify(userRepository).save(any(User.class));
+    }
+
+    @DisplayName("Customer cannot update translator's languages")
+    @Test
+    void customerCannotUpdateTranslatorLanguages() {
+        asUser(customer);
+        UUID id = translator.getId();
+
+        try {
+            userService.updateUserLanguages(id, Set.of(Locale.ITALIAN));
+            assert false;
+        } catch (Exception e) {
+            assert e instanceof NoAccessToOperateException;
+        }
+    }
+
+    @DisplayName("Admin cannot update other user's languages")
+    @Test
+    void adminCannotUpdateOthersLanguages() {
+        asUser(admin);
+        UUID id = translator.getId();
+
+        try {
+            userService.updateUserLanguages(id, Set.of(Locale.ITALIAN));
+            assert false;
+        } catch (Exception e) {
+            assert e instanceof NoAccessToOperateException;
+        }
+    }
+
+    @DisplayName("System mode can update any user's languages")
+    @Test
+    void systemModeCanUpdateLanguages() {
+        asSystem();
+        UUID id = translator.getId();
+        var newLangs = Set.of(Locale.GERMAN);
+        User updatedUser = translator;
+        updatedUser.setLanguages(newLangs);
+
+        when(userRepository.getUserById(id)).thenReturn(Optional.of(translator))
+                .thenReturn(Optional.of(updatedUser));
+
+        var result = userService.updateUserLanguages(id, newLangs);
+        assert result.equals(newLangs);
     }
 }

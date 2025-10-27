@@ -100,6 +100,25 @@ public class User {
         return new User(name, emailAddress, UserRole.TRANSLATOR, languages);
     }
 
+    /**
+     * Creates a new administrator user.
+     * <br><br>
+     * REQUIREMENTS:
+     * <ol>
+     *     <li>name must not be empty</li>
+     *     <li>emailAddress must not be empty and it must be a valid email address</li>
+     * </ol>
+     *
+     * @param name         Name of the administrator
+     * @param emailAddress Email address of the administrator
+     * @return New administrator user
+     */
+    public static User createAdmin(String name, String emailAddress) {
+        validateName(name, emailAddress);
+
+        return new User(name, emailAddress, UserRole.ADMINISTRATOR, Collections.emptySet());
+    }
+
     private static void validateName(String name, String emailAddress) {
         if (name == null || name.isBlank()) {
             log.error("Name is empty");
@@ -111,6 +130,8 @@ public class User {
             throw new IllegalArgumentException("Email address cannot be empty or invalid");
         }
     }
+
+
 
     /**
      * Sets the hashed password for the user.

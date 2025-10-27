@@ -25,6 +25,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final ExecutionContextFilter executionContextFilter;
     private final SecurityRulesLoader rulesLoader;
 
     /**
@@ -38,6 +39,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(executionContextFilter, JwtAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> {
 
                     for (SecurityRulesLoader.SecurityRule rule : rulesLoader.getRules()) {

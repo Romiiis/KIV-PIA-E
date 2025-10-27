@@ -3,20 +3,18 @@ package com.romiiis.service.impl;
 
 import com.romiiis.configuration.ResourceHeader;
 import com.romiiis.domain.Project;
+import com.romiiis.domain.User;
 import com.romiiis.domain.UserRole;
-import com.romiiis.exception.FileNotFoundException;
-import com.romiiis.exception.FileStorageException;
-import com.romiiis.exception.ProjectNotFoundException;
-import com.romiiis.exception.UserNotFoundException;
+import com.romiiis.exception.*;
 import com.romiiis.filter.ProjectsFilter;
 import com.romiiis.repository.IProjectRepository;
+import com.romiiis.security.CallerContextProvider;
 import com.romiiis.service.interfaces.IFileSystemService;
 import com.romiiis.service.interfaces.IProjectService;
 import com.romiiis.service.interfaces.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -37,6 +35,8 @@ public class DefaultProjectServiceImpl implements IProjectService {
     private final IUserService userService;
     private final IProjectRepository projectRepository;
     private final IFileSystemService fsService;
+    private final CallerContextProvider callerContextProvider;
+
 
     /**
      * Creates a new project for the current user
@@ -46,18 +46,13 @@ public class DefaultProjectServiceImpl implements IProjectService {
      * @return newly created project
      */
     @Override
-    public Project createProject(UUID customerId, Locale targetLanguage, ResourceHeader sourceFile) throws ProjectNotFoundException, UserNotFoundException, FileStorageException, IllegalArgumentException {
+    public Project createProject(Locale targetLanguage, ResourceHeader sourceFile) throws ProjectNotFoundException, UserNotFoundException, FileStorageException, NoAccessToOperateException {
 
-        var customer = userService.getUserById(customerId);
-
-        if (customer == null) {
-            log.error("Customer with ID {} not found", customerId);
-            throw new UserNotFoundException("Customer not found");
-        }
+        User customer = this.fetchUserFromContext();
 
         if (!customer.getRole().equals(UserRole.CUSTOMER)) {
-            log.error("User with ID {} is not a customer", customerId);
-            throw new IllegalArgumentException("User is not a customer");
+            log.error("User with ID {} is not a customer", customer.getId());
+            throw new NoAccessToOperateException("User is not a customer");
         }
 
         var newProject = new Project(customer, targetLanguage, sourceFile.resourceName());
@@ -70,16 +65,20 @@ public class DefaultProjectServiceImpl implements IProjectService {
 
         log.info("Created new project with ID {} for customer {}", newProject.getId(), customer.getClass());
 
-        // Try to find the project and return it
-        var storedProject = projectRepository.findById(newProject.getId());
+        // Now try to assign the best translator
+        try {
+            User bestTranslator = getBestTranslatorForProject(newProject);
+            newProject.assignTranslator(bestTranslator);
+            projectRepository.save(newProject);
+            log.info("Assigned translator with ID {} to project ID {}", bestTranslator.getId(), newProject.getId());
 
-        if (storedProject == null) {
-            log.error("Failed to retrieve newly created project with ID {}", newProject.getId());
-            throw new ProjectNotFoundException("Failed to retrieve newly created project");
-
-        } else {
-            return storedProject;
+        } catch (UserNotFoundException ex) {
+            log.warn("No suitable translator found for project ID - closing {}", newProject.getId());
+            newProject.close();
         }
+
+        return newProject;
+
     }
 
     /**
@@ -90,6 +89,15 @@ public class DefaultProjectServiceImpl implements IProjectService {
      */
     @Override
     public List<Project> getAllProjects(ProjectsFilter filter) {
+        User caller = fetchUserFromContext();
+        // If caller is not system, restrict to their own projects
+        if (!callerContextProvider.isSystem()) {
+            if (caller.getRole() == UserRole.CUSTOMER) {
+                filter.setCustomerId(caller.getId());
+            } else if (caller.getRole() == UserRole.TRANSLATOR) {
+                filter.setTranslatorId(caller.getId());
+            }
+        }
         return projectRepository.getAll(filter);
     }
 
@@ -101,15 +109,24 @@ public class DefaultProjectServiceImpl implements IProjectService {
      * @throws ProjectNotFoundException if the project is not found
      */
     @Override
-    public Project getProjectById(UUID projectId) throws ProjectNotFoundException {
-        var project = projectRepository.findById(projectId);
+    public Project getProjectById(UUID projectId) throws ProjectNotFoundException, NoAccessToOperateException {
 
-        if (project == null) {
-            log.error("Project with ID {} not found", projectId);
-            throw new ProjectNotFoundException("Project not found");
+        // If caller is not system, check access rights
+        if (!callerContextProvider.isSystem()) {
+
+            User caller = fetchUserFromContext();
+            Project project = fetchProject(projectId);
+            boolean isProjectOwner = project.getCustomer().getId().equals(caller.getId());
+            boolean isAssignedTranslator = project.getTranslator() != null &&
+                    project.getTranslator().getId().equals(caller.getId());
+            if (!isProjectOwner && !isAssignedTranslator && caller.getRole() != UserRole.ADMINISTRATOR) {
+                log.error("User with ID {} is not authorized to access project ID: {}", caller.getId(), projectId);
+                throw new NoAccessToOperateException("User is not authorized to access this project");
+            }
         }
 
-        return project;
+
+        return this.fetchProject(projectId);
     }
 
 
@@ -120,10 +137,22 @@ public class DefaultProjectServiceImpl implements IProjectService {
      * @return The byte array of the original file data.
      */
     @Override
-    public ResourceHeader getOriginalFile(UUID projectId) throws ProjectNotFoundException, FileStorageException{
-        Project project = getProjectById(projectId);
+    public ResourceHeader getOriginalFile(UUID projectId) throws ProjectNotFoundException, FileStorageException, NoAccessToOperateException {
+        User caller = fetchUserFromContext();
+        Project project = fetchProject(projectId);
 
-        if (project.getOriginalFileName() == null ||project.getOriginalFileName().isEmpty()) {
+        // Original file can be accessed by customer who owns the project or the assigned translator or admin
+        if (!callerContextProvider.isSystem()) {
+            boolean isProjectOwner = project.getCustomer().getId().equals(caller.getId());
+            boolean isAssignedTranslator = project.getTranslator() != null &&
+                    project.getTranslator().getId().equals(caller.getId());
+            if (!isProjectOwner && !isAssignedTranslator && caller.getRole() != UserRole.ADMINISTRATOR) {
+                log.error("User with ID {} is not authorized to access original file for project ID: {}", caller.getId(), projectId);
+                throw new NoAccessToOperateException("User is not authorized to access original file for this project");
+            }
+        }
+
+        if (project.getOriginalFileName() == null || project.getOriginalFileName().isEmpty()) {
             log.error("Original file for project ID {} not found", projectId);
             throw new FileStorageException("Original file not found for project ID " + projectId);
         }
@@ -132,11 +161,23 @@ public class DefaultProjectServiceImpl implements IProjectService {
     }
 
     @Override
-    public ResourceHeader getTranslatedFile(UUID projectId) throws ProjectNotFoundException, FileStorageException, FileNotFoundException {
+    public ResourceHeader getTranslatedFile(UUID projectId) throws ProjectNotFoundException, FileStorageException, FileNotFoundException, NoAccessToOperateException {
 
-        Project project = getProjectById(projectId);
+        Project project = fetchProject(projectId);
+        User caller = fetchUserFromContext();
 
-        if (project.getTranslatedFileName() == null ||project.getTranslatedFileName().isEmpty()) {
+        // Translated file can be accessed by customer who owns the project or the assigned translator or admin
+        if (!callerContextProvider.isSystem()) {
+            boolean isProjectOwner = project.getCustomer().getId().equals(caller.getId());
+            boolean isAssignedTranslator = project.getTranslator() != null &&
+                    project.getTranslator().getId().equals(caller.getId());
+            if (!isProjectOwner && !isAssignedTranslator && caller.getRole() != UserRole.ADMINISTRATOR) {
+                log.error("User with ID {} is not authorized to access translated file for project ID: {}", caller.getId(), projectId);
+                throw new NoAccessToOperateException("User is not authorized to access translated file for this project");
+            }
+        }
+
+        if (project.getTranslatedFileName() == null || project.getTranslatedFileName().isEmpty()) {
             log.error("Translated file for project ID {} not found", projectId);
             throw new FileNotFoundException("Translated file not found for project ID " + projectId);
         }
@@ -157,6 +198,7 @@ public class DefaultProjectServiceImpl implements IProjectService {
      */
     @Override
     public void updateProject(Project project) throws ProjectNotFoundException {
+        //
         projectRepository.save(project);
     }
 
@@ -168,5 +210,71 @@ public class DefaultProjectServiceImpl implements IProjectService {
     @Override
     public List<String> getAllProjectIdsAsString() {
         return projectRepository.getAllProjectIdsAsString();
+    }
+
+
+    /**
+     * Finds the best translator for a given project based on their workload and language proficiency.
+     *
+     * @param project the project to find a translator for
+     * @return the best suited translator
+     * @throws UserNotFoundException if no suitable translator is found
+     */
+    private User getBestTranslatorForProject(Project project) throws UserNotFoundException {
+        // First get the target language of the project
+        Locale targetLanguage = project.getTargetLanguage();
+
+        // Then get all translators who know this language
+        List<UUID> translators = userService.getTranslatorIdsByLanguage(targetLanguage);
+
+        // Find the translator with the least number of assigned projects
+        UUID bestTranslatorId = null;
+        int minProjects = Integer.MAX_VALUE;
+
+        for (UUID translatorId : translators) {
+            int projectCount = projectRepository.countProjectsWithTranslator(translatorId);
+            if (projectCount < minProjects) {
+                minProjects = projectCount;
+                bestTranslatorId = translatorId;
+            }
+        }
+
+        if (bestTranslatorId != null) {
+            try {
+                UUID finalBestTranslatorId = bestTranslatorId;
+                return callerContextProvider.runAsSystem(() ->
+                        userService.getUserById(finalBestTranslatorId)
+                );
+
+
+            } catch (UserNotFoundException e) {
+                log.error("Best translator with ID {} not found", bestTranslatorId);
+                throw new UserNotFoundException("Best translator not found");
+            }
+        }
+
+        log.error("No suitable translator found for project ID {}", project.getId());
+        throw new UserNotFoundException("No suitable translator found");
+    }
+
+
+    private User fetchUserFromContext() throws UserNotFoundException {
+        User caller = callerContextProvider.getCaller();
+
+        if (caller == null) {
+            log.error("Caller not found in context");
+            throw new UserNotFoundException("Caller not found");
+        }
+        return caller;
+    }
+
+    private Project fetchProject(UUID projectId) throws ProjectNotFoundException {
+        Project project = projectRepository.findById(projectId);
+
+        if (project == null) {
+            log.error("Project with ID {} not found", projectId);
+            throw new ProjectNotFoundException("Project not found");
+        }
+        return project;
     }
 }

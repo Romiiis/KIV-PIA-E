@@ -1,9 +1,10 @@
 package com.romiiis.repository.impl;
 
+import com.mongodb.client.MongoClient;
 import com.romiiis.configuration.UserMongoFilter;
-import com.romiiis.filter.UsersFilter;
 import com.romiiis.domain.User;
 import com.romiiis.domain.UserRole;
+import com.romiiis.filter.UsersFilter;
 import com.romiiis.mapper.MongoUserMapper;
 import com.romiiis.model.UserDB;
 import com.romiiis.model.UserRoleDB;
@@ -11,6 +12,7 @@ import com.romiiis.repository.IUserRepository;
 import com.romiiis.repository.mongo.MongoUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -32,6 +34,7 @@ public class UserRepositoryImpl implements IUserRepository {
     private final MongoUserRepository mongoRepo;
     private final MongoUserMapper mapper;
     private final MongoTemplate mongoTemplate;
+    private final MongoClient mongo;
 
 
     /**
@@ -41,7 +44,7 @@ public class UserRepositoryImpl implements IUserRepository {
      * @return the User with the given ID, or null if not found
      */
     @Override
-    public Optional<User> getUserById(UUID id){
+    public Optional<User> getUserById(UUID id) {
         UserDB userDB = mongoRepo.findById(id).orElse(null);
         if (userDB == null) {
             return Optional.empty();
@@ -120,6 +123,7 @@ public class UserRepositoryImpl implements IUserRepository {
     /**
      * Get the list of languages associated with a user.
      * MUST be a translator.
+     *
      * @param userId the UUID of the user
      * @return a list of language codes associated with the user
      */
@@ -131,5 +135,36 @@ public class UserRepositoryImpl implements IUserRepository {
 
         UserDB user = mongoTemplate.findOne(query, UserDB.class);
         return user != null ? new ArrayList<>(user.getLanguages()) : List.of();
+    }
+
+
+    /**
+     * Get the list of translator IDs proficient in a specific language.
+     *
+     * @param language the target language
+     * @return a list of translator UUIDs proficient in the specified language
+     */
+    @Override
+    public List<UUID> getTranslatorsIdsByLanguage(Locale language) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("role").is(UserRoleDB.TRANSLATOR));
+        query.addCriteria(Criteria.where("languages").is(language));
+
+        query.fields().include("_id");
+
+        List<UserDB> users = mongoTemplate.find(query, UserDB.class, "users");
+
+        return users.stream()
+                .map(UserDB::getId)
+                .toList();
+
+    }
+
+    /**
+     * Deletes all users from the database.
+     */
+    @Override
+    public void deleteAll() {
+       mongoRepo.deleteAll();
     }
 }

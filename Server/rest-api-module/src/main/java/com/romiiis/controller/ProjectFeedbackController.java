@@ -1,6 +1,8 @@
 package com.romiiis.controller;
 
+import com.romiiis.mapper.FeedbackMapper;
 import com.romiiis.model.ProjectFeedbackDTO;
+import com.romiiis.service.interfaces.IFeedbackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +20,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProjectFeedbackController implements ProjectsFeedbackApi {
 
+    private final IFeedbackService feedbackService;
+    private final FeedbackMapper feedbackMapper;
+
     @Override
     public ResponseEntity<ProjectFeedbackDTO> getProjectFeedback(UUID id) {
-        // TODO: Implement the logic to retrieve project feedback by ID
-        return ProjectsFeedbackApi.super.getProjectFeedback(id);
+        var feedback = feedbackService.getFeedbackByProjectId(id);
+        return ResponseEntity.ok(feedbackMapper.domainToDto(feedback));
     }
-
 
 }

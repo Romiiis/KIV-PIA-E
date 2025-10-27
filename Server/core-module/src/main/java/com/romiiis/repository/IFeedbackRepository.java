@@ -16,4 +16,23 @@ public interface IFeedbackRepository {
      */
     Feedback getFeedbackByProjectId(UUID projectId);
 
+
+    /**
+     * Saves feedback to the repository
+     * @param feedback feedback to save
+     */
+    void save(Feedback feedback);
+
+    /**
+     * Deletes feedback from the repository
+     * @param projectId ID of the project whose feedback is to be deleted
+     */
+    void deleteForProject(UUID projectId);
+
+
+    /**
+     * Deletes all feedback entries from the repository
+     */
+    void deleteAll();
+
 }

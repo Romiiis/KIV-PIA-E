@@ -22,9 +22,7 @@ public class FeedbackDB {
     @Id
     private UUID id;
 
-    @DBRef
-    private ProjectDB project;
-
+    private UUID projectId;
     private String text;
     private Instant createdAt;
 }

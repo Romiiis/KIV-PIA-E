@@ -1,8 +1,9 @@
 package com.romiiis.service.interfaces;
 
-import com.romiiis.filter.UsersFilter;
 import com.romiiis.domain.User;
+import com.romiiis.domain.UserRole;
 import com.romiiis.exception.UserNotFoundException;
+import com.romiiis.filter.UsersFilter;
 
 import java.util.List;
 import java.util.Locale;
@@ -46,10 +47,21 @@ public interface IUserService {
      */
     User createNewTranslator(String name, String email, Set<Locale> langs, String password) throws UserNotFoundException;
 
+
+    /**
+     * Creates a new admin with the given details.
+     * Saves the admin to the database and returns the created User object.
+     *
+     * @param name     the name of the admin
+     * @param email    the email address of the admin
+     * @param password hashed password
+     */
+    User createNewAdmin(String name, String email, String password) throws UserNotFoundException;
+
     /**
      * Retrieves a user by their unique identifier.
      *
-     * @param userId the UUID of the user to retrieve
+     * @param userId   the UUID of the user to retrieve
      * @return the User with the given ID, or null if not found
      */
     User getUserById(UUID userId) throws UserNotFoundException;
@@ -58,7 +70,7 @@ public interface IUserService {
     /**
      * Fetches all users with optional filtering.
      *
-     * @param filter the filter criteria for fetching users
+     * @param filter   the filter criteria for fetching users
      * @return a list of users matching the filter criteria
      */
     List<User> getAllUsers(UsersFilter filter);
@@ -73,6 +85,31 @@ public interface IUserService {
     List<Locale> getUsersLanguages(UUID userId) throws IllegalArgumentException;
 
 
+    /**
+     * Updates the set of languages associated with a user.
+     *
+     * @param userId    the UUID of the user
+     * @param languages the new set of languages to associate with the user
+     * @return the updated set of languages
+     */
     Set<Locale> updateUserLanguages(UUID userId, Set<Locale> languages) throws UserNotFoundException;
+
+
+    /**
+     * Get all translators proficient in a specific language.
+     *
+     * @param language the target language
+     * @return a list of translators proficient in the specified language
+     */
+    List<UUID> getTranslatorIdsByLanguage(Locale language);
+
+
+    /**
+     * Retrieves the role of a user by their unique identifier.
+     *
+     * @param userId the UUID of the user
+     * @return the UserRole of the user
+     */
+    UserRole getUserRole(UUID userId) throws UserNotFoundException;
 
 }

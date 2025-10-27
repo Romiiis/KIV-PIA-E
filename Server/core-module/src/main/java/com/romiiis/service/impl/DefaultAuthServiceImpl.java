@@ -5,6 +5,7 @@ import com.romiiis.exception.EmailInUseException;
 import com.romiiis.exception.InvalidAuthCredentialsException;
 import com.romiiis.exception.UserNotFoundException;
 import com.romiiis.repository.IUserRepository;
+import com.romiiis.security.CallerContextProvider;
 import com.romiiis.service.interfaces.IAuthService;
 import com.romiiis.service.interfaces.IJwtService;
 import com.romiiis.service.interfaces.IPasswordHasher;
@@ -32,6 +33,7 @@ public class DefaultAuthServiceImpl implements IAuthService {
     private final IUserRepository userRepository;
     private final IJwtService jwtService;
     private final IPasswordHasher passwordHasher;
+    private final CallerContextProvider callerContextProvider;
 
     /**
      * Logs in a user with the given email and hashed password.
@@ -61,7 +63,7 @@ public class DefaultAuthServiceImpl implements IAuthService {
             log.warn("Auth failed: Invalid credentials for email {}", email);
             throw new InvalidAuthCredentialsException();
         } else {
-            User user = userService.getUserByEmail(email);
+            User user =  callerContextProvider.runAsSystem(()-> userService.getUserByEmail(email));
             return jwtService.generateToken(user.getId(), user.getRole().name());
         }
     }

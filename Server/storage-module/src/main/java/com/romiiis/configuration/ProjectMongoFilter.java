@@ -35,6 +35,16 @@ public class ProjectMongoFilter {
 //            finalCriteria = finalCriteria.and("feedback").exists(true);
 //        }
 
+
+        if (filter.getCustomerId() != null) {
+            finalCriteria = finalCriteria.and("customer.$id").is(filter.getCustomerId());
+        }
+
+        if (filter.getTranslatorId() != null) {
+            finalCriteria = finalCriteria.and("translator.$id").is(filter.getTranslatorId());
+        }
+
+
         return finalCriteria;
     }
 }

@@ -26,4 +26,15 @@ public interface MongoProjectRepository extends MongoRepository<ProjectDB, UUID>
      */
     @Query(value = "{}", fields = "{ '_id' : 1 }")
     List<ProjectDB> findAllIds();
+
+
+    /**
+     * Counts the number of ProjectDB entities associated with a specific translator ID.
+     *
+     * @param translatorId the UUID of the translator
+     * @return the count of ProjectDB entities for the given translator ID
+     */
+    @Query(value = "{ 'translator.$id': ?0 }", count = true)
+    int countByTranslatorId(UUID translatorId);
+
 }

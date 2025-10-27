@@ -12,6 +12,6 @@ import com.romiiis.configuration.ErrorCode;
  */
 public class InvalidAuthCredentialsException extends BaseException {
     public InvalidAuthCredentialsException() {
-        super("Invalid data provided for authentication.", ErrorCode.BAD_REQUEST);
+        super("Invalid data provided for authentication.", ErrorCode.UNAUTHORIZED);
     }
 }

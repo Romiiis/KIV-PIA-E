@@ -41,6 +41,17 @@ public interface IProjectRepository {
      */
     List<String> getAllProjectIdsAsString();
 
+    /**
+     * Counts the number of projects associated with a specific translator.
+     *
+     * @param translatorId the UUID of the translator
+     * @return the count of projects associated with the translator
+     */
+    int countProjectsWithTranslator(UUID translatorId);
 
 
+    /**
+     * Deletes all projects from the repository.
+     */
+    void deleteAll();
 }

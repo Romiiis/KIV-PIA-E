@@ -4,6 +4,7 @@ import com.romiiis.domain.User;
 import com.romiiis.exception.EmailInUseException;
 import com.romiiis.exception.InvalidAuthCredentialsException;
 import com.romiiis.repository.IUserRepository;
+import com.romiiis.security.CallerContextProvider;
 import com.romiiis.service.interfaces.IJwtService;
 import com.romiiis.service.interfaces.IPasswordHasher;
 import com.romiiis.service.interfaces.IUserService;
@@ -17,7 +18,9 @@ import org.mockito.MockitoAnnotations;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,8 +35,12 @@ class DefaultAuthServiceImplTest {
     @Mock
     private IPasswordHasher passwordHasher;
 
+    @Mock
+    private CallerContextProvider callerContextProvider;
+
     @InjectMocks
     private DefaultAuthServiceImpl authService;
+
 
     private User mockCustomer;
     private User mockTranslator;
@@ -47,6 +54,11 @@ class DefaultAuthServiceImplTest {
         MockitoAnnotations.openMocks(this);
         mockCustomer = User.createCustomer("Roman", email).withHashedPassword(hashed);
         mockTranslator = User.createTranslator("Eva", "eva@example.com", Set.of(Locale.ENGLISH)).withHashedPassword(hashed);
+
+        when(callerContextProvider.runAsSystem(any())).thenAnswer(invocation -> {
+            Supplier<?> s = invocation.getArgument(0);
+            return s.get();
+        });
     }
 
 

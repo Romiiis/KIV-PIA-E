@@ -493,12 +493,19 @@ paths:
       requestBody:
         required: true
         content:
-          '*/*':
+          multipart/form-data:
             schema:
-              type: string
-              format: binary
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
           description: Translated content uploaded successfully.
         '400':
           description: Invalid input data.
@@ -529,6 +536,10 @@ paths:
             format: uuid
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
           description: Translated content approved successfully.
         '401':
           description: Unauthorized - no valid authentication token provided.
@@ -562,6 +573,10 @@ paths:
               $ref: '#/components/schemas/ProjectFeedbackRequest'
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
           description: Translated content rejected successfully.
         '401':
           description: Unauthorized - no valid authentication token provided.
@@ -589,6 +604,11 @@ paths:
             format: uuid
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+
           description: Project closed successfully.
         '401':
           description: Unauthorized - no valid authentication token provided.
@@ -612,6 +632,7 @@ paths:
       operationId: getProjectFeedback
       parameters:
         - name: id
+          description: Id of the project
           in: path
           required: true
           schema:
@@ -711,7 +732,7 @@ components:
       enum:
         - CUSTOMER
         - TRANSLATOR
-        - ADMIN
+        - ADMINISTRATOR
     
     #??? MAYBE HEADERS ???
     UserHeader:
@@ -870,12 +891,6 @@ components:
       required: [ languageCode, content ]
       additionalProperties: false
       properties:
-        customerId:
-          type: string
-          format: uuid
-          description: >
-            ID of the customer creating the project.  
-            Optional — will use the authenticated user if omitted.
         languageCode:
           type: string
           minLength: 2

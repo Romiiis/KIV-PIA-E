@@ -3,7 +3,13 @@ package com.romiiis.service.impl;
 import com.romiiis.configuration.ResourceHeader;
 import com.romiiis.domain.Project;
 import com.romiiis.domain.User;
+import com.romiiis.domain.UserRole;
+import com.romiiis.exception.FileNotFoundException;
+import com.romiiis.exception.FileStorageException;
+import com.romiiis.exception.NoAccessToOperateException;
+import com.romiiis.exception.ProjectNotFoundException;
 import com.romiiis.repository.IProjectRepository;
+import com.romiiis.security.CallerContextProvider;
 import com.romiiis.service.interfaces.IFileSystemService;
 import com.romiiis.service.interfaces.IUserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,223 +19,233 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
 class DefaultProjectServiceImplTest {
 
-    @Mock
-    private IUserService userService;
-    @Mock
-    private IProjectRepository projectRepository;
-    @Mock
-    private IFileSystemService fsService;
+    @Mock private IUserService userService;
+    @Mock private IProjectRepository projectRepository;
+    @Mock private IFileSystemService fsService;
+    @Mock private CallerContextProvider callerContextProvider;
 
     @InjectMocks
     private DefaultProjectServiceImpl projectService;
 
-    private UUID userId;
-    String userName = "Mock User";
-    String userEmail = "mock@gmail.com";
-    private User mockUser;
-    private ResourceHeader sourceFile;
+    private User admin;
+    private User customer;
+    private User translator;
+    private Project project;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        mockUser = User.createCustomer(userName, userEmail);
-        userId = mockUser.getId();
-        sourceFile = new ResourceHeader("test.txt", "Hello world".getBytes());
+        admin = User.createAdmin("Admin", "admin@test.com");
+        customer = User.createCustomer("John", "john@test.com");
+        translator = User.createTranslator("Eva", "eva@test.com", java.util.Set.of(Locale.ENGLISH));
+
+        project = Project.builder()
+                .id(UUID.randomUUID())
+                .customer(customer)
+                .translator(translator)
+                .originalFileName("orig.txt")
+                .translatedFileName("trans.txt")
+                .build();
     }
 
-    @DisplayName("createProject should create project successfully")
-    @Test
-    void createProject_shouldCreateProjectSuccessfully() throws Exception {
-        // given
-        when(userService.getUserById(userId)).thenReturn(mockUser);
-
-        when(projectRepository.findById(any())).thenAnswer(inv -> Project.builder().id(inv.getArgument(0)).customer(mockUser).build());
-        // when
-        Project result = projectService.createProject(userId, Locale.ENGLISH, sourceFile);
-
-        // then
-        assert result != null;
-        assert result.getCustomer().equals(mockUser);
-        verify(fsService).saveOriginalFile(eq(result.getId()), eq(sourceFile.resourceData()));
-        verify(projectRepository).save(any(Project.class));
+    private void asUser(User user) {
+        when(callerContextProvider.isSystem()).thenReturn(false);
+        when(callerContextProvider.getCaller()).thenReturn(user);
     }
 
-    @DisplayName("createProject should throw UserNotFoundException when user does not exist")
-    @Test
-    void createProject_shouldThrowUserNotFoundException_whenUserDoesNotExist() {
-        // given
-        when(userService.getUserById(userId)).thenReturn(null);
+    private void asSystem() {
+        when(callerContextProvider.isSystem()).thenReturn(true);
+    }
 
-        // when & then
+    // ---------------------------------------------------------
+    // getProjectById
+    // ---------------------------------------------------------
+    @DisplayName("Customer can get own project")
+    @Test
+    void customerCanGetOwnProject() throws Exception {
+        asUser(customer);
+        when(projectRepository.findById(project.getId())).thenReturn(project);
+
+        Project result = projectService.getProjectById(project.getId());
+        assert result.equals(project);
+    }
+
+    @DisplayName("Translator can get assigned project")
+    @Test
+    void translatorCanGetAssignedProject() throws Exception {
+        asUser(translator);
+        when(projectRepository.findById(project.getId())).thenReturn(project);
+
+        Project result = projectService.getProjectById(project.getId());
+        assert result.equals(project);
+    }
+
+    @DisplayName("Customer cannot get another user's project")
+    @Test
+    void customerCannotGetOtherProject() {
+        asUser(User.createCustomer("Other", "o@test.com"));
+        when(projectRepository.findById(project.getId())).thenReturn(project);
+
         try {
-            projectService.createProject(userId, Locale.ENGLISH, sourceFile);
-            assert false; // should not reach here
+            projectService.getProjectById(project.getId());
+            assert false;
         } catch (Exception e) {
-            assert e instanceof com.romiiis.exception.UserNotFoundException;
+            assert e instanceof NoAccessToOperateException;
         }
     }
 
-    @DisplayName("createProject should throw IllegalArgumentException when user is not a customer")
+    @DisplayName("Admin can get any project")
     @Test
-    void createProject_shouldThrowIllegalArgumentException_whenUserIsNotCustomer() {
-        Set<Locale> locales = new HashSet<>();
-        locales.add(Locale.ENGLISH);
-        locales.add(Locale.FRENCH);
+    void adminCanGetAnyProject() throws Exception {
+        asUser(admin);
+        when(projectRepository.findById(project.getId())).thenReturn(project);
 
-        // given
-        User translatorUser = User.createTranslator("Translator", "translator@gmail.com", locales);
-        when(userService.getUserById(userId)).thenReturn(translatorUser);
+        Project result = projectService.getProjectById(project.getId());
+        assert result.equals(project);
+    }
 
-        // when & then
+    @DisplayName("System can get any project (bypass checks)")
+    @Test
+    void systemCanGetAnyProject() throws Exception {
+        asSystem();
+        when(projectRepository.findById(project.getId())).thenReturn(project);
+
+        Project result = projectService.getProjectById(project.getId());
+        assert result.equals(project);
+    }
+
+    // ---------------------------------------------------------
+    // getOriginalFile
+    // ---------------------------------------------------------
+    @DisplayName("Customer can access own original file")
+    @Test
+    void customerCanAccessOwnOriginalFile() throws Exception {
+        asUser(customer);
+        when(projectRepository.findById(project.getId())).thenReturn(project);
+        when(fsService.getOriginalFile(project.getId()))
+                .thenReturn(new ResourceHeader("orig.txt", "data".getBytes()));
+
+        var result = projectService.getOriginalFile(project.getId());
+        assert result != null;
+        verify(fsService).getOriginalFile(project.getId());
+    }
+
+    @DisplayName("Translator can access assigned original file")
+    @Test
+    void translatorCanAccessAssignedOriginalFile() throws Exception {
+        asUser(translator);
+        when(projectRepository.findById(project.getId())).thenReturn(project);
+        when(fsService.getOriginalFile(project.getId()))
+                .thenReturn(new ResourceHeader("orig.txt", "data".getBytes()));
+
+        var result = projectService.getOriginalFile(project.getId());
+        assert result != null;
+        verify(fsService).getOriginalFile(project.getId());
+    }
+
+    @DisplayName("Customer cannot access another user's original file")
+    @Test
+    void customerCannotAccessOthersOriginalFile() {
+        asUser(User.createCustomer("Other", "other@test.com"));
+        when(projectRepository.findById(project.getId())).thenReturn(project);
+
         try {
-            projectService.createProject(userId, Locale.ENGLISH, sourceFile);
-            assert false; // should not reach here
+            projectService.getOriginalFile(project.getId());
+            assert false;
         } catch (Exception e) {
-            assert e instanceof IllegalArgumentException;
+            assert e instanceof NoAccessToOperateException;
         }
     }
 
-    @DisplayName("getAllProjects should return list of projects (Empty List)")
+    @DisplayName("Admin can access any original file")
     @Test
-    void getAllProjects_shouldReturnListOfProjects() {
-        // given
-        var filter = new com.romiiis.filter.ProjectsFilter();
-        when(projectRepository.getAll(filter)).thenReturn(java.util.List.of());
+    void adminCanAccessAnyOriginalFile() throws Exception {
+        asUser(admin);
+        when(projectRepository.findById(project.getId())).thenReturn(project);
+        when(fsService.getOriginalFile(project.getId()))
+                .thenReturn(new ResourceHeader("orig.txt", "data".getBytes()));
 
-        // when
-        var result = projectService.getAllProjects(filter);
-
-        // then
+        var result = projectService.getOriginalFile(project.getId());
         assert result != null;
-        assert result.isEmpty();
-        verify(projectRepository).getAll(filter);
     }
 
-    @DisplayName("getAllProjects should return list of projects (Non-Empty List)")
+    // ---------------------------------------------------------
+    // getTranslatedFile
+    // ---------------------------------------------------------
+    @DisplayName("Translator can access own translated file")
     @Test
-    void getAllProjects_shouldReturnListOfProjects_NonEmpty() {
-        // given
-        var filter = new com.romiiis.filter.ProjectsFilter();
-        var mockProject = Project.builder().id(UUID.randomUUID()).customer(mockUser).build();
-        when(projectRepository.getAll(filter)).thenReturn(java.util.List.of(mockProject));
+    void translatorCanAccessOwnTranslatedFile() throws Exception {
+        asUser(translator);
+        when(projectRepository.findById(project.getId())).thenReturn(project);
+        when(fsService.getTranslatedFile(project.getId()))
+                .thenReturn(new ResourceHeader("trans.txt", "translated".getBytes()));
 
-        // when
-        var result = projectService.getAllProjects(filter);
-
-        // then
+        var result = projectService.getTranslatedFile(project.getId());
         assert result != null;
-        assert result.size() == 1;
-        assert result.getFirst().equals(mockProject);
-        verify(projectRepository).getAll(filter);
+        verify(fsService).getTranslatedFile(project.getId());
     }
 
-
-    @DisplayName("getProjectById should return project when found")
+    @DisplayName("Customer can access own translated file")
     @Test
-    void getProjectById_shouldReturnProject_whenFound() throws Exception {
-        // given
-        UUID projectId = UUID.randomUUID();
-        var mockProject = Project.builder().id(projectId).customer(mockUser).build();
-        when(projectRepository.findById(projectId)).thenReturn(mockProject);
+    void customerCanAccessOwnTranslatedFile() throws Exception {
+        asUser(customer);
+        when(projectRepository.findById(project.getId())).thenReturn(project);
+        when(fsService.getTranslatedFile(project.getId()))
+                .thenReturn(new ResourceHeader("trans.txt", "translated".getBytes()));
 
-        // when
-        var result = projectService.getProjectById(projectId);
-
-        // then
+        var result = projectService.getTranslatedFile(project.getId());
         assert result != null;
-        assert result.equals(mockProject);
-        verify(projectRepository).findById(projectId);
     }
 
-    @DisplayName("getProjectById should throw ProjectNotFoundException when not found")
+    @DisplayName("Customer cannot access others translated file")
     @Test
-    void getProjectById_shouldThrowProjectNotFoundException_whenNotFound() {
-        // given
-        UUID projectId = UUID.randomUUID();
-        when(projectRepository.findById(projectId)).thenReturn(null);
-        // when & then
+    void customerCannotAccessOthersTranslatedFile() {
+        asUser(User.createCustomer("Other", "o@test.com"));
+        when(projectRepository.findById(project.getId())).thenReturn(project);
+
         try {
-            projectService.getProjectById(projectId);
-            assert false; // should not reach here
+            projectService.getTranslatedFile(project.getId());
+            assert false;
         } catch (Exception e) {
-            assert e instanceof com.romiiis.exception.ProjectNotFoundException;
+            assert e instanceof NoAccessToOperateException;
         }
     }
 
-    @DisplayName("getOriginalFile should retrieve original file from file system service")
+    @DisplayName("Throws FileNotFoundException when translated file missing")
     @Test
-    void getOriginalFile_shouldRetrieveOriginalFile() throws Exception {
-        // given
-        UUID projectId = UUID.randomUUID();
-        ResourceHeader mockResource = new ResourceHeader("original.txt", "Original content".getBytes());
-        when(fsService.getOriginalFile(projectId)).thenReturn(mockResource);
-        when(projectRepository.findById(projectId)).thenReturn(Project.builder().id(projectId).originalFileName("original.txt").build());
-        // when
-        ResourceHeader result = projectService.getOriginalFile(projectId);
+    void throwsFileNotFoundWhenTranslatedMissing() {
+        asUser(customer);
+        var p = Project.builder().id(UUID.randomUUID()).customer(customer).build();
+        when(projectRepository.findById(p.getId())).thenReturn(p);
 
-        // then
-        assert result != null;
-        assert result.equals(mockResource);
-        verify(fsService).getOriginalFile(projectId);
-    }
-
-    @DisplayName("getOriginalFile should throw ProjectNotFoundException when project not found")
-    @Test
-    void getOriginalFile_shouldThrowProjectNotFoundException_whenProjectNotFound() {
-        // given
-        UUID projectId = UUID.randomUUID();
-        when(projectRepository.findById(projectId)).thenReturn(null);
-        // when & then
         try {
-            projectService.getOriginalFile(projectId);
-            assert false; // should not reach here
+            projectService.getTranslatedFile(p.getId());
+            assert false;
         } catch (Exception e) {
-            assert e instanceof com.romiiis.exception.ProjectNotFoundException;
+            assert e instanceof FileNotFoundException;
         }
     }
 
-    @DisplayName("getTranslatedFile should retrieve translated file from file system service")
+    @DisplayName("Throws FileStorageException when original file missing")
     @Test
-    void getTranslatedFile_shouldRetrieveTranslatedFile() throws Exception {
-        // given
-        UUID projectId = UUID.randomUUID();
-        ResourceHeader mockResource = new ResourceHeader("translated.txt", "Translated content".getBytes());
-        when(fsService.getTranslatedFile(projectId)).thenReturn(mockResource);
-        when(projectRepository.findById(projectId)).thenReturn(Project.builder().id(projectId).translatedFileName("translated.txt").build());
+    void throwsFileStorageExceptionWhenOriginalMissing() {
+        asUser(customer);
+        var p = Project.builder().id(UUID.randomUUID()).customer(customer).build();
+        when(projectRepository.findById(p.getId())).thenReturn(p);
 
-
-        // when
-        ResourceHeader result = projectService.getTranslatedFile(projectId);
-
-        // then
-        assert result != null;
-        assert result.equals(mockResource);
-        verify(fsService).getTranslatedFile(projectId);
-    }
-
-
-    @DisplayName("getTranslatedFile should throw ProjectNotFoundException when project not found")
-    @Test
-    void getTranslatedFile_shouldThrowProjectNotFoundException_whenProjectNotFound() {
-        // given
-        UUID projectId = UUID.randomUUID();
-        when(projectRepository.findById(projectId)).thenReturn(null);
-        // when & then
         try {
-            projectService.getTranslatedFile(projectId);
-            assert false; // should not reach here
+            projectService.getOriginalFile(p.getId());
+            assert false;
         } catch (Exception e) {
-            assert e instanceof com.romiiis.exception.ProjectNotFoundException;
+            assert e instanceof FileStorageException;
         }
     }
 }

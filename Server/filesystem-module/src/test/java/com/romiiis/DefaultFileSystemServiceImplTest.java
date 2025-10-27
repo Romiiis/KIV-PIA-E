@@ -26,21 +26,24 @@ class DefaultFileSystemServiceImplTest {
     @BeforeEach
     void setUp() throws IOException {
         // Create a temporary directory for test isolation
-        tempDir = Files.createTempDirectory("test-filesystem-service");
+        var tempDirName = "tempTestDir";
 
         // Create anonymous subclass to override rootDirectory
-        fileSystemService = new DefaultFileSystemServiceImpl();
+        fileSystemService = new DefaultFileSystemServiceImpl(tempDirName);
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        if (Files.exists(tempDir)) {
-            Files.walk(tempDir)
-                    .sorted(Comparator.reverseOrder()) // delete children first
+        // Clean up the temporary directory after each test
+        var rootDir = Path.of("tempTestDir");
+        if (Files.exists(rootDir)) {
+            Files.walk(rootDir)
+                    .sorted(Comparator.reverseOrder())
                     .forEach(path -> {
                         try {
-                            Files.deleteIfExists(path);
-                        } catch (IOException ignored) {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            // Ignore
                         }
                     });
         }

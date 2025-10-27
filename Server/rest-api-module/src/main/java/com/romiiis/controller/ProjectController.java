@@ -35,7 +35,6 @@ public class ProjectController implements ProjectsApi {
     private final ProjectMapper projectMapper;
     private final CommonMapper commonMapper;
 
-
     /**
      * Lists all projects with optional filtering by state, language code, and feedback presence.
      *
@@ -60,15 +59,23 @@ public class ProjectController implements ProjectsApi {
      *
      * @param languageCode Target language code for the project.
      * @param content      Multipart file containing the project content.
-     * @param customerId   UUID of the customer creating the project.
      * @return A ResponseEntity containing the created ProjectDTO.
      */
     @Override
-    public ResponseEntity<ProjectDTO> createProject(String languageCode, MultipartFile content, UUID customerId) {
+    public ResponseEntity<ProjectDTO> createProject(String languageCode, MultipartFile content) {
+
+        // Convert language code to Locale
         Locale language = Locale.forLanguageTag(languageCode);
+
+        // Convert MultipartFile to ResourceHeader
         ResourceHeader resHeader = projectMapper.resourceToHeader(content.getResource()) ;
-        var newProject = projectService.createProject(customerId, language, resHeader);
+
+        // Create new project
+        var newProject = projectService.createProject(language, resHeader);
+
+        // Map domain project to DTO
         var projectDTO = projectMapper.mapDomainToDTO(newProject);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(projectDTO);
     }
 
@@ -112,9 +119,9 @@ public class ProjectController implements ProjectsApi {
      */
     @Override
     public ResponseEntity<Resource> downloadTranslatedContent(UUID id) {
+
         ResourceHeader resHeader = projectService.getTranslatedFile(id);
         Project project = projectService.getProjectById(id);
-
         Resource resource =projectMapper.headerToResource(resHeader);
 
         if (project.getTranslatedFileName().isEmpty()) {

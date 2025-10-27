@@ -3,10 +3,7 @@ package com.romiiis.service.interfaces;
 
 import com.romiiis.configuration.ResourceHeader;
 import com.romiiis.domain.Project;
-import com.romiiis.exception.FileNotFoundException;
-import com.romiiis.exception.FileStorageException;
-import com.romiiis.exception.ProjectNotFoundException;
-import com.romiiis.exception.UserNotFoundException;
+import com.romiiis.exception.*;
 import com.romiiis.filter.ProjectsFilter;
 
 import java.util.List;
@@ -23,7 +20,7 @@ public interface IProjectService {
     /**
      * Fetches all projects, possibly filtered by the given filter
      *
-     * @param filter filter to apply
+     * @param filter   filter to apply
      * @return all projects matching the filter
      */
     List<Project> getAllProjects(ProjectsFilter filter);
@@ -44,7 +41,7 @@ public interface IProjectService {
      * @param sourceFile     source file to translate
      * @return newly created project
      */
-    Project createProject(UUID customerId, Locale targetLanguage, ResourceHeader sourceFile) throws ProjectNotFoundException, UserNotFoundException, FileStorageException, IllegalArgumentException;
+    Project createProject(Locale targetLanguage, ResourceHeader sourceFile) throws ProjectNotFoundException, UserNotFoundException, FileStorageException, NoAccessToOperateException;
 
 
     /**
@@ -56,15 +53,20 @@ public interface IProjectService {
     ResourceHeader getOriginalFile(UUID projectId) throws ProjectNotFoundException, FileStorageException;
 
 
-
+    /**
+     * Retrieves the translated file data for a given project.
+     *
+     * @param projectId The ID of the project.
+     * @return The byte array of the translated file data.
+     */
     ResourceHeader getTranslatedFile(UUID projectId) throws ProjectNotFoundException, FileStorageException, FileNotFoundException;
 
     /**
      * Updates an existing project.
      *
-     * @param project the project to be updated
+     * @param project  the project to be updated
      */
-    void updateProject(Project project) throws ProjectNotFoundException;
+    void updateProject( Project project) throws ProjectNotFoundException;
 
 
     /**

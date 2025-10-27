@@ -2,14 +2,14 @@ package com.romiiis.controller;
 
 import com.romiiis.configuration.ResourceHeader;
 import com.romiiis.mapper.ProjectMapper;
+import com.romiiis.model.ProjectDTO;
 import com.romiiis.model.ProjectFeedbackRequestDTO;
-import com.romiiis.service.interfaces.IProjectService;
-import com.romiiis.service.interfaces.IProjectWorkflowService;
+import com.romiiis.service.interfaces.IProjectWFService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -20,10 +20,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @RestController
-public class ProjectsWorkflowController implements ProjectsWorkflowApi {
+public class ProjectsWFController implements ProjectsWorkflowApi {
 
 
-    private final IProjectWorkflowService projectWorkflowService;
+    private final IProjectWFService projectWorkflowService;
     private final ProjectMapper projectMapper;
 
     /**
@@ -33,9 +33,11 @@ public class ProjectsWorkflowController implements ProjectsWorkflowApi {
      * @return A ResponseEntity indicating the result of the operation.
      */
     @Override
-    public ResponseEntity<Void> approveTranslatedContent(UUID id) {
-        // TODO Implement logic for approving translated content
-        return ProjectsWorkflowApi.super.approveTranslatedContent(id);
+    public ResponseEntity<ProjectDTO> approveTranslatedContent(UUID id) {
+        projectWorkflowService.approveProject(
+                id
+        );
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -45,9 +47,11 @@ public class ProjectsWorkflowController implements ProjectsWorkflowApi {
      * @return A ResponseEntity indicating the result of the operation.
      */
     @Override
-    public ResponseEntity<Void> closeProject(UUID id) {
-        // TODO Implement logic for closing the project
-        return ProjectsWorkflowApi.super.closeProject(id);
+    public ResponseEntity<ProjectDTO> closeProject(UUID id) {
+        projectWorkflowService.closeProject(
+                id
+        );
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -58,22 +62,28 @@ public class ProjectsWorkflowController implements ProjectsWorkflowApi {
      * @return A ResponseEntity indicating the result of the operation.
      */
     @Override
-    public ResponseEntity<Void> rejectTranslatedContent(UUID id, ProjectFeedbackRequestDTO projectFeedbackRequestDTO) {
-        // TODO Implement logic for rejecting translated content with feedback
-        return ProjectsWorkflowApi.super.rejectTranslatedContent(id, projectFeedbackRequestDTO);
+    public ResponseEntity<ProjectDTO> rejectTranslatedContent(UUID id, ProjectFeedbackRequestDTO projectFeedbackRequestDTO) {
+        projectWorkflowService.rejectProject(
+                id,
+                projectFeedbackRequestDTO.getText()
+        );
+        return ResponseEntity.ok().build();
     }
 
     /**
      * Uploads the translated content for a project identified by its UUID.
      *
      * @param id   The UUID of the project.
-     * @param body The translated content as a Resource.
+     * @param file The translated file to be uploaded.
      * @return A ResponseEntity indicating the result of the operation.
      */
     @Override
-    public ResponseEntity<Void> uploadTranslatedContent(UUID id, Resource body) {
-        ResourceHeader resHeader = projectMapper.resourceToHeader(body);
+    public ResponseEntity<ProjectDTO> uploadTranslatedContent(UUID id, MultipartFile file) {
+
+        ResourceHeader resHeader = projectMapper.resourceToHeader(file.getResource());
+
         projectWorkflowService.uploadTranslatedFile(id, resHeader);
+
         return ResponseEntity.ok().build();
     }
 }

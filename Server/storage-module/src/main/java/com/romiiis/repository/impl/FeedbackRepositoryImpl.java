@@ -5,7 +5,6 @@ import com.romiiis.mapper.MongoFeedbackMapper;
 import com.romiiis.repository.IFeedbackRepository;
 import com.romiiis.repository.mongo.MongoFeedbackRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
@@ -26,7 +25,37 @@ public class FeedbackRepositoryImpl implements IFeedbackRepository {
     @Override
     public Feedback getFeedbackByProjectId(UUID projectId) {
         return mapper.mapDBToDomain(
-                mongoFeedbackRepository.getFeedbackById(projectId)
+                mongoFeedbackRepository.getFeedbackByProjectId(projectId)
         );
+    }
+
+    /**
+     * Saves feedback to the repository.
+     *
+     * @param feedback the Feedback to save
+     */
+    @Override
+    public void save(Feedback feedback) {
+        mongoFeedbackRepository.save(
+                mapper.mapDomainToDB(feedback)
+        );
+    }
+
+    /**
+     * Deletes feedback for the specified project ID.
+     *
+     * @param projectId the UUID of the project whose feedback is to be deleted
+     */
+    @Override
+    public void deleteForProject(UUID projectId) {
+        mongoFeedbackRepository.deleteByProjectId(projectId);
+    }
+
+    /**
+     * Deletes all feedback entries from the repository.
+     */
+    @Override
+    public void deleteAll() {
+        mongoFeedbackRepository.deleteAll();
     }
 }

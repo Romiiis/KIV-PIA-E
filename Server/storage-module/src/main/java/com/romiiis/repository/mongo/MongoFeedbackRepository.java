@@ -3,6 +3,7 @@ package com.romiiis.repository.mongo;
 
 import com.romiiis.model.FeedbackDB;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
@@ -22,7 +23,16 @@ public interface MongoFeedbackRepository extends MongoRepository<FeedbackDB, UUI
      * @param id the UUID of the feedback to retrieve
      * @return the FeedbackDB entity with the given ID, or null if not found
      */
-    FeedbackDB getFeedbackById(UUID id);
+    FeedbackDB getFeedbackByProjectId(UUID id);
+
+
+    /**
+     * Deletes a FeedbackDB entity by its associated project ID.
+     *
+     * @param projectId the UUID of the project whose feedback is to be deleted
+     */
+    @Query(value = "{ 'project.$id': ?0 }", delete = true)
+    void deleteByProjectId(UUID projectId);
 
 }
 

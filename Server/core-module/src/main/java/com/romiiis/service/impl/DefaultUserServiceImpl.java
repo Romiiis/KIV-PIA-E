@@ -3,9 +3,11 @@ package com.romiiis.service.impl;
 
 import com.romiiis.domain.User;
 import com.romiiis.domain.UserRole;
+import com.romiiis.exception.NoAccessToOperateException;
 import com.romiiis.exception.UserNotFoundException;
 import com.romiiis.filter.UsersFilter;
 import com.romiiis.repository.IUserRepository;
+import com.romiiis.security.CallerContextProvider;
 import com.romiiis.service.interfaces.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ public class DefaultUserServiceImpl implements IUserService {
      * Repository for user data access
      */
     private final IUserRepository userRepository;
+    private final CallerContextProvider callerContextProvider;
 
     /**
      * Retrieves a user by their email address.
@@ -33,7 +36,24 @@ public class DefaultUserServiceImpl implements IUserService {
      * @return the User with the given email, or null if not found
      */
     @Override
-    public User getUserByEmail(String email) throws UserNotFoundException {
+    public User getUserByEmail(String email) throws UserNotFoundException, NoAccessToOperateException {
+
+        // TODO - add authorization checks here
+        // TODO - admin can access all users, customers and translators can access their own data only.
+        if (!callerContextProvider.isSystem()) {
+
+            User caller = fetchUserFromContext();
+
+            if (caller.getRole() != UserRole.ADMINISTRATOR) {
+
+                // Non-admin users can only fetch their own data and translators can fetch data of customers assigned to their projects
+                if (!caller.getEmailAddress().equalsIgnoreCase(email)) {
+                    log.error("User with email {} is not authorized to access data of email {}", caller.getEmailAddress(), email);
+                    throw new NoAccessToOperateException("User is not authorized to access data of email " + email);
+                }
+            }
+
+        }
 
         Optional<User> userOpt = userRepository.getUserByEmail(email);
 
@@ -60,16 +80,8 @@ public class DefaultUserServiceImpl implements IUserService {
 
         User newUser = User.createCustomer(name, email).withHashedPassword(password);
         userRepository.save(newUser);
-
-        // Try to fetch the user back to ensure it was saved correctly
-        Optional<User> savedUserOpt = userRepository.getUserByEmail(email);
-
-        if (savedUserOpt.isEmpty()) {
-            log.error("Failed to retrieve newly created customer with email {}", email);
-            throw new UserNotFoundException("Failed to retrieve newly created customer");
-        }
         log.info("New customer created: {}", newUser.getEmailAddress());
-        return savedUserOpt.get();
+        return newUser;
     }
 
 
@@ -87,14 +99,8 @@ public class DefaultUserServiceImpl implements IUserService {
     public User createNewTranslator(String name, String email, Set<Locale> langs, String password) throws UserNotFoundException {
         User newUser = User.createTranslator(name, email, langs).withHashedPassword(password);
         userRepository.save(newUser);
-
-        Optional<User> savedUserOpt = userRepository.getUserByEmail(email);
-        if (savedUserOpt.isEmpty()) {
-            log.error("Failed to retrieve newly created translator with email {}", email);
-            throw new UserNotFoundException("Failed to retrieve newly created translator");
-        }
         log.info("New translator created: {}", newUser.getEmailAddress());
-        return savedUserOpt.get();
+        return newUser;
     }
 
 
@@ -106,6 +112,23 @@ public class DefaultUserServiceImpl implements IUserService {
      */
     @Override
     public User getUserById(UUID userId) {
+        // TODO - add authorization checks here
+        // TODO - admin can access all users, customers can access their own data only and translators can access their own data only.
+        if (!callerContextProvider.isSystem()) {
+
+            User caller = fetchUserFromContext();
+
+            if (caller.getRole() != UserRole.ADMINISTRATOR) {
+
+                // Non-admin users can only fetch their own data
+                if (!caller.getId().equals(userId)) {
+                    log.error("User with ID {} is not authorized to access data of user ID {}", caller.getId(), userId);
+                    throw new NoAccessToOperateException("User is not authorized to access data of user ID " + userId);
+                }
+            }
+
+        }
+
         Optional<User> userOpt = userRepository.getUserById(userId);
         if (userOpt.isEmpty()) {
             log.warn("User with ID {} not found", userId);
@@ -124,6 +147,16 @@ public class DefaultUserServiceImpl implements IUserService {
      */
     @Override
     public List<User> getAllUsers(UsersFilter filter) {
+        // TODO - add authorization checks here
+        // TODO - only admin can fetch all users
+        if (!callerContextProvider.isSystem()) {
+            User caller = fetchUserFromContext();
+
+            if (caller.getRole() != UserRole.ADMINISTRATOR) {
+                log.error("User with ID {} is not authorized to fetch all users", caller.getId());
+                throw new NoAccessToOperateException("User is not authorized to fetch all users");
+            }
+        }
         return userRepository.getAllUsers(filter);
     }
 
@@ -134,11 +167,21 @@ public class DefaultUserServiceImpl implements IUserService {
      * @return a list of language codes associated with the user
      */
     @Override
-    public List<Locale> getUsersLanguages(UUID userId) throws IllegalArgumentException {
+    public List<Locale> getUsersLanguages(UUID userId) throws UserNotFoundException {
+
+        // TODO - only admin and the user themselves can access this data
+        if (!callerContextProvider.isSystem()) {
+            User caller = fetchUserFromContext();
+
+            if (caller.getRole() != UserRole.ADMINISTRATOR && !caller.getId().equals(userId)) {
+                log.error("User with ID {} is not authorized to access languages of user ID {}", caller.getId(), userId);
+                throw new NoAccessToOperateException("User is not authorized to access languages of user ID " + userId);
+            }
+        }
 
         if (userRepository.getRoleById(userId) != UserRole.TRANSLATOR) {
             log.error("User with ID {} is not a translator and has no associated languages", userId);
-            throw new IllegalArgumentException("User with ID " + userId + " is not a translator");
+            throw new UserNotFoundException("User with ID " + userId + " is not a translator");
         }
 
         return userRepository.getUsersLanguages(userId);
@@ -154,17 +197,63 @@ public class DefaultUserServiceImpl implements IUserService {
      */
     @Override
     public Set<Locale> updateUserLanguages(UUID userId, Set<Locale> languages) throws UserNotFoundException {
+
+        // Only translator themselves
+        if (!callerContextProvider.isSystem()) {
+            User caller = fetchUserFromContext();
+
+            if (caller.getRole() != UserRole.TRANSLATOR || !caller.getId().equals(userId)) {
+                log.error("User with ID {} is not authorized to update languages of user ID {}", caller.getId(), userId);
+                throw new NoAccessToOperateException("User is not authorized to update languages of user ID " + userId);
+            }
+        }
         User user = getUserById(userId);
 
-        if (user == null) {
-            log.error("User with ID {} not found for language update", userId);
-            throw new UserNotFoundException("User with ID " + userId + " not found");
-        }
         user.setLanguages(languages);
         userRepository.save(user);
         log.info("Updated languages for user ID {}: {}", userId, languages);
 
         user = getUserById(userId);
         return user.getLanguages();
+    }
+
+    /**
+     * Retrieves a list of translator IDs proficient in the specified language.
+     *
+     * @param language the target language
+     * @return a list of translator UUIDs proficient in the specified language
+     */
+    @Override
+    public List<UUID> getTranslatorIdsByLanguage(Locale language) {
+        return userRepository.getTranslatorsIdsByLanguage(language);
+    }
+
+    /**
+     * Retrieves the role of a user by their unique identifier.
+     *
+     * @param userId the UUID of the user
+     * @return the UserRole of the user
+     */
+    @Override
+    public UserRole getUserRole(UUID userId) throws UserNotFoundException {
+        return userRepository.getRoleById(userId);
+    }
+
+
+    private User fetchUserFromContext() throws UserNotFoundException {
+        User caller = callerContextProvider.getCaller();
+        if (caller == null) {
+            log.error("Caller not found in context");
+            throw new UserNotFoundException("Caller not found");
+        }
+        return caller;
+    }
+
+    @Override
+    public User createNewAdmin(String name, String email, String password) throws UserNotFoundException {
+        User newUser = User.createAdmin(name, email).withHashedPassword(password);
+        userRepository.save(newUser);
+        log.info("New administrator created: {}", newUser.getEmailAddress());
+        return newUser;
     }
 }

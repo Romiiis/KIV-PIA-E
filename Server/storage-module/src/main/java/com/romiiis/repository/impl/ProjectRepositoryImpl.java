@@ -1,8 +1,8 @@
 package com.romiiis.repository.impl;
 
 import com.romiiis.configuration.ProjectMongoFilter;
-import com.romiiis.filter.ProjectsFilter;
 import com.romiiis.domain.Project;
+import com.romiiis.filter.ProjectsFilter;
 import com.romiiis.mapper.MongoProjectMapper;
 import com.romiiis.model.ProjectDB;
 import com.romiiis.repository.IProjectRepository;
@@ -78,4 +78,17 @@ public class ProjectRepositoryImpl implements IProjectRepository {
                 .toList();
     }
 
+    @Override
+    public int countProjectsWithTranslator(UUID translatorId) {
+        return mongoRepo.countByTranslatorId(translatorId);
+    }
+
+    /**
+     * Deletes all projects from the MongoDB database.
+     */
+    @Override
+    public void deleteAll() {
+        mongoRepo.deleteAll();
+
+    }
 }
