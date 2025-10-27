@@ -1,6 +1,10 @@
-export interface User {
+import {UserRoleDomain} from '@core/models/userRole.model';
+
+export interface UserDomain {
   id: string;
   name: string;
   emailAddress: string;
-  role: 'customer' | 'translator' | 'admin';
+  role: UserRoleDomain
+  languages?: string[];
+  createdAt: string;
 }

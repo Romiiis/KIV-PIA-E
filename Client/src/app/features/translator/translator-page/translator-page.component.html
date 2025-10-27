@@ -1,19 +1,19 @@
 
 <div class="dashboard">
-  <div class="stat-card">✅ {{ projects | filterByStatus:'closed' | length }} completed overall </div>
+  <div class="stat-card">✅ {{ projects | filterByStatus:ProjectStatusDomain.CLOSED | length }} completed overall </div>
 
   <div class="header">
-    <div class="stat-card">📄 {{ projects | filterByStatus:'assigned' | length }} for translation</div>
+    <div class="stat-card">📄 {{ projects | filterByStatus:ProjectStatusDomain.ASSIGNED | length }} for translation</div>
     <!-- TODO Assigned + with feedback -->
-    <div class="stat-card">📝 {{ projects | filterByStatus:'assigned' | length }} for customer feedback </div>
+    <div class="stat-card">📝 {{ projects | filterByStatus:ProjectStatusDomain.ASSIGNED | length }} for customer feedback </div>
 
-    <div class="stat-card">❌ {{ projects | filterByStatus:'approved' | length }} rejected </div>
+    <div class="stat-card">❌ {{ projects | filterByStatus:ProjectStatusDomain.APPROVED | length }} rejected </div>
   </div>
 
   <div class="timeline-board">
     <div class="stage created">
       <h3>Waiting for your translation</h3>
-      @for (p of projects | filterByStatus:'created'; track p.id) {
+      @for (p of projects | filterByStatus:ProjectStatusDomain.CREATED; track p.id) {
         <div class="project-card">
           <div class="title">{{ p.customerId }}</div>
           <div class="lang">English → {{ p.targetLanguage }}</div>
@@ -23,7 +23,7 @@
 
     <div class="stage completed">
       <h3>Waiting for feedback</h3>
-      @for (p of projects | filterByStatus:'completed'; track p.id) {
+      @for (p of projects | filterByStatus:ProjectStatusDomain.COMPLETED; track p.id) {
         <div class="project-card">
           <div class="title">{{ p.customerId }}</div>
           <div class="lang">English → {{ p.targetLanguage }}</div>
@@ -33,7 +33,7 @@
 
     <div class="stage approved">
       <h3>Rejected</h3>
-      @for (p of projects | filterByStatus:'approved'; track p.id) {
+      @for (p of projects | filterByStatus:ProjectStatusDomain.APPROVED; track p.id) {
         <div class="project-card">
           <div class="title">{{ p.customerId }}</div>
           <div class="lang">English → {{ p.targetLanguage }}</div>

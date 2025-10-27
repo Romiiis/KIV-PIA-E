@@ -4,9 +4,11 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "generate:api": "ng-openapi -c openapi.config.ts",
+    "prebuild": "npm run generate:api",
+    "build": "npm run generate:api && ng build"
   },
   "prettier": {
     "printWidth": 100,
@@ -47,6 +49,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "ng-openapi": "^0.2.8"
   }
 }

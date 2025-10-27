@@ -4,15 +4,15 @@
 </button>
 <div class="dashboard">
   <div class="header">
-    <div class="stat-card">📄 {{ projects | filterByStatus:'created' | length }} to translate</div>
-    <div class="stat-card">📝 {{ projects | filterByStatus:'completed' | length }} feedback</div>
-    <div class="stat-card">✅ {{ projects | filterByStatus:'approved' | length }} done</div>
+    <div class="stat-card">📄 {{ projects | filterByStatus:ProjectStatusDomain.CREATED | length }} to translate</div>
+    <div class="stat-card">📝 {{ projects | filterByStatus:ProjectStatusDomain.COMPLETED | length }} feedback</div>
+    <div class="stat-card">✅ {{ projects | filterByStatus:ProjectStatusDomain.APPROVED | length }} done</div>
   </div>
 
   <div class="timeline-board">
     <div class="stage created">
       <h3>Waiting for translation</h3>
-      @for (p of projects | filterByStatus:'created'; track p.id) {
+      @for (p of projects | filterByStatus:ProjectStatusDomain.CREATED; track p.id) {
         <div class="project-card">
           <div class="title">{{ p.customerId }}</div>
           <div class="lang">English → {{ p.targetLanguage }}</div>
@@ -22,7 +22,7 @@
 
     <div class="stage completed">
       <h3>Waiting for feedback</h3>
-      @for (p of projects | filterByStatus:'completed'; track p.id) {
+      @for (p of projects | filterByStatus:ProjectStatusDomain.COMPLETED; track p.id) {
         <div class="project-card">
           <div class="title">{{ p.customerId }}</div>
           <div class="lang">English → {{ p.targetLanguage }}</div>
@@ -32,7 +32,7 @@
 
     <div class="stage approved">
       <h3>Completed</h3>
-      @for (p of projects | filterByStatus:'approved'; track p.id) {
+      @for (p of projects | filterByStatus:ProjectStatusDomain.APPROVED; track p.id) {
         <div class="project-card">
           <div class="title">{{ p.customerId }}</div>
           <div class="lang">English → {{ p.targetLanguage }}</div>

@@ -13,8 +13,6 @@ import java.util.UUID;
 /**
  * Project domain object
  * Represents a translation project
- *
- * @author Roman Pejs
  */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PACKAGE)

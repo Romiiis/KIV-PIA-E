@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {FilterByStatusPipe} from '@shared/pipes/filter-by-status-pipe';
 import {LengthPipe} from '@shared/pipes/length-pipe';
 import {Project} from '@core/models/project.model';
+import {ProjectStatusDomain} from '@core/models/projectStatus.model';
 
 @Component({
   selector: 'app-admin-page.component',
@@ -21,7 +22,7 @@ export class AdminPageComponent {
       customerId: 'cust001',
       sourceFileUrl: '/files/documents/contract-en.pdf',
       targetLanguage: 'de',
-      status: 'created'
+      status: ProjectStatusDomain.CREATED
     },
     {
       id: 'p2',
@@ -29,7 +30,7 @@ export class AdminPageComponent {
       translatorId: 'trans001',
       sourceFileUrl: '/files/articles/news-fr.docx',
       targetLanguage: 'en',
-      status: 'assigned'
+      status: ProjectStatusDomain.ASSIGNED
     },
     {
       id: 'p3',
@@ -37,7 +38,7 @@ export class AdminPageComponent {
       translatorId: 'trans002',
       sourceFileUrl: '/files/presentations/marketing-es.pptx',
       targetLanguage: 'cs',
-      status: 'completed'
+      status: ProjectStatusDomain.COMPLETED
     },
     {
       id: 'p4',
@@ -45,7 +46,7 @@ export class AdminPageComponent {
       translatorId: 'trans003',
       sourceFileUrl: '/files/manuals/product-it.pdf',
       targetLanguage: 'pl',
-      status: 'completed'
+      status: ProjectStatusDomain.COMPLETED
     },
     {
       id: 'p5',
@@ -53,8 +54,9 @@ export class AdminPageComponent {
       translatorId: 'trans004',
       sourceFileUrl: '/files/letters/letter-ru.txt',
       targetLanguage: 'en',
-      status: 'completed'
+      status: ProjectStatusDomain.COMPLETED
     }
   ];
 
+  protected readonly ProjectStatusDomain = ProjectStatusDomain;
 }

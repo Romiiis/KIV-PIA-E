@@ -4,6 +4,7 @@ import {LengthPipe} from '@shared/pipes/length-pipe';
 import {NewProjectComponent} from '@features/customer/new-project/new-project.component';
 import {NgIf} from '@angular/common';
 import {Project} from '@core/models/project.model';
+import {ProjectStatusDomain} from '@core/models/projectStatus.model';
 
 @Component({
   selector: 'app-customer-page',
@@ -36,7 +37,7 @@ export class CustomerPageComponent {
       customerId: 'cust001',
       sourceFileUrl: '/files/documents/contract-en.pdf',
       targetLanguage: 'de',
-      status: 'created'
+      status: ProjectStatusDomain.COMPLETED
     },
     {
       id: 'p2',
@@ -44,7 +45,7 @@ export class CustomerPageComponent {
       translatorId: 'trans001',
       sourceFileUrl: '/files/articles/news-fr.docx',
       targetLanguage: 'en',
-      status: 'assigned'
+      status: ProjectStatusDomain.ASSIGNED
     },
     {
       id: 'p3',
@@ -52,7 +53,7 @@ export class CustomerPageComponent {
       translatorId: 'trans002',
       sourceFileUrl: '/files/presentations/marketing-es.pptx',
       targetLanguage: 'cs',
-      status: 'completed'
+      status: ProjectStatusDomain.COMPLETED
     },
     {
       id: 'p4',
@@ -60,7 +61,7 @@ export class CustomerPageComponent {
       translatorId: 'trans003',
       sourceFileUrl: '/files/manuals/product-it.pdf',
       targetLanguage: 'pl',
-      status: 'completed'
+      status: ProjectStatusDomain.COMPLETED
     },
     {
       id: 'p5',
@@ -68,10 +69,10 @@ export class CustomerPageComponent {
       translatorId: 'trans004',
       sourceFileUrl: '/files/letters/letter-ru.txt',
       targetLanguage: 'en',
-      status: 'completed'
+      status: ProjectStatusDomain.COMPLETED
     }
   ];
 
 
-
+  protected readonly ProjectStatusDomain = ProjectStatusDomain;
 }

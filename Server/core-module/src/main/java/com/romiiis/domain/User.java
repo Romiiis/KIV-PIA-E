@@ -14,13 +14,13 @@ import java.util.regex.Pattern;
  * User domain object
  * Represents a user of the system, either a customer or a translator
  *
- * @author Roman Pejs
  */
 @Slf4j
 @Getter
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @Builder
 public class User {
+
     private UUID id;
     private String name;
     private String emailAddress;
@@ -49,8 +49,6 @@ public class User {
         this.languages = languages;
         this.createdAt = Instant.now();
     }
-
-
 
 
     /**
@@ -130,7 +128,6 @@ public class User {
             throw new IllegalArgumentException("Email address cannot be empty or invalid");
         }
     }
-
 
 
     /**

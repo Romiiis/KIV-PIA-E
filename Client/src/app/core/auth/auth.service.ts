@@ -1,7 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
 import {Observable, of} from 'rxjs';
-import {User} from '@core/models/user.model';
+import {UserDomain} from '@core/models/user.model';
+import {UserRoleDomain} from '@core/models/userRole.model';
 
 
 const MOCKS = [
@@ -35,23 +36,14 @@ const MOCKS = [
 @Injectable({providedIn: 'root'})
 export class AuthService {
 
-  loggedUser: User | undefined
+  loggedUser: UserDomain | undefined
 
   constructor(private router: Router) {
   }
 
   login(email: string, password: string): Observable<boolean> {
 
-    const found = MOCKS.find(
-      m => m.username == email && m.password == password
-    );
-
-    console.log('Login attempt:', {email, password, found});
-
-    if (found) {
-      this.loggedUser = found.user as User;
-      return of(true);
-    }
+    //TODO Replace with real API call
 
     this.loggedUser = undefined;
     return of(false);
@@ -63,7 +55,7 @@ export class AuthService {
   }
 
 
-  getRole(): string | null {
+  getRole(): UserRoleDomain | null {
     return this.loggedUser?.role || null;
   }
 

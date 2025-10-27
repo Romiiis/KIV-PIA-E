@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
 import {AuthService} from '@core/auth/auth.service';
+import {UserRoleDomain} from '@core/models/userRole.model';
 
 @Injectable({ providedIn: 'root' })
 export class RoleRedirectGuard implements CanActivate {
@@ -21,16 +22,16 @@ export class RoleRedirectGuard implements CanActivate {
     }
 
     // If user has a role, check if they are going to the right place
-    if (role === 'customer' && state.url.startsWith('/customer')) return true;
-    if (role === 'translator' && state.url.startsWith('/translator')) return true;
-    if (role === 'admin' && state.url.startsWith('/admin')) return true;
+    if (role === UserRoleDomain.CUSTOMER && state.url.startsWith('/customer')) return true;
+    if (role === UserRoleDomain.TRANSLATOR && state.url.startsWith('/translator')) return true;
+    if (role === UserRoleDomain.ADMINISTRATOR && state.url.startsWith('/admin')) return true;
 
     // If user is going to root or wildcard, redirect based on role
     if (state.url === '/' || route.routeConfig?.path === '**') {
       switch (role) {
-        case 'customer': return this.router.parseUrl('/customer');
-        case 'translator': return this.router.parseUrl('/translator');
-        case 'admin': return this.router.parseUrl('/admin');
+        case UserRoleDomain.CUSTOMER: return this.router.parseUrl('/customer');
+        case UserRoleDomain.TRANSLATOR: return this.router.parseUrl('/translator');
+        case UserRoleDomain.ADMINISTRATOR: return this.router.parseUrl('/admin');
       }
     }
 

@@ -1,0 +1,5 @@
+export enum UserRoleDomain {
+  CUSTOMER = "CUSTOMER",
+  TRANSLATOR = "TRANSLATOR",
+  ADMINISTRATOR = "ADMINISTRATOR"
+}

@@ -1,6 +1,6 @@
 import {Component, HostListener, Input} from '@angular/core';
 import {NgIf} from '@angular/common';
-import {User} from '@core/models/user.model';
+import {UserDomain} from '@core/models/user.model';
 import {RouterOutlet} from '@angular/router';
 import {AuthService} from '@core/auth/auth.service';
 
@@ -14,7 +14,7 @@ import {AuthService} from '@core/auth/auth.service';
   styleUrl: './layout.component.css'
 })
 export class LayoutComponent {
-  loggedUser!: User
+  loggedUser!: UserDomain
   showMenu = false;
   closeTimeout: any;
 

@@ -1,7 +1,5 @@
 package com.romiiis.configuration;
 
-import lombok.Getter;
-
 /**
  * Record representing a resource header with its name and data.
  *
