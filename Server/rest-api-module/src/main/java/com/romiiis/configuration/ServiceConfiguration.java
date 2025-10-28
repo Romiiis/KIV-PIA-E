@@ -31,7 +31,7 @@ public class ServiceConfiguration {
 
     @Bean
     public IAuthService authService(IUserService userService, IUserRepository userRepository, IJwtService jwtService, IPasswordHasher passwordHasher, CallerContextProvider callerContextProvider) {
-        return new DefaultAuthServiceImpl(userService, userRepository, jwtService, passwordHasher, callerContextProvider);
+        return new DefaultAuthServiceImpl(userService, userRepository, passwordHasher, callerContextProvider);
     }
 
     @Bean

@@ -9,7 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -29,6 +32,11 @@ public class DefaultJwtServiceImpl implements IJwtService {
      */
     private final Map<String, Instant> blacklist = new ConcurrentHashMap<>();
 
+    /**
+     * Constructor
+     *
+     * @param props JWT properties
+     */
     public DefaultJwtServiceImpl(JwtProperties props) {
         this.props = props;
         this.secretKey = Keys.hmacShaKeyFor(props.getSecret().getBytes(StandardCharsets.UTF_8));
@@ -47,13 +55,6 @@ public class DefaultJwtServiceImpl implements IJwtService {
         return generateAccessToken(userId.toString(), jti, expiresAt, role);
     }
 
-    /**
-     * Backward-compatible method (no role).
-     */
-    @Override
-    public String generateToken(UUID userId) {
-        return generateToken(userId, null);
-    }
 
     /**
      * Generates an access token with the specified parameters.
@@ -79,8 +80,30 @@ public class DefaultJwtServiceImpl implements IJwtService {
         return builder.signWith(secretKey, SignatureAlgorithm.HS256).compact();
     }
 
+
+    /**
+     * Generates a refresh token for the given user ID and role.
+     *
+     * @param subject user identifier (UUID)
+     * @param role    single role (e.g. "ADMIN", "CUSTOMER", "TRANSLATOR")
+     * @return signed JWT refresh token
+     */
     @Override
-    public String generateRefreshToken(String subject, String jti, String parentJti, Instant expiresAt) {
+    public String generateRefreshToken(UUID subject, String role) {
+        String jti = UUID.randomUUID().toString();
+        Instant expiresAt = Instant.now().plusMillis(props.getRefreshExpirationMs());
+        return generateRefreshToken(subject.toString(), jti, expiresAt, role);
+    }
+
+    /**
+     * Generates a refresh token with the specified parameters.
+     *
+     * @param subject   Subject of the token (user ID)
+     * @param jti       Unique token identifier
+     * @param expiresAt Expiration time
+     * @param role      single user role (nullable)
+     */
+    private String generateRefreshToken(String subject, String jti, Instant expiresAt, String role) {
         JwtBuilder builder = Jwts.builder()
                 .setSubject(subject)
                 .setId(jti)
@@ -89,12 +112,20 @@ public class DefaultJwtServiceImpl implements IJwtService {
                 .setExpiration(Date.from(expiresAt))
                 .claim("type", "refresh");
 
-        if (parentJti != null)
-            builder.claim("parent", parentJti);
+        if (role != null) {
+            builder.claim("role", role);
+        }
 
         return builder.signWith(secretKey, SignatureAlgorithm.HS256).compact();
     }
 
+
+    /**
+     * Validates the given JWT token.
+     *
+     * @param token JWT token
+     * @return true if the token is valid, false otherwise
+     */
     @Override
     public boolean validateToken(String token) {
         try {
@@ -112,6 +143,12 @@ public class DefaultJwtServiceImpl implements IJwtService {
         }
     }
 
+    /**
+     * Parses the JWT token and returns the claims.
+     *
+     * @param token JWT token
+     * @return Jws<Claims> object containing the token claims
+     */
     private Jws<Claims> parse(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
@@ -120,6 +157,13 @@ public class DefaultJwtServiceImpl implements IJwtService {
                 .parseClaimsJws(token);
     }
 
+
+    /**
+     * Extracts the subject (user ID) from a JWT token.
+     *
+     * @param token JWT token
+     * @return the subject (user ID)
+     */
     @Override
     public String getSubjectFromToken(String token) {
         return parse(token).getBody().getSubject();
@@ -141,8 +185,14 @@ public class DefaultJwtServiceImpl implements IJwtService {
         }
     }
 
-    @Override
-    public Optional<String> getJti(String token) {
+
+    /**
+     * Extracts the JWT ID (jti) from a JWT token.
+     *
+     * @param token JWT token
+     * @return Optional containing the jti if present, otherwise empty
+     */
+    private Optional<String> getJti(String token) {
         try {
             return Optional.ofNullable(parse(token).getBody().getId());
         } catch (Exception e) {
@@ -150,20 +200,36 @@ public class DefaultJwtServiceImpl implements IJwtService {
         }
     }
 
-    @Override
-    public Instant getExpiration(String token) {
+    /**
+     * Extracts the expiration time from a JWT token.
+     *
+     * @param token JWT token
+     * @return expiration time as Instant
+     */
+    public Instant getTokenExpirationMs(String token) {
         return parse(token).getBody().getExpiration().toInstant();
     }
 
-    @Override
+    /**
+     * Extracts the expiration time from a JWT token.
+     *
+     * @param token JWT token
+     * @return expiration time as Instant
+     */
     public boolean isExpired(String token) {
-        return getExpiration(token).isBefore(Instant.now());
+        return getTokenExpirationMs(token).isBefore(Instant.now());
     }
 
+
+    /**
+     * Invalidates the given JWT token by adding its jti to the blacklist.
+     *
+     * @param token the JWT token to invalidate
+     */
     @Override
     public void invalidateToken(String token) {
         getJti(token).ifPresent(jti -> {
-            Instant exp = getExpiration(token);
+            Instant exp = getTokenExpirationMs(token);
             blacklist.put(jti, exp);
             log.info("Token invalidated: jti={}, exp={}", jti, exp);
         });
@@ -181,12 +247,31 @@ public class DefaultJwtServiceImpl implements IJwtService {
         return true;
     }
 
+    /**
+     * Parses the claims from the given JWT token.
+     *
+     * @param token JWT token
+     * @return Optional containing the Claims if parsing is successful, otherwise empty
+     */
     @Override
     public long getRemainingLifetime(String token) {
         try {
-            return Math.max(0, getExpiration(token).toEpochMilli() - Instant.now().toEpochMilli());
+            return Math.max(0, getTokenExpirationMs(token).toEpochMilli() - Instant.now().toEpochMilli());
         } catch (Exception e) {
             return 0;
+        }
+    }
+
+
+    @Override
+    public boolean isRefreshToken(String token) {
+        try {
+            Claims claims = parse(token).getBody();
+            String type = claims.get("type", String.class);
+            return "refresh".equals(type);
+        } catch (Exception e) {
+            log.warn("Cannot determine token type: {}", e.getMessage());
+            return false;
         }
     }
 }

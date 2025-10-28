@@ -1,7 +1,7 @@
 import {UserDomain} from '@core/models/user.model';
 import {UserRoleDomain} from '@core/models/userRole.model';
 import {EnumMapper} from './enum.mapper';
-import {User} from '../../../generatedAPI';
+import {User} from '@generated/model/user';
 
 export class UserMapper {
 
@@ -18,7 +18,7 @@ export class UserMapper {
       emailAddress: apiUser.emailAddress,
       languages: apiUser.languages,
       role: EnumMapper.mapApiUserRoleToDomainRole(apiUser.role),
-      createdAt: apiUser.createdAt.toISOString(),
+      createdAt: apiUser.createdAt.toString()
     }
   }
 

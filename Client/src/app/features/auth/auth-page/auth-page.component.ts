@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, Validators, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import { Router } from '@angular/router';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Router} from '@angular/router';
 import {AuthService} from '@core/auth/auth.service';
 import {NotificationService} from '@core/services/notification.service';
 import {NgIf, NgOptimizedImage} from '@angular/common';
+import {UserRoleDomain} from '@core/models/userRole.model';
 
 @Component({
   selector: 'app-auth-page',
@@ -23,7 +24,6 @@ export class AuthPageComponent implements OnInit {
 
 
   ngOnInit(): void {
-    // login form
     this.loginForm = this.fb.group({
       email: ['', Validators.required],
       password: ['', Validators.required]
@@ -54,10 +54,29 @@ export class AuthPageComponent implements OnInit {
   submitLogin() {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
-      this.auth.login(email!, password!).subscribe(() => {
-        const role = this.auth.getRole();
-        this.router.navigate([`/${role}`]);
-      });
+      this.auth.login(email, password)
+        .then(user => {
+          this.notify.success('Login successful!');
+          // Redirect based on role
+          switch (user?.role) {
+            case UserRoleDomain.CUSTOMER:
+              this.router.navigate(['/customer']);
+              break;
+            case UserRoleDomain.TRANSLATOR:
+              this.router.navigate(['/translator']);
+              break;
+            case UserRoleDomain.ADMINISTRATOR:
+              this.router.navigate(['/admin']);
+              break;
+            default:
+              this.router.navigate(['/']);
+          }
+        })
+        .catch(err => {
+          console.error('Login error:', err);
+          this.notify.error('Login failed. Please check your credentials.');
+        });
+
     }
   }
 

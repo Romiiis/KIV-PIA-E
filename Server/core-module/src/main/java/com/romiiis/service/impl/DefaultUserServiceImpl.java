@@ -65,6 +65,13 @@ public class DefaultUserServiceImpl implements IUserService {
         return userOpt.get();
     }
 
+    @Override
+    public User createNewUser(String name, String email, String password) throws UserNotFoundException {
+        User newUser = User.createUser(name, email, password);
+        userRepository.save(newUser);
+        log.info("New user created: {}", newUser.getEmailAddress());
+        return newUser;
+    }
 
     /**
      * Creates a new customer with the given details.
@@ -240,6 +247,12 @@ public class DefaultUserServiceImpl implements IUserService {
     }
 
 
+    /**
+     * Fetches the caller user from the context.
+     *
+     * @return the caller User
+     * @throws UserNotFoundException if the caller is not found in the context
+     */
     private User fetchUserFromContext() throws UserNotFoundException {
         User caller = callerContextProvider.getCaller();
         if (caller == null) {
@@ -249,11 +262,52 @@ public class DefaultUserServiceImpl implements IUserService {
         return caller;
     }
 
+    /**
+     * Creates a new administrator with the given details.
+     * Saves the administrator to the database and returns the created User object.
+     *
+     * @param name     the name of the administrator
+     * @param email    the email address of the administrator
+     * @param password hashed password
+     * @return the created User object
+     */
     @Override
     public User createNewAdmin(String name, String email, String password) throws UserNotFoundException {
         User newUser = User.createAdmin(name, email).withHashedPassword(password);
         userRepository.save(newUser);
         log.info("New administrator created: {}", newUser.getEmailAddress());
         return newUser;
+    }
+
+
+    /**
+     * Initializes a user with the given role and languages.
+     *
+     * @param userId the UUID of the user to initialize
+     * @param role   the role to assign to the user
+     * @param langs  the set of languages to associate with the user
+     * @throws UserNotFoundException if the user with the given ID does not exist
+     */
+    @Override
+    public User initializeUser(UUID userId, UserRole role, Set<Locale> langs) throws UserNotFoundException {
+        if (callerContextProvider.isSystem()) {
+            log.error("System context is not authorized to initialize user data");
+            throw new NoAccessToOperateException("System context is not authorized to initialize user data");
+        }
+
+        User caller = fetchUserFromContext();
+        User user = getUserById(userId);
+
+        // Only user themselves can initialize their data
+        if (!caller.getId().equals(userId)) {
+            log.error("User with ID {} is not authorized to initialize data of user ID {}", caller.getId(), userId);
+            throw new NoAccessToOperateException("User is not authorized to initialize data of user ID " + userId);
+        }
+
+        user.initializeUser(role, langs);
+        userRepository.save(user);
+        log.info("Initialized user ID {} with role {} and languages {}", userId, role, langs);
+
+        return user;
     }
 }

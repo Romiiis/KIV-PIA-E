@@ -42,6 +42,17 @@ public interface IUserService {
      *
      * @param name     the name of the user
      * @param email    the email address of the user
+     * @param password hashed password
+     */
+    User createNewUser(String name, String email, String password) throws UserNotFoundException;
+
+
+    /**
+     * Creates a new user with the given details.
+     * Saves the user to the database and returns the created User object.
+     *
+     * @param name     the name of the user
+     * @param email    the email address of the user
      * @param langs    the set of languages the user is proficient in
      * @param password hashed password
      */
@@ -61,7 +72,7 @@ public interface IUserService {
     /**
      * Retrieves a user by their unique identifier.
      *
-     * @param userId   the UUID of the user to retrieve
+     * @param userId the UUID of the user to retrieve
      * @return the User with the given ID, or null if not found
      */
     User getUserById(UUID userId) throws UserNotFoundException;
@@ -70,7 +81,7 @@ public interface IUserService {
     /**
      * Fetches all users with optional filtering.
      *
-     * @param filter   the filter criteria for fetching users
+     * @param filter the filter criteria for fetching users
      * @return a list of users matching the filter criteria
      */
     List<User> getAllUsers(UsersFilter filter);
@@ -111,5 +122,16 @@ public interface IUserService {
      * @return the UserRole of the user
      */
     UserRole getUserRole(UUID userId) throws UserNotFoundException;
+
+
+    /**
+     * Sets the role of a user by their unique identifier.
+     *
+     * @param userId the UUID of the user
+     * @param role   the UserRole to set for the user
+     * @param langs  the set of languages if the role is TRANSLATOR
+     * @return the updated User object
+     */
+    User initializeUser(UUID userId, UserRole role, Set<Locale> langs) throws UserNotFoundException;
 
 }

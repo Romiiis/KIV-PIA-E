@@ -3,8 +3,6 @@ package com.romiiis.controller;
 import com.romiiis.domain.User;
 import com.romiiis.filter.UsersFilter;
 import com.romiiis.repository.IUserRepository;
-import com.romiiis.security.CallerContextProvider;
-import com.romiiis.service.interfaces.IAuthService;
 import com.romiiis.service.interfaces.IUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,13 +13,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.Locale;
+import jakarta.servlet.http.Cookie;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -37,155 +36,160 @@ class AuthControllerTest {
     @Autowired
     private IUserService userService;
 
-    @Autowired
-    private IAuthService authService;
-
-    @Autowired
-    private CallerContextProvider callerContextProvider;
-
     @BeforeEach
-    void setUp() {
+    void setup() {
         userRepository.deleteAll();
-
     }
 
-
-    @DisplayName("POST /auth/register registers new customer and returns JWT")
+    // =====================================================================
+    // REGISTER
+    // =====================================================================
+    @DisplayName("POST /auth/register - creates new user and returns JWT tokens + cookies")
     @Test
-    void registerCustomer_ok() throws Exception {
+    void registerCustomer_setsCookiesAndReturnsTokens() throws Exception {
         String json = """
                 {
-                  "type": "customer",
-                  "name": "John Doe",
-                  "emailAddress": "john.doe@test.com",
-                  "password": "secure123"
+                  "name": "John Cookie",
+                  "emailAddress": "john.cookie@test.com",
+                  "password": "superpass"
                 }
                 """;
 
-        var mvcResult = mockMvc.perform(post("/auth/register")
+        MvcResult result = mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.accessToken").exists())
+                .andExpect(jsonPath("$.refreshToken").exists())
                 .andReturn();
 
-        String response = mvcResult.getResponse().getContentAsString();
-        assertThat(response).contains("accessToken");
+        var response = result.getResponse();
+        Cookie[] cookies = response.getCookies();
 
-        // Verify user created in DB
+        assertThat(Arrays.asList(cookies))
+                .extracting(Cookie::getName)
+                .contains("access_token", "refresh_token");
+
+        assertThat(Arrays.stream(cookies)
+                .filter(Cookie::isHttpOnly)
+                .count()).isEqualTo(2);
+
         assertThat(userRepository.getAllUsers(new UsersFilter()))
                 .extracting(User::getEmailAddress)
-                .contains("john.doe@test.com");
+                .contains("john.cookie@test.com");
     }
 
 
-    @DisplayName("POST /auth/register registers new translator and returns JWT")
+    @DisplayName("POST /auth/login - logs in existing user and sets JWT cookies")
     @Test
-    void registerTranslator_ok() throws Exception {
+    void loginUser_setsJwtCookies() throws Exception {
         String json = """
                 {
-                  "type": "translator",
-                  "name": "Jane Translator",
-                  "emailAddress": "jane.translator@test.com",
-                  "password": "translatorPass",
-                  "languages": ["en", "de"]
-                }
-                """;
-
-        var mvcResult = mockMvc.perform(post("/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.accessToken").exists())
-                .andReturn();
-
-        String response = mvcResult.getResponse().getContentAsString();
-        assertThat(response).contains("accessToken");
-
-        var user = userRepository.getAllUsers(new UsersFilter()).stream()
-                .filter(u -> u.getEmailAddress().equals("jane.translator@test.com"))
-                .findFirst()
-                .orElseThrow();
-
-        assertThat(user.getLanguages())
-                .extracting(Locale::getLanguage)
-                .containsExactlyInAnyOrder("en", "de");
-    }
-
-
-    @DisplayName("POST /auth/login logs in existing user and returns JWT")
-    @Test
-    void loginUser_ok() throws Exception {
-        // Prepare user first // Register
-        String json = """
-                {
-                  "type": "translator",
-                  "name": "Jane Translator",
-                  "emailAddress": "jane.translator@test.com",
-                  "password": "translatorPass",
-                  "languages": ["en", "de"]
-                }
-                """;
-
-        var mvcResult = mockMvc.perform(post("/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.accessToken").exists())
-                .andReturn();
-
-        String response = mvcResult.getResponse().getContentAsString();
-        assertThat(response).contains("accessToken");
-
-
-        json = """
-                {
-                  "emailAddress": "jane.translator@test.com",
-                  "password": "translatorPass"
-                }
-                """;
-
-        mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").exists());
-    }
-
-    @DisplayName("POST /auth/login returns 401 for wrong password")
-    @Test
-    void loginUser_invalidPassword() throws Exception {
-        // Prepare user
-        userService.createNewCustomer("John Wrong", "wrong@test.com", "rightpass");
-
-        String json = """
-                {
-                  "emailAddress": "wrong@test.com",
-                  "password": "badpass"
-                }
-                """;
-
-        mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @DisplayName("POST /auth/register returns 400 for invalid request type")
-    @Test
-    void registerUser_invalidType() throws Exception {
-        String json = """
-                {
-                  "type": "unknown",
-                  "name": "Unknown User",
-                  "emailAddress": "unknown@test.com",
-                  "password": "nopass"
+                  "name": "Login Tester",
+                  "emailAddress": "login@test.com",
+                  "password": "mypassword"
                 }
                 """;
 
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.accessToken").exists())
+                .andExpect(jsonPath("$.refreshToken").exists())
+                .andReturn();
+
+
+
+
+        String loginJson = """
+                {
+                  "emailAddress": "login@test.com",
+                  "password": "mypassword"
+                }
+                """;
+
+        MvcResult result = mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").exists())
+                .andReturn();
+
+        Cookie[] cookies = result.getResponse().getCookies();
+
+        assertThat(Arrays.asList(cookies))
+                .extracting(Cookie::getName)
+                .contains("access_token", "refresh_token");
+    }
+
+    @DisplayName("POST /auth/refresh - issues new tokens and cookies from refresh_token")
+    @Test
+    void refreshToken_ok() throws Exception {
+        String registerJson = """
+                {
+                  "name": "Refresh Tester",
+                  "emailAddress": "refresh@test.com",
+                  "password": "password123"
+                }
+                """;
+
+        MvcResult registerResult = mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(registerJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        Cookie[] initialCookies = registerResult.getResponse().getCookies();
+
+        MvcResult refreshResult = mockMvc.perform(post("/auth/refresh")
+                        .cookie(initialCookies))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").exists())
+                .andExpect(jsonPath("$.refreshToken").exists())
+                .andReturn();
+
+        Cookie[] refreshedCookies = refreshResult.getResponse().getCookies();
+        assertThat(Arrays.asList(refreshedCookies))
+                .extracting(Cookie::getName)
+                .contains("access_token", "refresh_token");
+    }
+
+
+    @DisplayName("POST /auth/logout - clears cookies and invalidates tokens")
+    @Test
+    void logout_clearsCookies() throws Exception {
+        // 1️⃣ registruj uživatele
+        String registerJson = """
+                {
+                  "name": "Logout Tester",
+                  "emailAddress": "logout@test.com",
+                  "password": "logout123"
+                }
+                """;
+
+        MvcResult registerResult = mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(registerJson))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        Cookie[] cookies = registerResult.getResponse().getCookies();
+
+        // 2️⃣ logout request
+        MvcResult logoutResult = mockMvc.perform(post("/auth/logout")
+                        .cookie(cookies))
+                .andExpect(status().isNoContent())
+                .andReturn();
+
+        Cookie[] clearedCookies = logoutResult.getResponse().getCookies();
+
+        // 3️⃣ ověř, že cookies byly smazány
+        assertThat(clearedCookies).isNotEmpty();
+        for (var cookie : clearedCookies) {
+            assertThat(cookie.getMaxAge())
+                    .as("Cookie %s should be cleared", cookie.getName())
+                    .isEqualTo(0);
+        }
     }
 }

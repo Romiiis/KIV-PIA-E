@@ -17,14 +17,6 @@ import java.util.UUID;
 public interface IJwtService {
 
     /**
-     * Generates a JWT access token for the given user ID (no role assigned).
-     *
-     * @param userId the user ID
-     * @return signed JWT string
-     */
-    String generateToken(UUID userId);
-
-    /**
      * Generates a JWT access token for the given user ID and role.
      *
      * @param userId the user ID
@@ -33,16 +25,15 @@ public interface IJwtService {
      */
     String generateToken(UUID userId, String role);
 
+
     /**
      * Generates a long-lived refresh token for the given subject.
      *
-     * @param subject   the subject (user identifier)
-     * @param jti       unique identifier of the refresh token
-     * @param parentJti optional ID of the parent refresh token (if rotating)
-     * @param expiresAt expiration timestamp (UTC)
+     * @param subject the subject (user identifier)
+     * @param role    single user role (e.g. "ADMIN", "CUSTOMER", "TRANSLATOR")
      * @return signed JWT refresh token string
      */
-    String generateRefreshToken(String subject, String jti, String parentJti, Instant expiresAt);
+    String generateRefreshToken(UUID subject, String role);
 
     /**
      * Validates a token (signature, structure, expiration, etc.).
@@ -60,13 +51,8 @@ public interface IJwtService {
      */
     String getSubjectFromToken(String token);
 
-    /**
-     * Extracts the unique JWT ID (jti) from the token.
-     *
-     * @param token the JWT token
-     * @return JWT ID (jti) if present, empty otherwise
-     */
-    Optional<String> getJti(String token);
+
+    long getRemainingLifetime(String token);
 
     /**
      * Extracts the single user role stored in the token.
@@ -76,21 +62,6 @@ public interface IJwtService {
      */
     Optional<String> getRoleFromToken(String token);
 
-    /**
-     * Extracts the expiration time of the token.
-     *
-     * @param token the JWT token
-     * @return expiration timestamp
-     */
-    Instant getExpiration(String token);
-
-    /**
-     * Checks whether a token is expired.
-     *
-     * @param token the JWT token
-     * @return true if the token is expired
-     */
-    boolean isExpired(String token);
 
     /**
      * Invalidates a token by adding it to the server-side blacklist.
@@ -107,11 +78,23 @@ public interface IJwtService {
      */
     boolean isTokenInvalidated(String jti);
 
+
     /**
-     * Returns the remaining time-to-live (TTL) of the token in milliseconds.
+     * Gets the token expiration time in milliseconds.
+     *
+     * @return token expiration time in milliseconds
+     */
+    Instant getTokenExpirationMs(String token);
+
+
+    /**
+     * Checks if the given token is a refresh token.
      *
      * @param token the JWT token
-     * @return remaining lifetime in milliseconds
+     * @return true if the token is a refresh token, false otherwise
      */
-    long getRemainingLifetime(String token);
+    boolean isRefreshToken(String token);
+
+
+
 }

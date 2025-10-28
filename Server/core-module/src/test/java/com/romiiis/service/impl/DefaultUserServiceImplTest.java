@@ -261,4 +261,140 @@ class DefaultUserServiceImplTest {
         var result = userService.updateUserLanguages(id, newLangs);
         assert result.equals(newLangs);
     }
+
+
+
+
+    // === TESTY initializeUser ===
+
+    @DisplayName("User can initialize themselves with role and languages")
+    @Test
+    void userCanInitializeSelf() {
+        User user = User.createUser("New User", "nu@gmail.com", "hashedPass");
+        asUser(user);
+        UUID id = user.getId();
+        Set<Locale> langs = Set.of(Locale.ENGLISH, Locale.FRENCH);
+        UserRole role = UserRole.TRANSLATOR;
+
+        when(userRepository.getUserById(id)).thenReturn(Optional.of(user));
+
+        var result = userService.initializeUser(id, role, langs);
+
+        assert result.equals(user);
+        assert result.getRole() == role;
+        assert result.getLanguages().size() == langs.size();
+        verify(userRepository).save(user);
+    }
+
+    @DisplayName("Throws NoAccessToOperateException when another user tries to initialize")
+    @Test
+    void otherUserCannotInitialize() {
+        asUser(admin);
+        UUID id = customer.getId();
+        when(userRepository.getUserById(id)).thenReturn(Optional.of(customer));
+
+        try {
+            userService.initializeUser(id, UserRole.CUSTOMER, Set.of(Locale.ENGLISH));
+            assert false;
+        } catch (Exception e) {
+            assert e instanceof NoAccessToOperateException;
+        }
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @DisplayName("Throws NoAccessToOperateException when user cannot access this operation")
+    @Test
+    void throwsWhenUserNotFound() {
+        asUser(customer);
+        UUID id = UUID.randomUUID();
+        when(userRepository.getUserById(id)).thenReturn(Optional.empty());
+
+        try {
+            userService.initializeUser(id, UserRole.CUSTOMER, Set.of(Locale.ENGLISH));
+            assert false;
+        } catch (Exception e) {
+            assert e instanceof NoAccessToOperateException;
+        }
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @DisplayName("System mode cannot initialize user (not owner)")
+    @Test
+    void systemCannotInitializeUser() {
+        asSystem();
+        UUID id = customer.getId();
+        when(userRepository.getUserById(id)).thenReturn(Optional.of(customer));
+
+        try {
+            userService.initializeUser(id, UserRole.CUSTOMER, Set.of(Locale.ENGLISH));
+            assert false;
+        } catch (Exception e) {
+            assert e instanceof NoAccessToOperateException;
+        }
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @DisplayName("User can initialize self without languages CUSTOMER")
+    @Test
+    void userCanInitializeWithoutLanguages() {
+        User user = User.createUser("New User", "nu@gmail.com", "hashedPass");
+        asUser(user);
+        UUID id = user.getId();
+        when(userRepository.getUserById(id)).thenReturn(Optional.of(user));
+
+        var result = userService.initializeUser(id, UserRole.CUSTOMER, null);
+
+        assert result.equals(user);
+        assert result.getLanguages().isEmpty();
+        verify(userRepository).save(user);
+    }
+
+    @DisplayName("initializeUser updates role and languages and saves user")
+    @Test
+    void initializeUserSavesAndUpdatesData() {
+        User translator = User.createUser("Translator", "t@gmail.com", "hashedPass");
+        asUser(translator);
+        UUID id = translator.getId();
+        Set<Locale> langs = Set.of(Locale.GERMAN, Locale.ITALIAN);
+        UserRole role = UserRole.TRANSLATOR;
+
+        when(userRepository.getUserById(id)).thenReturn(Optional.of(translator));
+
+        var result = userService.initializeUser(id, role, langs);
+
+        assert result.equals(translator);
+        assert result.getRole() == role;
+        assert result.getLanguages().equals(langs);
+        verify(userRepository).save(translator);
+    }
+
+    @DisplayName("initializeUser Translator without languages")
+    @Test
+    void initializeUserErrorTranslatorNoLangs() {
+        User translator = User.createUser("Translator", "t@gmail.com", "hashedPass");
+        asUser(translator);
+        UUID id = translator.getId();
+        UserRole role = UserRole.TRANSLATOR;
+
+        when(userRepository.getUserById(id)).thenReturn(Optional.of(translator));
+
+        try {
+            userService.initializeUser(id, role, Collections.emptySet());
+            assert false;
+        } catch (Exception e) {
+            assert e instanceof IllegalArgumentException;
+        }
+
+        verify(userRepository, never()).save(any());
+
+
+
+
+    }
+
+
+
 }

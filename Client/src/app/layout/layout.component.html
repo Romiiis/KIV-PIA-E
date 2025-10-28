@@ -1,3 +1,4 @@
+<div *ngIf="authService.user() as user">
 
 <nav class="navbar">
   <!-- Logo -->
@@ -13,13 +14,13 @@
        (mouseleave)="closeMenu()">
     <div class="avatar-name" (click)="toggleMenu()">
       <img class="avatar" src="https://www.svgrepo.com/show/452030/avatar-default.svg" alt="User"/>
-      <span class="username">{{ this.loggedUser.name }}</span>
+      <span class="username">{{ user.name }}</span>
       <span class="caret">▾</span>
     </div>
 
     <div class="dropdown" *ngIf="showMenu">
       <div class="role">
-        <p class="roleLabel">Role:&nbsp; </p><p> {{ loggedUser.role }}</p>
+        <p class="roleLabel">Role:&nbsp; </p><p> {{ user.role }}</p>
       </div>
       <button (click)="logout()">Logout</button>
     </div>
@@ -30,3 +31,5 @@
 <main class="content">
   <router-outlet></router-outlet>
 </main>
+
+</div>

@@ -10,7 +10,7 @@ export class RoleRedirectGuard implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree {
 
     // Get the role of the current user
-    const role = this.auth.getRole();
+    const role = this.auth.user()?.role;
 
     // If no role (not logged in) -> just route to login page
     if (!role) {

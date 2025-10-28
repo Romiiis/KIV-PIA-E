@@ -72,6 +72,26 @@ public class User {
     }
 
     /**
+     * Creates a new customer user without role assignment.
+     * <br><br>
+     * REQUIREMENTS:
+     * <ol>
+     *     <li>name must not be empty</li>
+     *     <li>emailAddress must not be empty and it must be a valid email address</li>
+     * </ol>
+     *
+     * @param name         Name of the customer
+     * @param emailAddress Email address of the customer
+     * @param password     Password of the customer
+     * @return New customer user
+     */
+    public static User createUser(String name, String emailAddress, String password) {
+        validateName(name, emailAddress);
+
+        return new User(name, emailAddress, null, Collections.emptySet());
+    }
+
+    /**
      * Creates a new translator user.
      * <br><br>
      * REQUIREMENTS:
@@ -139,6 +159,44 @@ public class User {
     public User withHashedPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
         return this;
+    }
+
+
+    /**
+     * Initializes the user with a role and languages (if applicable).
+     * This method can only be called once per user instance.
+     *
+     * @param role      Role to assign to the user (cannot be ADMINISTRATOR)
+     * @param languages Set of languages (required if role is TRANSLATOR)
+     */
+    public void initializeUser(UserRole role, Set<Locale> languages) {
+        if (this.role != null) {
+            log.error("User role is already set");
+            throw new IllegalStateException("User role is already set");
+        }
+
+        if (role == null) {
+            log.error("Role cannot be null");
+            throw new IllegalArgumentException("Role cannot be null");
+        }
+
+        if (role == UserRole.ADMINISTRATOR) {
+            log.error("Cannot initialize user as administrator");
+            throw new IllegalArgumentException("Cannot initialize user as administrator");
+        }
+
+        this.role = role;
+
+        if (role == UserRole.TRANSLATOR) {
+            if (languages == null || languages.isEmpty()) {
+                log.error("Languages are empty for translator");
+                throw new IllegalArgumentException("At least one language must be specified for translator");
+            }
+            this.languages = languages;
+        } else {
+            this.languages = Collections.emptySet();
+        }
+
     }
 
 

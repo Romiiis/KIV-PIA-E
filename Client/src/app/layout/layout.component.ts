@@ -1,28 +1,20 @@
-import {Component, HostListener, Input} from '@angular/core';
-import {NgIf} from '@angular/common';
-import {UserDomain} from '@core/models/user.model';
-import {RouterOutlet} from '@angular/router';
-import {AuthService} from '@core/auth/auth.service';
+import { Component, HostListener, signal } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { AuthService } from '@core/auth/auth.service';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-layout',
-  imports: [
-    NgIf,
-    RouterOutlet
-  ],
+  standalone: true,
+  imports: [NgIf, RouterOutlet],
   templateUrl: './layout.component.html',
-  styleUrl: './layout.component.css'
+  styleUrl: './layout.component.css',
 })
 export class LayoutComponent {
-  loggedUser!: UserDomain
   showMenu = false;
   closeTimeout: any;
 
-  constructor(
-    public authService: AuthService) {
-    this.loggedUser = this.authService.getUser()!;
-  }
-
+  constructor(public authService: AuthService) {}
 
   toggleMenu() {
     this.showMenu = !this.showMenu;
@@ -35,11 +27,8 @@ export class LayoutComponent {
     this.showMenu = true;
   }
 
-
   closeMenu() {
-    this.closeTimeout = setTimeout(() => {
-      this.showMenu = false;
-    }, 250); // 250 ms delay
+    this.closeTimeout = setTimeout(() => (this.showMenu = false), 250);
   }
 
   @HostListener('document:click', ['$event'])
@@ -51,9 +40,6 @@ export class LayoutComponent {
   }
 
   logout() {
-    console.log('Logging out...');
-    this.authService.logout()
+    this.authService.logout();
   }
-
-
 }

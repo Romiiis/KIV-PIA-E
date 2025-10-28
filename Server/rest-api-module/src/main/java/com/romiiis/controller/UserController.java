@@ -3,6 +3,8 @@ package com.romiiis.controller;
 import com.romiiis.filter.UsersFilter;
 import com.romiiis.mapper.CommonMapper;
 import com.romiiis.mapper.UserMapper;
+
+import com.romiiis.model.InitializeUserRequestDTO;
 import com.romiiis.model.UserDTO;
 import com.romiiis.model.UserRoleDTO;
 import com.romiiis.service.interfaces.IUserService;
@@ -56,7 +58,20 @@ public class UserController implements UsersApi {
 
 
 
+    /**
+     * Changes the role and languages of a user.
+     *
+     * @param id                         The UUID of the user to be updated.
+     * @param initializeUserRequestDTO   The request DTO containing the new role and languages.
+     * @return A ResponseEntity containing the updated UserDTO.
+     */
+    @Override
+    public ResponseEntity<UserDTO> changeUserRole(UUID id, InitializeUserRequestDTO initializeUserRequestDTO) {
+        var updatedUser = userService.initializeUser(
+                id,
+                commonMapper.mapUserRoleDTOToDomain(initializeUserRequestDTO.getRole()),
+                commonMapper.mapListStringToSetLocale(initializeUserRequestDTO.getLanguages()));
 
-
-
+        return ResponseEntity.ok(userMapper.mapDomainToDTO(updatedUser));
+    }
 }

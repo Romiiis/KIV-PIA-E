@@ -10,6 +10,8 @@ import { NgOptimizedImage } from '@angular/common';
 
 import { routes } from './app.routes';
 import {provideHttpClient} from '@angular/common/http';
+import {provideAngularQuery} from '@tanstack/angular-query-experimental';
+import {QueryClient} from '@tanstack/query-core';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,6 +20,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     importProvidersFrom(NgOptimizedImage),
     provideHttpClient(),
+    provideAngularQuery(new QueryClient()),
+
 
   ]
 };

@@ -6,7 +6,7 @@
     "start": "ng serve",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "generate:api": "ng-openapi -c openapi.config.ts",
+    "generate:api": "npx orval --config ./orval.config.cjs",
     "prebuild": "npm run generate:api",
     "build": "npm run generate:api && ng build"
   },
@@ -36,7 +36,9 @@
     "src": "^1.1.2",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0",
-    "bootstrap": "^5.3.8"
+    "bootstrap": "^5.3.8",
+    "@tanstack/angular-query-experimental": "^5.87.4",
+    "@tanstack/query-core": "^5.87.4"
   },
   "devDependencies": {
     "@angular/build": "^20.3.3",
@@ -50,6 +52,6 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.9.2",
-    "ng-openapi": "^0.2.8"
-  }
+    "orval": "^8.0.0-rc.0"}
+
 }

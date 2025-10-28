@@ -70,11 +70,10 @@ class DefaultAuthServiceImplTest {
         when(userService.getUserByEmail(email)).thenReturn(mockCustomer);
         when(jwtService.generateToken(mockCustomer.getId(), mockCustomer.getRole().name())).thenReturn(jwtToken);
 
-        String result = authService.login(email, password);
+        User result = authService.login(email, password);
 
-        assert result.equals(jwtToken);
+        assert result.equals(mockCustomer);
         verify(passwordHasher).verify(password, hashed);
-        verify(jwtService).generateToken(mockCustomer.getId(), mockCustomer.getRole().name());
     }
 
     @DisplayName("login should throw InvalidAuthCredentialsException when email not found")
@@ -105,86 +104,44 @@ class DefaultAuthServiceImplTest {
     }
 
 
-    @DisplayName("registerCustomer should create new user and return token")
+    @DisplayName("registerUser should create new user and return token")
     @Test
-    void registerCustomer_shouldCreateUserAndReturnToken() throws Exception {
+    void registerUser_shouldCreateUserAndReturnToken() throws Exception {
         when(userRepository.emailInUse(email)).thenReturn(false);
         when(passwordHasher.hash(password)).thenReturn(hashed);
         when(userService.createNewCustomer("Roman", email, hashed)).thenReturn(mockCustomer);
         when(jwtService.generateToken(mockCustomer.getId(), mockCustomer.getRole().name())).thenReturn(jwtToken);
 
-        String result = authService.registerCustomer("Roman", email, password);
+        User result = authService.registerUser("Roman", email, password);
 
-        assert result.equals(jwtToken);
+        assert result.equals(mockCustomer);
+
         verify(userService).createNewCustomer("Roman", email, hashed);
-        verify(jwtService).generateToken(mockCustomer.getId(), mockCustomer.getRole().name());
     }
 
-    @DisplayName("registerCustomer should throw EmailInUseException when email already used")
+    @DisplayName("registerUser should throw EmailInUseException when email already used")
     @Test
-    void registerCustomer_shouldThrow_whenEmailAlreadyUsed() {
+    void registerUser_shouldThrow_whenEmailAlreadyUsed() {
         when(userRepository.emailInUse(email)).thenReturn(true);
 
         try {
-            authService.registerCustomer("Roman", email, password);
+            authService.registerUser("Roman", email, password);
             assert false;
         } catch (Exception e) {
             assert e instanceof EmailInUseException;
         }
     }
 
-    @DisplayName("registerCustomer should throw InvalidAuthCredentialsException for invalid email")
+    @DisplayName("registerUser should throw InvalidAuthCredentialsException for invalid email")
     @Test
-    void registerCustomer_shouldThrow_whenEmailInvalid() {
+    void registerUser_shouldThrow_whenEmailInvalid() {
         String badEmail = "invalidEmail";
         try {
-            authService.registerCustomer("Roman", badEmail, password);
+            authService.registerUser("Roman", badEmail, password);
             assert false;
         } catch (Exception e) {
             assert e instanceof InvalidAuthCredentialsException;
         }
     }
 
-
-    @DisplayName("registerTranslator should create translator and return token")
-    @Test
-    void registerTranslator_shouldCreateTranslatorAndReturnToken() throws Exception {
-        Set<Locale> langs = Set.of(Locale.ENGLISH);
-        when(userRepository.emailInUse(email)).thenReturn(false);
-        when(passwordHasher.hash(password)).thenReturn(hashed);
-        when(userService.createNewTranslator("Eva", email, langs, hashed)).thenReturn(mockTranslator);
-        when(jwtService.generateToken(mockTranslator.getId(), mockTranslator.getRole().name())).thenReturn(jwtToken);
-
-        String result = authService.registerTranslator("Eva", email, langs, password);
-
-        assert result.equals(jwtToken);
-        verify(userService).createNewTranslator("Eva", email, langs, hashed);
-        verify(jwtService).generateToken(mockTranslator.getId(), mockTranslator.getRole().name());
-    }
-
-    @DisplayName("registerTranslator should throw EmailInUseException when email already in use")
-    @Test
-    void registerTranslator_shouldThrow_whenEmailInUse() {
-        when(userRepository.emailInUse(email)).thenReturn(true);
-
-        try {
-            authService.registerTranslator("Eva", email, Set.of(Locale.ENGLISH), password);
-            assert false;
-        } catch (Exception e) {
-            assert e instanceof EmailInUseException;
-        }
-    }
-
-    @DisplayName("registerTranslator should throw InvalidAuthCredentialsException for invalid email")
-    @Test
-    void registerTranslator_shouldThrow_whenEmailInvalid() {
-        String badEmail = "translator.gmail.com";
-
-        try {
-            authService.registerTranslator("Eva", badEmail, Set.of(Locale.ENGLISH), password);
-            assert false;
-        } catch (Exception e) {
-            assert e instanceof InvalidAuthCredentialsException;
-        }
-    }
 }

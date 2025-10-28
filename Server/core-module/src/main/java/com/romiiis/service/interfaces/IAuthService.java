@@ -1,11 +1,9 @@
 package com.romiiis.service.interfaces;
 
+import com.romiiis.domain.User;
 import com.romiiis.exception.EmailInUseException;
 import com.romiiis.exception.InvalidAuthCredentialsException;
 import com.romiiis.exception.UserNotFoundException;
-
-import java.util.Locale;
-import java.util.Set;
 
 /**
  * Service interface for authentication-related operations.
@@ -16,33 +14,8 @@ import java.util.Set;
  */
 public interface IAuthService {
 
-    /**
-     * Registers a new customer and returns a JWT token upon successful registration.
-     *
-     * @param name     Name of the customer
-     * @param email    Email of the customer
-     * @param password Hashed password of the customer
-     * @return JWT token as a String
-     * @throws InvalidAuthCredentialsException if the provided credentials are invalid
-     * @throws EmailInUseException             if the email is already in use
-     * @throws UserNotFoundException           if the user could not be found after registration
-     */
-    String registerCustomer(String name, String email, String password) throws InvalidAuthCredentialsException, EmailInUseException, UserNotFoundException;
 
-    /**
-     * Registers a new translator and returns a JWT token upon successful registration.
-     *
-     * @param name     Name of the translator
-     * @param email    Email of the translator
-     * @param langs    Set of languages the translator is proficient in
-     * @param password Hashed password of the translator
-     * @return JWT token as a String
-     * @throws InvalidAuthCredentialsException if the provided credentials are invalid
-     * @throws EmailInUseException             if the email is already in use
-     * @throws UserNotFoundException           if the user could not be found after registration
-     */
-    String registerTranslator(String name, String email, Set<Locale> langs, String password) throws InvalidAuthCredentialsException, EmailInUseException, UserNotFoundException;
-
+    User registerUser(String name, String email, String password) throws InvalidAuthCredentialsException, EmailInUseException, UserNotFoundException;
 
     /**
      * Authenticates a user and returns a JWT token if the credentials are valid.
@@ -52,6 +25,6 @@ public interface IAuthService {
      * @return JWT token as a String
      * @throws EmailInUseException if the email is already in use
      */
-    String login(String email, String password) throws EmailInUseException;
+    User login(String email, String password) throws EmailInUseException;
 
 }
