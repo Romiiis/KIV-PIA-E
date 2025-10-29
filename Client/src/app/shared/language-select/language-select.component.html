@@ -1,36 +1,38 @@
 <div class="language-select">
-  <label class="label">Select Languages</label>
+  <div class="input-area" (click)="focusInput(input)">
+    <div class="tags-wrapper">
+      <div class="tag" *ngFor="let lang of selectedLanguages">
+        {{ lang.name }}
+        <button type="button" class="remove-btn" (click)="removeLanguage(lang)">
+          ×
+        </button>
+      </div>
 
-  <div class="multi-input" (click)="focusInput(input)">
-    <div class="tag" *ngFor="let lang of selectedLanguages">
-      {{ lang.name }}
-      <button type="button" class="remove-btn" (click)="removeLanguage(lang)">×</button>
+      <input
+        #input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        (focus)="showDropdown = true"
+        placeholder="Type to search..."
+      />
     </div>
-
-    <input
-      #input
-      type="text"
-      [(ngModel)]="searchTerm"
-      (input)="onSearch()"
-      (focus)="showDropdown = true"
-      placeholder="Type to search..."
-    />
   </div>
 
-  <!-- Dropdown -->
-  <ul class="dropdown" *ngIf="showDropdown && filteredLanguages.length > 0">
-    <li
+  <div class="dropdown" *ngIf="showDropdown">
+    <div
       *ngFor="let lang of filteredLanguages"
-      (click)="selectLanguage(lang)"
+      class="option"
       [class.selected]="isSelected(lang)"
+      (click)="selectLanguage(lang)"
     >
+      <span class="checkmark" *ngIf="isSelected(lang)">✔</span>
       <span class="name">{{ lang.name }}</span>
-      <span class="code">({{ lang.code }})</span>
-      <span *ngIf="isSelected(lang)" class="check">✓</span>
-    </li>
-  </ul>
+      <span class="code">{{ lang.code }}</span>
+    </div>
 
-  <div class="no-results" *ngIf="showDropdown && filteredLanguages.length === 0">
-    No matching languages
+    <div class="no-results" *ngIf="filteredLanguages.length === 0">
+      No matching languages
+    </div>
   </div>
 </div>

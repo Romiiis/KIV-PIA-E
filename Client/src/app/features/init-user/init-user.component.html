@@ -23,7 +23,7 @@
   </div>
 
   <!-- Show language select if translator -->
-  <div *ngIf="form.get('role')?.value === 'translator'">
+  <div *ngIf="form.get('role')?.value === 'translator'" style="width: 100%; margin: 20px 0;">
     <span>Languages you know:</span>
     <app-language-select
       [multiple]="true"
@@ -31,5 +31,5 @@
     </app-language-select>
   </div>
 
-  <button class="save-btn" (click)="saveSelection()">Continue</button>
+  <button class="save-btn" (click)="saveSelection()">Finish</button>
 </div>

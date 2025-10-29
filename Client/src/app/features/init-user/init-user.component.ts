@@ -12,7 +12,6 @@ import {LanguageSelectComponent} from '@shared/language-select/language-select.c
 })
 export class InitUserComponent {
   form: FormGroup;
-  availableLanguages = ['English', 'Spanish', 'French', 'German', 'Czech', 'Polish'];
   selectedLanguages: string[] = [];
 
   constructor(private fb: FormBuilder) {
@@ -29,16 +28,6 @@ export class InitUserComponent {
       this.selectedLanguages = [];
       this.form.get('languages')?.setValue([]);
     }
-  }
-
-  toggleLanguage(lang: string, event: Event) {
-    const checked = (event.target as HTMLInputElement).checked;
-    if (checked) {
-      this.selectedLanguages.push(lang);
-    } else {
-      this.selectedLanguages = this.selectedLanguages.filter(l => l !== lang);
-    }
-    this.form.get('languages')?.setValue(this.selectedLanguages);
   }
 
   onLanguagesSelected(selected: string[] | string) {
