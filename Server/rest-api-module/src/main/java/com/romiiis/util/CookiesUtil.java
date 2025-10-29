@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,12 @@ public class CookiesUtil {
 
     private final IJwtService jwtService;
 
+    @Value("${accesstoken.name}")
+    private String accessTokenCookieName;
+
+    @Value("${refreshtoken.name}")
+    private String refreshTokenCookieName;
+
     /**
      * Sets the access and refresh tokens as HTTP-only cookies in the response.
      *
@@ -25,19 +32,19 @@ public class CookiesUtil {
      * @param tokens   TokenPair containing access and refresh tokens
      */
     public void setCookies(HttpServletResponse response, TokenPair tokens) {
-        ResponseCookie accessCookie = ResponseCookie.from("access_token", tokens.accessToken())
+        ResponseCookie accessCookie = ResponseCookie.from(accessTokenCookieName, tokens.accessToken())
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .sameSite("None")
+                .sameSite("Lax")
                 .maxAge(jwtService.getRemainingLifetime(tokens.accessToken()) / 1000)
                 .build();
 
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", tokens.refreshToken())
+        ResponseCookie refreshCookie = ResponseCookie.from(refreshTokenCookieName, tokens.refreshToken())
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .sameSite("None")
+                .sameSite("Lax")
                 .maxAge(jwtService.getRemainingLifetime(tokens.refreshToken()) / 1000)
                 .build();
 
@@ -46,13 +53,21 @@ public class CookiesUtil {
     }
 
     public void clearCookies(HttpServletResponse response) {
-        ResponseCookie clearAccess = ResponseCookie.from("access_token", "").path("/").maxAge(0).build();
-        ResponseCookie clearRefresh = ResponseCookie.from("refresh_token", "").path("/").maxAge(0).build();
+        ResponseCookie clearAccess = ResponseCookie.from(accessTokenCookieName, "").path("/").maxAge(0).build();
+        ResponseCookie clearRefresh = ResponseCookie.from(refreshTokenCookieName, "").path("/").maxAge(0).build();
         response.addHeader(HttpHeaders.SET_COOKIE, clearAccess.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, clearRefresh.toString());
     }
 
-    public String extractCookie(HttpServletRequest request, String name) {
+    public String extractAccessToken(HttpServletRequest request) {
+        return extractCookie(request, accessTokenCookieName);
+    }
+
+    public String extractRefreshToken(HttpServletRequest request) {
+        return extractCookie(request, refreshTokenCookieName);
+    }
+
+    private String extractCookie(HttpServletRequest request, String name) {
         if (request.getCookies() == null) return null;
         return Arrays.stream(request.getCookies())
                 .filter(c -> name.equals(c.getName()))

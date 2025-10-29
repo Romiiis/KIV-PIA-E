@@ -18,33 +18,34 @@ security:
 
     - path: /auth/logout
       method: POST
-      roles: [ADMIN, CUSTOMER, TRANSLATOR]
+      roles: [ ADMIN, CUSTOMER, TRANSLATOR ]
 
     # --------------------
     # ME ENDPOINT
     # --------------------
     - path: /me
       method: GET
-      roles: [ADMIN, CUSTOMER, TRANSLATOR]
+      access: authenticated
+
 
     # --------------------
     # USERS ENDPOINTS
     # --------------------
     - path: /users
       method: GET
-      roles: [ADMIN]
+      roles: [ ADMIN ]
 
     - path: /users/*
       method: GET
-      roles: [ADMIN, CUSTOMER, TRANSLATOR]
+      roles: [ ADMIN, CUSTOMER, TRANSLATOR ]
 
     - path: /users/*/languages
       method: GET
-      roles: [ADMIN, TRANSLATOR]
+      roles: [ ADMIN, TRANSLATOR ]
 
     - path: /users/*/languages
       method: PUT
-      roles: [TRANSLATOR]
+      roles: [ TRANSLATOR ]
 
     # --------------------
     # PROJECTS ENDPOINTS
@@ -52,44 +53,44 @@ security:
     # Everyone can view list of projects (each sees own)
     - path: /projects
       method: GET
-      roles: [ADMIN, CUSTOMER, TRANSLATOR]
+      roles: [ ADMIN, CUSTOMER, TRANSLATOR ]
 
     # Only customers can create new projects
     - path: /projects
       method: POST
-      roles: [CUSTOMER]
+      roles: [ CUSTOMER ]
 
     - path: /projects/*
       method: GET
-      roles: [ADMIN, CUSTOMER, TRANSLATOR]
+      roles: [ ADMIN, CUSTOMER, TRANSLATOR ]
 
     - path: /projects/*/original
       method: GET
-      roles: [CUSTOMER, TRANSLATOR]
+      roles: [ CUSTOMER, TRANSLATOR ]
 
     - path: /projects/*/translated
       method: GET
-      roles: [ADMIN, CUSTOMER, TRANSLATOR]
+      roles: [ ADMIN, CUSTOMER, TRANSLATOR ]
 
     - path: /projects/*/translated
       method: PUT
-      roles: [TRANSLATOR]
+      roles: [ TRANSLATOR ]
 
     - path: /projects/*/approve
       method: POST
-      roles: [CUSTOMER]
+      roles: [ CUSTOMER ]
 
     - path: /projects/*/reject
       method: POST
-      roles: [CUSTOMER]
+      roles: [ CUSTOMER ]
 
     - path: /projects/*/close
       method: POST
-      roles: [ADMIN]
+      roles: [ ADMIN ]
 
     # --------------------
     # FEEDBACK ENDPOINT
     # --------------------
     - path: /projects/*/feedback
       method: GET
-      roles: [ADMIN, CUSTOMER, TRANSLATOR]
+      roles: [ ADMIN, CUSTOMER, TRANSLATOR ]

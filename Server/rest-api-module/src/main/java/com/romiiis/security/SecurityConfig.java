@@ -59,7 +59,6 @@ public class SecurityConfig {
                             }
                         }
 
-                        // Building matcher
                         var matcher = (method != null)
                                 ? auth.requestMatchers(method, path)
                                 : auth.requestMatchers(path);
@@ -92,7 +91,6 @@ public class SecurityConfig {
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
         config.setExposedHeaders(List.of("Set-Cookie"));
-
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 

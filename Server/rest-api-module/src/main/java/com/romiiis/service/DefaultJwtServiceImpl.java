@@ -1,7 +1,11 @@
 package com.romiiis.service;
 
 import com.romiiis.configuration.JwtProperties;
+import com.romiiis.domain.User;
+import com.romiiis.domain.UserRole;
+import com.romiiis.security.CallerContextProvider;
 import com.romiiis.service.interfaces.IJwtService;
+import com.romiiis.service.interfaces.IUserService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +30,8 @@ public class DefaultJwtServiceImpl implements IJwtService {
 
     private final SecretKey secretKey;
     private final JwtProperties props;
+    private final IUserService userService;
+    private final CallerContextProvider callerContextProvider;
 
     /**
      * Blacklist of invalidated tokens (jti -> expiration time)
@@ -37,7 +43,9 @@ public class DefaultJwtServiceImpl implements IJwtService {
      *
      * @param props JWT properties
      */
-    public DefaultJwtServiceImpl(JwtProperties props) {
+    public DefaultJwtServiceImpl(JwtProperties props, IUserService userService, CallerContextProvider callerContextProvider) {
+        this.callerContextProvider = callerContextProvider;
+        this.userService = userService;
         this.props = props;
         this.secretKey = Keys.hmacShaKeyFor(props.getSecret().getBytes(StandardCharsets.UTF_8));
     }
@@ -46,13 +54,12 @@ public class DefaultJwtServiceImpl implements IJwtService {
      * Generates an access token for the given user ID and role.
      *
      * @param userId user identifier (UUID)
-     * @param role   single role (e.g. "ADMIN", "CUSTOMER", "TRANSLATOR")
      * @return signed JWT access token
      */
-    public String generateToken(UUID userId, String role) {
+    public String generateToken(UUID userId) {
         String jti = UUID.randomUUID().toString();
         Instant expiresAt = Instant.now().plusMillis(props.getAccessExpirationMs());
-        return generateAccessToken(userId.toString(), jti, expiresAt, role);
+        return generateAccessToken(userId.toString(), jti, expiresAt);
     }
 
 
@@ -62,9 +69,8 @@ public class DefaultJwtServiceImpl implements IJwtService {
      * @param subject   Subject of the token (user ID)
      * @param jti       Unique token identifier
      * @param expiresAt Expiration time
-     * @param role      single user role (nullable)
      */
-    private String generateAccessToken(String subject, String jti, Instant expiresAt, String role) {
+    private String generateAccessToken(String subject, String jti, Instant expiresAt) {
         JwtBuilder builder = Jwts.builder()
                 .setSubject(subject)
                 .setId(jti)
@@ -73,9 +79,6 @@ public class DefaultJwtServiceImpl implements IJwtService {
                 .setExpiration(Date.from(expiresAt))
                 .claim("type", "access");
 
-        if (role != null) {
-            builder.claim("role", role);
-        }
 
         return builder.signWith(secretKey, SignatureAlgorithm.HS256).compact();
     }
@@ -85,14 +88,13 @@ public class DefaultJwtServiceImpl implements IJwtService {
      * Generates a refresh token for the given user ID and role.
      *
      * @param subject user identifier (UUID)
-     * @param role    single role (e.g. "ADMIN", "CUSTOMER", "TRANSLATOR")
      * @return signed JWT refresh token
      */
     @Override
-    public String generateRefreshToken(UUID subject, String role) {
+    public String generateRefreshToken(UUID subject) {
         String jti = UUID.randomUUID().toString();
         Instant expiresAt = Instant.now().plusMillis(props.getRefreshExpirationMs());
-        return generateRefreshToken(subject.toString(), jti, expiresAt, role);
+        return generateRefreshToken(subject.toString(), jti, expiresAt);
     }
 
     /**
@@ -101,9 +103,8 @@ public class DefaultJwtServiceImpl implements IJwtService {
      * @param subject   Subject of the token (user ID)
      * @param jti       Unique token identifier
      * @param expiresAt Expiration time
-     * @param role      single user role (nullable)
      */
-    private String generateRefreshToken(String subject, String jti, Instant expiresAt, String role) {
+    private String generateRefreshToken(String subject, String jti, Instant expiresAt) {
         JwtBuilder builder = Jwts.builder()
                 .setSubject(subject)
                 .setId(jti)
@@ -112,9 +113,6 @@ public class DefaultJwtServiceImpl implements IJwtService {
                 .setExpiration(Date.from(expiresAt))
                 .claim("type", "refresh");
 
-        if (role != null) {
-            builder.claim("role", role);
-        }
 
         return builder.signWith(secretKey, SignatureAlgorithm.HS256).compact();
     }
@@ -175,14 +173,10 @@ public class DefaultJwtServiceImpl implements IJwtService {
      * @param token JWT token
      * @return the role (e.g. "ADMIN"), or empty if missing
      */
-    public Optional<String> getRoleFromToken(String token) {
-        try {
-            Claims claims = parse(token).getBody();
-            return Optional.ofNullable(claims.get("role", String.class));
-        } catch (Exception e) {
-            log.warn("Cannot extract role from token: {}", e.getMessage());
-            return Optional.empty();
-        }
+    public Optional<UserRole> getRoleFromToken(String token) {
+        String userId = getSubjectFromToken(token);
+        User user = callerContextProvider.runAsSystem(() -> userService.getUserById(UUID.fromString(userId)));
+        return Optional.ofNullable(user.getRole());
     }
 
 

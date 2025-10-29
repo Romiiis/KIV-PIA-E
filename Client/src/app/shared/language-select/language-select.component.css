@@ -1,98 +1,170 @@
 .language-select {
   width: 100%;
   font-family: 'Inter', sans-serif;
+  position: relative;
 }
 
+/* Label */
 .label {
   display: block;
   font-size: 0.85rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
   color: #333;
 }
 
-.input-wrapper {
-  position: relative;
-}
-
-.language-select input {
-  width: 92%;
-  border-radius: 12px;
+/* === Multi-input === */
+.multi-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
   border: 1px solid #d1d5db;
-  padding: 0.6rem 1.2rem;
-  font-size: 0.95rem;
-  transition: all 0.25s ease;
+  border-radius: 10px;
+  padding: 0.35rem 0.6rem;
+  min-height: 2.3rem;
+  max-height: 5.5rem; /* když je hodně tagů */
+  overflow-y: auto;
+  cursor: text;
   background: #fff;
+  transition: all 0.2s ease;
 }
 
-.language-select input:focus {
-  border-color: transparent;
-  box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px rgba(59,130,246,0.2);
+.multi-input:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+
+.multi-input input {
+  border: none;
   outline: none;
+  flex: 1;
+  font-size: 0.9rem;
+  min-width: 80px;
+  background: transparent;
 }
 
-.caret {
-  position: absolute;
-  right: 1.2rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #666;
+.multi-input input::placeholder {
+  color: #aaa;
+}
+
+/* === Tagy === */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #eff6ff;
+  color: #1e3a8a;
   font-size: 0.8rem;
-  pointer-events: none;
+  font-weight: 500;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  white-space: nowrap;
 }
 
+.remove-btn {
+  border: none;
+  background: transparent;
+  color: #555;
+  cursor: pointer;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.remove-btn:hover {
+  color: #dc2626;
+}
+
+/* === Dropdown === */
 .dropdown {
-  margin-top: 0.4rem;
+  position: absolute;
+  top: calc(100% + 0.3rem);
+  left: 0;
+  right: 0;
   background: #fff;
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  max-height: 280px;
+  border-radius: 8px;
+  max-height: 200px;
   overflow-y: auto;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   z-index: 100;
-  animation: fadeIn 0.15s ease-in;
+  animation: fadeIn 0.1s ease-in;
 }
 
 .dropdown li {
-  display: grid;
-  grid-template-columns: 1fr auto; /* jméno zabere vše, kód vpravo */
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 0.7rem 1rem;
+  padding: 0.5rem 0.8rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.15s;
   border-bottom: 1px solid #f3f4f6;
 }
 
 
+.dropdown li:last-child {
+  border-bottom: none;
+}
 
 .dropdown li:hover {
   background: #f9fafb;
 }
 
+.dropdown li.selected {
+  background: #e8f0fe;
+}
+
 .name {
+  flex: 1;
   font-weight: 500;
   color: #333;
+  font-size: 0.9rem;
 }
 
 .code {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #777;
+  margin-left: 0.5rem;
 }
 
+.check {
+  margin-left: 0.4rem;
+  color: #3b82f6;
+  font-weight: bold;
+}
 
+/* === No results === */
 .no-results {
-  margin-top: 0.4rem;
+  position: absolute;
+  top: calc(100% + 0.3rem);
+  left: 0;
+  right: 0;
   background: #fff;
   border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 0.8rem;
+  border-radius: 8px;
+  padding: 0.6rem;
   color: #777;
   text-align: center;
-  font-size: 0.9rem;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+  font-size: 0.85rem;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
 }
 
+/* Scrollbar */
+.dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdown::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 6px;
+}
+
+.dropdown::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Animation */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
 }

@@ -66,8 +66,8 @@ public class ServiceConfiguration {
     }
 
     @Bean
-    public IJwtService jwtService(JwtProperties props) {
-        return new DefaultJwtServiceImpl(props);
+    public IJwtService jwtService(JwtProperties props, IUserService userService, CallerContextProvider callerContextProvider) {
+        return new DefaultJwtServiceImpl(props, userService, callerContextProvider);
     }
 
 

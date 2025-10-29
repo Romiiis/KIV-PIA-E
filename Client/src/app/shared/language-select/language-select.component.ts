@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -10,15 +10,18 @@ interface Language {
 
 @Component({
   selector: 'app-language-select',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './language-select.component.html',
   styleUrls: ['./language-select.component.css']
 })
 export class LanguageSelectComponent implements OnInit {
-  @Output() selected = new EventEmitter<string>();
+  @Input() multiple = false;
+  @Output() selected = new EventEmitter<string | string[]>();
 
   languages: Language[] = [];
   filteredLanguages: Language[] = [];
+  selectedLanguages: Language[] = [];
   searchTerm = '';
   showDropdown = false;
 
@@ -40,8 +43,25 @@ export class LanguageSelectComponent implements OnInit {
   }
 
   selectLanguage(lang: Language) {
-    this.searchTerm = lang.name;
-    this.showDropdown = false;
-    this.selected.emit(lang.code);
+    if (this.isSelected(lang)) {
+      this.removeLanguage(lang);
+      return;
+    }
+    this.selectedLanguages.push(lang);
+    this.selected.emit(this.selectedLanguages.map(l => l.code));
+    this.searchTerm = '';
+  }
+
+  removeLanguage(lang: Language) {
+    this.selectedLanguages = this.selectedLanguages.filter(l => l.code !== lang.code);
+    this.selected.emit(this.selectedLanguages.map(l => l.code));
+  }
+
+  isSelected(lang: Language): boolean {
+    return this.selectedLanguages.some(l => l.code === lang.code);
+  }
+
+  focusInput(input: HTMLInputElement) {
+    input.focus();
   }
 }

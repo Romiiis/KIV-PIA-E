@@ -2,6 +2,7 @@ package com.romiiis.controller;
 
 
 import com.romiiis.domain.User;
+import com.romiiis.domain.UserRole;
 import com.romiiis.mapper.CommonMapper;
 import com.romiiis.model.AuthJWTResponseDTO;
 import com.romiiis.model.LoginUserRequestDTO;
@@ -47,6 +48,7 @@ public class AuthController implements AuthApi {
     private final CookiesUtil cookiesUtil;
 
 
+
     /**
      * Handles user login requests.
      *
@@ -61,7 +63,7 @@ public class AuthController implements AuthApi {
                 loginUserRequestDTO.getPassword()
         );
 
-        var tokens = generateTokenPair(user.getId(), user.getRole().name());
+        var tokens = generateTokenPair(user.getId());
 
         HttpServletResponse response = getCurrentResponse();
         cookiesUtil.setCookies(response, tokens);
@@ -94,7 +96,7 @@ public class AuthController implements AuthApi {
                 registerUserRequestDTO.getPassword()
         );
 
-        var tokens = generateTokenPair(user.getId(), user.getRole().name());
+        var tokens = generateTokenPair(user.getId());
 
         HttpServletResponse response = getCurrentResponse();
         cookiesUtil.setCookies(response, tokens);
@@ -111,15 +113,14 @@ public class AuthController implements AuthApi {
         HttpServletRequest request = getCurrentRequest();
         HttpServletResponse response = getCurrentResponse();
 
-        String refreshToken = cookiesUtil.extractCookie(request, "refresh_token");
+        String refreshToken = cookiesUtil.extractRefreshToken(request);
         if (refreshToken == null || !jwtService.validateToken(refreshToken) || !jwtService.isRefreshToken(refreshToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         UUID userId = UUID.fromString(jwtService.getSubjectFromToken(refreshToken));
-        String role = jwtService.getRoleFromToken(refreshToken).orElse(null);
 
-        var tokens = generateTokenPair(userId, role);
+        var tokens = generateTokenPair(userId);
 
         cookiesUtil.setCookies(response, tokens);
 
@@ -136,8 +137,8 @@ public class AuthController implements AuthApi {
         HttpServletRequest request = getCurrentRequest();
         HttpServletResponse response = getCurrentResponse();
 
-        String accessToken = cookiesUtil.extractCookie(request, "access_token");
-        String refreshToken = cookiesUtil.extractCookie(request, "refresh_token");
+        String accessToken = cookiesUtil.extractAccessToken(request);
+        String refreshToken = cookiesUtil.extractRefreshToken(request);
 
         if (accessToken != null) jwtService.invalidateToken(accessToken);
         if (refreshToken != null) jwtService.invalidateToken(refreshToken);
@@ -152,12 +153,11 @@ public class AuthController implements AuthApi {
      * Generates a pair of access and refresh tokens for the given user ID and role.
      *
      * @param userId UUID of the user
-     * @param role   Role of the user
      * @return TokenPair containing access and refresh tokens
      */
-    public TokenPair generateTokenPair(UUID userId, String role) {
-        String accessToken = jwtService.generateToken(userId, role);
-        String refreshToken = jwtService.generateRefreshToken(userId, role);
+    public TokenPair generateTokenPair(UUID userId) {
+        String accessToken = jwtService.generateToken(userId);
+        String refreshToken = jwtService.generateRefreshToken(userId);
 
         return new TokenPair(accessToken, refreshToken);
     }

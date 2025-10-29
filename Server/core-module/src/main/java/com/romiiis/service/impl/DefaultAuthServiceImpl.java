@@ -100,7 +100,7 @@ public class DefaultAuthServiceImpl implements IAuthService {
         // hash password
         String hashPassword = passwordHasher.hash(password);
 
-        return userService.createNewCustomer(name, email, hashPassword);
+        return userService.createNewUser(name, email, hashPassword);
 
     }
 }

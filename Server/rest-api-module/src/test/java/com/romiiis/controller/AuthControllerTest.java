@@ -68,7 +68,7 @@ class AuthControllerTest {
 
         assertThat(Arrays.asList(cookies))
                 .extracting(Cookie::getName)
-                .contains("access_token", "refresh_token");
+                .contains("accessToken", "refreshToken");
 
         assertThat(Arrays.stream(cookies)
                 .filter(Cookie::isHttpOnly)
@@ -120,7 +120,7 @@ class AuthControllerTest {
 
         assertThat(Arrays.asList(cookies))
                 .extracting(Cookie::getName)
-                .contains("access_token", "refresh_token");
+                .contains("accessToken", "refreshToken");
     }
 
     @DisplayName("POST /auth/refresh - issues new tokens and cookies from refresh_token")
@@ -152,7 +152,7 @@ class AuthControllerTest {
         Cookie[] refreshedCookies = refreshResult.getResponse().getCookies();
         assertThat(Arrays.asList(refreshedCookies))
                 .extracting(Cookie::getName)
-                .contains("access_token", "refresh_token");
+                .contains("accessToken", "refreshToken");
     }
 
 

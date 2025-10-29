@@ -66,26 +66,6 @@
       Confirm Password
       <input type="password" formControlName="confirmPassword" placeholder="Repeat your password" />
     </label>
-
-    <div class="role-selection">
-      <span>I am a:</span>
-      <div class="role-tabs">
-        <button
-          type="button"
-          [class.active]="registerForm.value.role === 'customer'"
-          (click)="registerForm.patchValue({ role: 'customer' })">
-          Customer
-        </button>
-        <button
-          type="button"
-          [class.active]="registerForm.value.role === 'translator'"
-          (click)="registerForm.patchValue({ role: 'translator' })">
-          Translator
-        </button>
-      </div>
-    </div>
-
-
     <button type="submit" [disabled]="registerForm.invalid">Register</button>
   </form>
 </div>

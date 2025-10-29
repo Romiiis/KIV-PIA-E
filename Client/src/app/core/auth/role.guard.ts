@@ -9,16 +9,28 @@ export class RoleRedirectGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree {
 
+    console.log("User logged in:", this.auth.isLoggedIn());
+    // If not logged in, only allow access to auth page
+    if (!this.auth.isLoggedIn()) {
+      // If goint to auth page from auth page, do not redirect (to avoid loop)
+      if (state.url === '/auth') {
+        return true;
+      }
+
+      // Otherwise, redirect to auth page
+      return this.router.parseUrl('/auth');
+    }
+
+
     // Get the role of the current user
     const role = this.auth.user()?.role;
 
-    // If no role (not logged in) -> just route to login page
+    // If no role (logged in but not initialised) -> just route to initial page
     if (!role) {
-      if (state.url === '/auth') {
-        return true; // If already going to auth page, allow it (do not redirect in a loop)
+      if (state.url === '/init') {
+        return true;
       }
-      // Otherwise, redirect to auth page
-      return this.router.parseUrl('/auth');
+      return this.router.parseUrl('/init');
     }
 
     // If user has a role, check if they are going to the right place

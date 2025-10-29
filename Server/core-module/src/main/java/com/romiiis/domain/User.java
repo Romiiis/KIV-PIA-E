@@ -87,8 +87,7 @@ public class User {
      */
     public static User createUser(String name, String emailAddress, String password) {
         validateName(name, emailAddress);
-
-        return new User(name, emailAddress, null, Collections.emptySet());
+        return new User(name, emailAddress, null, Collections.emptySet()).withHashedPassword(password);
     }
 
     /**

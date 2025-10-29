@@ -1,5 +1,7 @@
 package com.romiiis.service.interfaces;
 
+import com.romiiis.domain.UserRole;
+
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,20 +22,18 @@ public interface IJwtService {
      * Generates a JWT access token for the given user ID and role.
      *
      * @param userId the user ID
-     * @param role   single user role (e.g. "ADMIN", "CUSTOMER", "TRANSLATOR")
      * @return signed JWT string
      */
-    String generateToken(UUID userId, String role);
+    String generateToken(UUID userId);
 
 
     /**
      * Generates a long-lived refresh token for the given subject.
      *
      * @param subject the subject (user identifier)
-     * @param role    single user role (e.g. "ADMIN", "CUSTOMER", "TRANSLATOR")
      * @return signed JWT refresh token string
      */
-    String generateRefreshToken(UUID subject, String role);
+    String generateRefreshToken(UUID subject);
 
     /**
      * Validates a token (signature, structure, expiration, etc.).
@@ -60,7 +60,7 @@ public interface IJwtService {
      * @param token JWT token
      * @return user role (e.g. "ADMIN"), or empty if not present
      */
-    Optional<String> getRoleFromToken(String token);
+    Optional<UserRole> getRoleFromToken(String token);
 
 
     /**

@@ -68,7 +68,7 @@ class DefaultAuthServiceImplTest {
         when(userRepository.getUserPasswordHash(email)).thenReturn(Optional.of(hashed));
         when(passwordHasher.verify(password, hashed)).thenReturn(true);
         when(userService.getUserByEmail(email)).thenReturn(mockCustomer);
-        when(jwtService.generateToken(mockCustomer.getId(), mockCustomer.getRole().name())).thenReturn(jwtToken);
+        when(jwtService.generateToken(mockCustomer.getId())).thenReturn(jwtToken);
 
         User result = authService.login(email, password);
 
@@ -109,14 +109,14 @@ class DefaultAuthServiceImplTest {
     void registerUser_shouldCreateUserAndReturnToken() throws Exception {
         when(userRepository.emailInUse(email)).thenReturn(false);
         when(passwordHasher.hash(password)).thenReturn(hashed);
-        when(userService.createNewCustomer("Roman", email, hashed)).thenReturn(mockCustomer);
-        when(jwtService.generateToken(mockCustomer.getId(), mockCustomer.getRole().name())).thenReturn(jwtToken);
+        when(userService.createNewUser("Roman", email, hashed)).thenReturn(mockCustomer);
+        when(jwtService.generateToken(mockCustomer.getId())).thenReturn(jwtToken);
 
         User result = authService.registerUser("Roman", email, password);
 
         assert result.equals(mockCustomer);
 
-        verify(userService).createNewCustomer("Roman", email, hashed);
+        verify(userService).createNewUser("Roman", email, hashed);
     }
 
     @DisplayName("registerUser should throw EmailInUseException when email already used")

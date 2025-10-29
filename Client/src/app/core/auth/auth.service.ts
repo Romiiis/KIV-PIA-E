@@ -1,19 +1,32 @@
-import { inject, Injectable, Injector, runInInjectionContext, computed, signal } from '@angular/core';
-import { useLoginMutation, useLogoutMutation, useMeQuery, useRegisterMutation } from '@api/queries/auth.query';
-import { UserDomain } from '@core/models/user.model';
-import { UserRoleDomain } from '@core/models/userRole.model';
+import {computed, effect, inject, Injectable, Injector, runInInjectionContext, signal} from '@angular/core';
+import {useLoginMutation, useLogoutMutation, useMeQuery, useRegisterMutation} from '@api/queries/auth.query';
+import {UserDomain} from '@core/models/user.model';
+import {UserRoleDomain} from '@core/models/userRole.model';
+import {Router} from '@angular/router';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class AuthService {
   private readonly injector = inject(Injector);
 
-  readonly user = runInInjectionContext(this.injector, () => {
-    const meQuery = useMeQuery();
-    return computed(() => meQuery.data());
-  });
+  readonly user = signal<UserDomain | undefined>(undefined);
+
 
   readonly isLoggedIn = computed(() => !!this.user());
   readonly role = computed(() => this.user()?.role);
+
+  constructor(private router: Router) {
+
+    // Effect to monitor user role and redirect to /init if role is undefined
+    runInInjectionContext(this.injector, () => {
+      effect(() => {
+        const user = this.user();
+        if (user && user.role === undefined) {
+          console.log('effect fired, user =', this.user());
+          //this.router.navigateByUrl('/init');
+        }
+      });
+    });
+  }
 
 
   async login(email: string, password: string): Promise<UserDomain | undefined> {
@@ -23,9 +36,12 @@ export class AuthService {
 
       return new Promise((resolve, reject) => {
         loginMutation.mutate(
-          { email, password },
+          {email, password},
           {
             onSuccess: async () => {
+              const me = await meQuery.refetch();
+              this.user.set(me.data);
+              resolve(me.data);
             },
             onError: (err) => {
               console.error('Login failed', err);
@@ -37,33 +53,30 @@ export class AuthService {
     });
   }
 
-  // ------------------------------
-  // 👤 REGISTRACE
-  // ------------------------------
-  async register(data: {
-    email: string;
-    password: string;
-    name: string;
-    type: UserRoleDomain;
-  }): Promise<boolean> {
+
+  async register(email: string, password: string, name: string): Promise<UserDomain | undefined>  {
     return runInInjectionContext(this.injector, async () => {
       const registerMutation = useRegisterMutation();
+      const meQuery = useMeQuery();
 
       return new Promise((resolve, reject) => {
-        registerMutation.mutate(data, {
-          onSuccess: () => resolve(true),
+        registerMutation.mutate({email, password, name}, {
+          onSuccess: async () => {
+            const me = await meQuery.refetch();
+            this.user.set(me.data);
+            resolve(me.data);
+
+          },
           onError: (err) => {
-            console.error('Registration failed', err);
-            reject(false);
+            console.error('Login failed', err);
+            reject(err);
           },
         });
       });
     });
   }
 
-  // ------------------------------
-  // 🚪 LOGOUT
-  // ------------------------------
+
   async logout(): Promise<boolean> {
     return runInInjectionContext(this.injector, async () => {
       const logoutMutation = useLogoutMutation();
@@ -80,9 +93,6 @@ export class AuthService {
     });
   }
 
-  // ------------------------------
-  // 📜 GETTERS
-  // ------------------------------
   get currentUser(): UserDomain | undefined {
     return this.user();
   }

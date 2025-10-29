@@ -22,7 +22,6 @@ export class AuthPageComponent implements OnInit {
   registerForm!: FormGroup;
 
 
-
   ngOnInit(): void {
     this.loginForm = this.fb.group({
       email: ['', Validators.required],
@@ -35,7 +34,6 @@ export class AuthPageComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required],
-      role: ['customer', Validators.required]
     });
 
   }
@@ -45,32 +43,24 @@ export class AuthPageComponent implements OnInit {
     private auth: AuthService,
     private notify: NotificationService,
     private router: Router
-  ) {}
+  ) {
+  }
 
   switchMode(newMode: 'login' | 'register') {
     this.mode = newMode;
   }
 
   submitLogin() {
+
     if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
+      const {email, password} = this.loginForm.value;
+
       this.auth.login(email, password)
+
         .then(user => {
+
           this.notify.success('Login successful!');
-          // Redirect based on role
-          switch (user?.role) {
-            case UserRoleDomain.CUSTOMER:
-              this.router.navigate(['/customer']);
-              break;
-            case UserRoleDomain.TRANSLATOR:
-              this.router.navigate(['/translator']);
-              break;
-            case UserRoleDomain.ADMINISTRATOR:
-              this.router.navigate(['/admin']);
-              break;
-            default:
-              this.router.navigate(['/']);
-          }
+            this.router.navigate([this.resolvePath(user?.role)]);
         })
         .catch(err => {
           console.error('Login error:', err);
@@ -80,11 +70,31 @@ export class AuthPageComponent implements OnInit {
     }
   }
 
+  resolvePath(userRole: UserRoleDomain | undefined): string {
+    switch (userRole) {
+      case UserRoleDomain.CUSTOMER:
+        return '/customer';
+      case UserRoleDomain.TRANSLATOR:
+        return '/translator';
+      case UserRoleDomain.ADMINISTRATOR:
+        return '/admin';
+      default:
+        return '/init';
+    }
+  }
+
   submitRegister() {
     if (this.registerForm.valid) {
-      console.log('New user:', this.registerForm.value);
-      this.notify.success('Registration successful! You can now log in.');
-      this.switchMode('login');
+      this.auth.register(
+        this.registerForm.value.email,
+        this.registerForm.value.password,
+        this.registerForm.value.fullname
+      )
+        .then(user => {
+          this.notify.success('Registration successful! You can now log in.');
+          this.router.navigate([this.resolvePath(user?.role)]);
+        });
+
     }
   }
 }

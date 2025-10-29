@@ -1,0 +1,35 @@
+<div class="init-container">
+  <h1 class="title">Welcome to LinguaFlow 🌍</h1>
+  <p class="subtitle">Let's set up your account</p>
+
+  <div class="role-selection">
+    <span>Select your role:</span>
+    <div class="role-tabs">
+      <button
+        type="button"
+        (click)="selectRole('customer')"
+        [class.active]="form.get('role')?.value === 'customer'"
+      >
+        Customer
+      </button>
+      <button
+        type="button"
+        (click)="selectRole('translator')"
+        [class.active]="form.get('role')?.value === 'translator'"
+      >
+        Translator
+      </button>
+    </div>
+  </div>
+
+  <!-- Show language select if translator -->
+  <div *ngIf="form.get('role')?.value === 'translator'">
+    <span>Languages you know:</span>
+    <app-language-select
+      [multiple]="true"
+      (selected)="onLanguagesSelected($event)">
+    </app-language-select>
+  </div>
+
+  <button class="save-btn" (click)="saveSelection()">Continue</button>
+</div>
