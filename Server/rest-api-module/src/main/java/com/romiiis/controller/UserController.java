@@ -66,12 +66,12 @@ public class UserController implements UsersApi {
      * @return A ResponseEntity containing the updated UserDTO.
      */
     @Override
-    public ResponseEntity<UserDTO> changeUserRole(UUID id, InitializeUserRequestDTO initializeUserRequestDTO) {
-        var updatedUser = userService.initializeUser(
+    public ResponseEntity<Void> changeUserRole(UUID id, InitializeUserRequestDTO initializeUserRequestDTO) {
+        userService.initializeUser(
                 id,
                 commonMapper.mapUserRoleDTOToDomain(initializeUserRequestDTO.getRole()),
                 commonMapper.mapListStringToSetLocale(initializeUserRequestDTO.getLanguages()));
 
-        return ResponseEntity.ok(userMapper.mapDomainToDTO(updatedUser));
+        return ResponseEntity.ok().build();
     }
 }

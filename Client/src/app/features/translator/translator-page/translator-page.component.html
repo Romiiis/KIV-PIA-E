@@ -15,7 +15,7 @@
       <h3>Waiting for your translation</h3>
       @for (p of projects | filterByStatus:ProjectStatusDomain.CREATED; track p.id) {
         <div class="project-card">
-          <div class="title">{{ p.customerId }}</div>
+          <div class="title">{{ p.customer.id }}</div>
           <div class="lang">English → {{ p.targetLanguage }}</div>
         </div>
       } @empty { <p class="empty">No projects</p> }
@@ -25,7 +25,7 @@
       <h3>Waiting for feedback</h3>
       @for (p of projects | filterByStatus:ProjectStatusDomain.COMPLETED; track p.id) {
         <div class="project-card">
-          <div class="title">{{ p.customerId }}</div>
+          <div class="title">{{ p.customer.id }}</div>
           <div class="lang">English → {{ p.targetLanguage }}</div>
         </div>
       } @empty { <p class="empty">No projects</p> }
@@ -35,7 +35,7 @@
       <h3>Rejected</h3>
       @for (p of projects | filterByStatus:ProjectStatusDomain.APPROVED; track p.id) {
         <div class="project-card">
-          <div class="title">{{ p.customerId }}</div>
+          <div class="title">{{ p.customer.id }}</div>
           <div class="lang">English → {{ p.targetLanguage }}</div>
         </div>
       } @empty { <p class="empty">No projects</p> }

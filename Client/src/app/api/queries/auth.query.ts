@@ -1,92 +1,61 @@
+// api/queries/auth.query.ts
 import {injectMutation, injectQuery, injectQueryClient} from '@tanstack/angular-query-experimental';
-import {UserMapper} from '@api/mappers/user.mapper';
-import {loginUser, logoutUser, registerUser} from '@generated/auth/auth';
-import {getCurrentUser} from '@generated/me/me';
-import {UserDomain} from '@core/models/user.model';
-import {UserRoleDomain} from '@core/models/userRole.model';
+import {AuthApiService} from '@api/apiServices/auth-api.service';
+import {queryFromApi} from '@api/query.utils';
+import type {LoginUserRequest, RegisterUserRequest} from '@generated/model';
+import {inject} from '@angular/core';
 
 
-/**
- * Fetch the current logged-in user
- */
+function hasAuthCookies(accessName = 'accessToken', refreshName = 'refreshToken'): boolean {
+  if (typeof document === 'undefined') return false;
+  const cookies = document.cookie.split(';').map(c => c.trim());
+  return cookies.some(c => c.startsWith(`${accessName}=`)) ||
+    cookies.some(c => c.startsWith(`${refreshName}=`));
+}
+
 export function useMeQuery() {
+  const authApi = inject(AuthApiService);
+
   return injectQuery(() => ({
     queryKey: ['me'],
-    queryFn: async (): Promise<UserDomain> => {
-      const response = await getCurrentUser({credentials: 'include'});
-
-      if (response.status !== 200)
-        throw new Error('Failed to fetch current user');
-
-      return UserMapper.mapApiUserToUser(response.data);
-    },
+    queryFn: () => queryFromApi(authApi.me()),
     staleTime: 1000 * 60 * 5,
+    enabled: hasAuthCookies(),
+    retry: false,
     refetchOnWindowFocus: true,
-    enabled: false,
   }));
 }
 
-
-/**
- * Login mutation
- * @returns Mutation object
- */
 export function useLoginMutation() {
+  const authApi = inject(AuthApiService);
   const queryClient = injectQueryClient();
 
   return injectMutation(() => ({
-    mutationFn: async (credentials: { email: string; password: string }) => {
-      const response = await loginUser(
-        {
-          emailAddress: credentials.email,
-          password: credentials.password,
-        },
-      );
-
-      if (response.status !== 200) throw new Error('Invalid credentials');
-      return response.data.accessToken as string;
-    },
+    mutationFn: (payload: LoginUserRequest) => queryFromApi(authApi.login(payload)),
     onSuccess: () => queryClient.invalidateQueries({queryKey: ['me']}),
   }));
 }
 
-/**
- * Register mutation
- * @returns Mutation object
- */
 export function useRegisterMutation() {
+  const authApi = inject(AuthApiService);
   const queryClient = injectQueryClient();
 
   return injectMutation(() => ({
-    mutationFn: async (data: { email: string; password: string; name: string; }) => {
-
-      const response = await registerUser(
-        {
-          emailAddress: data.email,
-          password: data.password,
-          name: data.name,
-        },
-      );
-
-      if (response.status !== 201) throw new Error('Registration failed');
-      return response.data;
-    },
+    mutationFn: (payload: RegisterUserRequest) => queryFromApi(authApi.register(payload)),
     onSuccess: () => queryClient.invalidateQueries({queryKey: ['me']}),
   }));
 }
 
-
-/**
- * Logout mutation
- */
 export function useLogoutMutation() {
+  const authApi = inject(AuthApiService);
   const queryClient = injectQueryClient();
 
   return injectMutation(() => ({
-    mutationFn: async () => {
-      const response = await logoutUser();
-      if (response.status !== 204) throw new Error('Logout failed');
+    mutationFn: () => queryFromApi(authApi.logout()),
+    onSuccess: () => {
+      queryClient.clear();
     },
-    onSuccess: () => queryClient.clear(),
   }));
+
+
 }

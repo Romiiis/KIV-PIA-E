@@ -25,7 +25,7 @@ export const routes: Routes = [
     ]
   },
   {path: "init", canActivate: [RoleRedirectGuard], component: InitUserComponent},
-  {path: 'auth', component: AuthPageComponent},
+  {path: 'auth', canActivate: [RoleRedirectGuard], component: AuthPageComponent},
   {
     path: '**',
     canActivate: [RoleRedirectGuard],

@@ -11,7 +11,7 @@
       @for (p of projects | filterByStatus:ProjectStatusDomain.CREATED; track p.id) {
         <div class="project-card">
           <div>
-            <div class="title">{{ p.customerId }}</div>
+            <div class="title">{{ p.customer.id }}</div>
             <div class="lang">English → {{ p.targetLanguage }}</div>
           </div>
           <div>
@@ -30,7 +30,7 @@
       @for (p of projects | filterByStatus:ProjectStatusDomain.COMPLETED; track p.id) {
         <div class="project-card">
           <div>
-            <div class="title">{{ p.customerId }}</div>
+            <div class="title">{{ p.customer.id }}</div>
             <div class="lang">English → {{ p.targetLanguage }}</div>
           </div>
           <div>

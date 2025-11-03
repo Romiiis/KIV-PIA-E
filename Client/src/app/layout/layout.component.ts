@@ -1,7 +1,7 @@
-import { Component, HostListener, signal } from '@angular/core';
-import { NgIf } from '@angular/common';
-import { AuthService } from '@core/auth/auth.service';
-import { RouterOutlet } from '@angular/router';
+import {Component, HostListener} from '@angular/core';
+import {NgIf} from '@angular/common';
+import {AuthService} from '@core/auth/auth.service';
+import {Router, RouterOutlet} from '@angular/router';
 
 @Component({
   selector: 'app-layout',
@@ -14,7 +14,8 @@ export class LayoutComponent {
   showMenu = false;
   closeTimeout: any;
 
-  constructor(public authService: AuthService) {}
+  constructor(public authService: AuthService, private router: Router) {
+  }
 
   toggleMenu() {
     this.showMenu = !this.showMenu;
@@ -40,6 +41,11 @@ export class LayoutComponent {
   }
 
   logout() {
-    this.authService.logout();
+    this.authService.logout().then(r => {
+        this.router.navigate(['/']).then(() => {
+        });
+      }
+    );
+
   }
 }

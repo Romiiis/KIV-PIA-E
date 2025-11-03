@@ -1,6 +1,5 @@
-export interface Feedback {
-  id: string;
+export interface FeedbackDomain {
   projectId: string;
-  customerMessage: string;
-  adminResponse?: string;
+  text: string;
+  createdAt: string;
 }

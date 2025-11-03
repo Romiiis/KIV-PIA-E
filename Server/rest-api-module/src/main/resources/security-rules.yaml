@@ -18,14 +18,14 @@ security:
 
     - path: /auth/logout
       method: POST
-      roles: [ ADMIN, CUSTOMER, TRANSLATOR ]
+      roles: [ ADMINISTRATOR, CUSTOMER, TRANSLATOR ]
 
     # --------------------
     # ME ENDPOINT
     # --------------------
     - path: /me
       method: GET
-      access: authenticated
+      access: AUTHENTICATED
 
 
     # --------------------
@@ -33,19 +33,23 @@ security:
     # --------------------
     - path: /users
       method: GET
-      roles: [ ADMIN ]
+      roles: [ ADMINISTRATOR ]
 
     - path: /users/*
       method: GET
-      roles: [ ADMIN, CUSTOMER, TRANSLATOR ]
+      roles: [ ADMINISTRATOR, CUSTOMER, TRANSLATOR ]
 
     - path: /users/*/languages
       method: GET
-      roles: [ ADMIN, TRANSLATOR ]
+      roles: [ ADMINISTRATOR, TRANSLATOR ]
 
     - path: /users/*/languages
       method: PUT
       roles: [ TRANSLATOR ]
+
+    - path: /users/*/role
+      method: POST
+      roles: AUTHENTICATED
 
     # --------------------
     # PROJECTS ENDPOINTS
@@ -53,7 +57,7 @@ security:
     # Everyone can view list of projects (each sees own)
     - path: /projects
       method: GET
-      roles: [ ADMIN, CUSTOMER, TRANSLATOR ]
+      roles: [ ADMINISTRATOR, CUSTOMER, TRANSLATOR ]
 
     # Only customers can create new projects
     - path: /projects
@@ -62,7 +66,7 @@ security:
 
     - path: /projects/*
       method: GET
-      roles: [ ADMIN, CUSTOMER, TRANSLATOR ]
+      roles: [ ADMINISTRATOR, CUSTOMER, TRANSLATOR ]
 
     - path: /projects/*/original
       method: GET
@@ -70,7 +74,7 @@ security:
 
     - path: /projects/*/translated
       method: GET
-      roles: [ ADMIN, CUSTOMER, TRANSLATOR ]
+      roles: [ ADMINISTRATOR, CUSTOMER, TRANSLATOR ]
 
     - path: /projects/*/translated
       method: PUT
@@ -86,11 +90,11 @@ security:
 
     - path: /projects/*/close
       method: POST
-      roles: [ ADMIN ]
+      roles: [ ADMINISTRATOR ]
 
     # --------------------
     # FEEDBACK ENDPOINT
     # --------------------
     - path: /projects/*/feedback
       method: GET
-      roles: [ ADMIN, CUSTOMER, TRANSLATOR ]
+      roles: [ ADMINISTRATOR, CUSTOMER, TRANSLATOR ]

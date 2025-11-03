@@ -36,5 +36,4 @@ public interface MongoProjectRepository extends MongoRepository<ProjectDB, UUID>
      */
     @Query(value = "{ 'translator.$id': ?0 }", count = true)
     int countByTranslatorId(UUID translatorId);
-
 }

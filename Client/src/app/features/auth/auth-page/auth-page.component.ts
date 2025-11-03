@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {AuthService} from '@core/auth/auth.service';
@@ -56,11 +56,13 @@ export class AuthPageComponent implements OnInit {
       const {email, password} = this.loginForm.value;
 
       this.auth.login(email, password)
-
-        .then(user => {
-
+        .then(() => {
           this.notify.success('Login successful!');
-            this.router.navigate([this.resolvePath(user?.role)]);
+          let currentUser = this.auth.user()
+          if (!currentUser) {
+            this.notify.error('Unable to retrieve user information.');
+          }
+          this.router.navigate([this.auth.resolvePath(currentUser?.role)]);
         })
         .catch(err => {
           console.error('Login error:', err);
@@ -70,18 +72,7 @@ export class AuthPageComponent implements OnInit {
     }
   }
 
-  resolvePath(userRole: UserRoleDomain | undefined): string {
-    switch (userRole) {
-      case UserRoleDomain.CUSTOMER:
-        return '/customer';
-      case UserRoleDomain.TRANSLATOR:
-        return '/translator';
-      case UserRoleDomain.ADMINISTRATOR:
-        return '/admin';
-      default:
-        return '/init';
-    }
-  }
+
 
   submitRegister() {
     if (this.registerForm.valid) {
@@ -90,9 +81,13 @@ export class AuthPageComponent implements OnInit {
         this.registerForm.value.password,
         this.registerForm.value.fullname
       )
-        .then(user => {
+        .then(() => {
           this.notify.success('Registration successful! You can now log in.');
-          this.router.navigate([this.resolvePath(user?.role)]);
+          let currentUser = this.auth.user()
+          if (!currentUser) {
+            this.notify.error('Unable to retrieve user information.');
+          }
+          this.router.navigate([this.auth.resolvePath(currentUser?.role)]);
         });
 
     }

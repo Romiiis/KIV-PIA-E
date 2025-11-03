@@ -2,7 +2,6 @@ package com.romiiis.controller;
 
 
 import com.romiiis.domain.User;
-import com.romiiis.domain.UserRole;
 import com.romiiis.mapper.CommonMapper;
 import com.romiiis.model.AuthJWTResponseDTO;
 import com.romiiis.model.LoginUserRequestDTO;
@@ -108,6 +107,12 @@ public class AuthController implements AuthApi {
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
+    /**
+     * Handles token refresh requests.
+     *
+     * @return a ResponseEntity containing the new JWT tokens if successful,
+     * or an unauthorized status if the refresh token is invalid
+     */
     @Override
     public ResponseEntity<AuthJWTResponseDTO> refreshToken() {
         HttpServletRequest request = getCurrentRequest();
@@ -132,6 +137,11 @@ public class AuthController implements AuthApi {
     }
 
 
+    /**
+     * Handles user logout requests.
+     *
+     * @return a ResponseEntity with no content status
+     */
     @Override
     public ResponseEntity<Void> logoutUser() {
         HttpServletRequest request = getCurrentRequest();
@@ -162,6 +172,13 @@ public class AuthController implements AuthApi {
         return new TokenPair(accessToken, refreshToken);
     }
 
+
+    /**
+     * Retrieves the current HTTP response from the request context.
+     *
+     * @return the current HttpServletResponse
+     * @throws IllegalStateException if there is no active HTTP request context
+     */
     private HttpServletResponse getCurrentResponse() {
         ServletRequestAttributes attrs =
                 (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -171,6 +188,12 @@ public class AuthController implements AuthApi {
         return attrs.getResponse();
     }
 
+    /**
+     * Retrieves the current HTTP request from the request context.
+     *
+     * @return the current HttpServletRequest
+     * @throws IllegalStateException if there is no active HTTP request context
+     */
     private HttpServletRequest getCurrentRequest() {
         return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
     }

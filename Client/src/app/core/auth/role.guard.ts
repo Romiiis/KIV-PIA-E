@@ -7,10 +7,14 @@ import {UserRoleDomain} from '@core/models/userRole.model';
 export class RoleRedirectGuard implements CanActivate {
   constructor(private auth: AuthService, private router: Router) {}
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree {
+  async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
+
+    while (this.auth.isInitializing()) {
+      await new Promise(r => setTimeout(r, 50));
+    }
 
     console.log("User logged in:", this.auth.isLoggedIn());
-    // If not logged in, only allow access to auth page
+
     if (!this.auth.isLoggedIn()) {
       // If goint to auth page from auth page, do not redirect (to avoid loop)
       if (state.url === '/auth') {
@@ -48,6 +52,6 @@ export class RoleRedirectGuard implements CanActivate {
     }
 
     // If none of the above, redirect to auth page (could also show a "not authorized" page)
-    return this.router.parseUrl('/auth');
+    return this.router.parseUrl('/');
   }
 }

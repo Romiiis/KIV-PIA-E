@@ -1,96 +1,61 @@
-import {computed, effect, inject, Injectable, Injector, runInInjectionContext, signal} from '@angular/core';
-import {useLoginMutation, useLogoutMutation, useMeQuery, useRegisterMutation} from '@api/queries/auth.query';
-import {UserDomain} from '@core/models/user.model';
-import {UserRoleDomain} from '@core/models/userRole.model';
-import {Router} from '@angular/router';
+import { Injectable, signal, computed, effect } from '@angular/core';
+import { useLoginMutation, useLogoutMutation, useRegisterMutation, useMeQuery } from '@api/queries/auth.query';
+import { UserDomain } from '@core/models/user.model';
+import { UserRoleDomain } from '@core/models/userRole.model';
+import {injectQueryClient} from '@tanstack/angular-query-experimental';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly injector = inject(Injector);
-
   readonly user = signal<UserDomain | undefined>(undefined);
-
-
   readonly isLoggedIn = computed(() => !!this.user());
   readonly role = computed(() => this.user()?.role);
+  readonly isInitializing = signal(true);
 
-  constructor(private router: Router) {
 
-    // Effect to monitor user role and redirect to /init if role is undefined
-    runInInjectionContext(this.injector, () => {
-      effect(() => {
-        const user = this.user();
-        if (user && user.role === undefined) {
-          console.log('effect fired, user =', this.user());
-          //this.router.navigateByUrl('/init');
-        }
-      });
+  private readonly queryClient = injectQueryClient();
+  private readonly loginMutation = useLoginMutation();
+  private readonly registerMutation = useRegisterMutation();
+  private readonly logoutMutation = useLogoutMutation();
+  private readonly meQuery = useMeQuery();
+
+  constructor() {
+    effect(() => {
+      const me = this.meQuery.data();
+      if (me) {
+        this.user.set(me);
+      }
     });
   }
 
-
-  async login(email: string, password: string): Promise<UserDomain | undefined> {
-    return runInInjectionContext(this.injector, async () => {
-      const loginMutation = useLoginMutation();
-      const meQuery = useMeQuery();
-
-      return new Promise((resolve, reject) => {
-        loginMutation.mutate(
-          {email, password},
-          {
-            onSuccess: async () => {
-              const me = await meQuery.refetch();
-              this.user.set(me.data);
-              resolve(me.data);
-            },
-            onError: (err) => {
-              console.error('Login failed', err);
-              reject(err);
-            },
-          }
-        );
-      });
-    });
+  async initialize(): Promise<void> {
+    this.isInitializing.set(true);
+    const result = await this.meQuery.refetch();
+    if (result.data) this.user.set(result.data);
+    else this.user.set(undefined);
+    this.isInitializing.set(false);
   }
 
 
-  async register(email: string, password: string, name: string): Promise<UserDomain | undefined>  {
-    return runInInjectionContext(this.injector, async () => {
-      const registerMutation = useRegisterMutation();
-      const meQuery = useMeQuery();
-
-      return new Promise((resolve, reject) => {
-        registerMutation.mutate({email, password, name}, {
-          onSuccess: async () => {
-            const me = await meQuery.refetch();
-            this.user.set(me.data);
-            resolve(me.data);
-
-          },
-          onError: (err) => {
-            console.error('Login failed', err);
-            reject(err);
-          },
-        });
-      });
-    });
+  async login(email: string, password: string): Promise<void> {
+    await this.loginMutation.mutateAsync({ emailAddress: email, password });
+    const result = await this.meQuery.refetch();
+    if (result.data) {
+      this.user.set(result.data);
+    }
   }
 
+  async register(email: string, password: string, name: string): Promise<void> {
+    await this.registerMutation.mutateAsync({ emailAddress: email, password, name });
+    const result = await this.meQuery.refetch();
+    if (result.data) {
+      this.user.set(result.data);
+    }  }
 
-  async logout(): Promise<boolean> {
-    return runInInjectionContext(this.injector, async () => {
-      const logoutMutation = useLogoutMutation();
+  async logout(): Promise<void> {
+    await this.logoutMutation.mutateAsync(undefined);
+    this.user.set(undefined);
+    this.queryClient.removeQueries({ queryKey: ['me'] });
 
-      return new Promise((resolve, reject) => {
-        logoutMutation.mutate(undefined, {
-          onSuccess: () => resolve(true),
-          onError: (err) => {
-            console.error('Logout failed', err);
-            reject(err);
-          },
-        });
-      });
-    });
   }
 
   get currentUser(): UserDomain | undefined {
@@ -100,4 +65,27 @@ export class AuthService {
   get currentRole(): UserRoleDomain | undefined {
     return this.role();
   }
+
+  resolvePath(userRole: UserRoleDomain | undefined): string {
+    switch (userRole) {
+      case UserRoleDomain.CUSTOMER:
+        return '/customer';
+      case UserRoleDomain.TRANSLATOR:
+        return '/translator';
+      case UserRoleDomain.ADMINISTRATOR:
+        return '/admin';
+      default:
+        return '/init';
+    }
+  }
+
+  async refreshUser(): Promise<UserDomain | undefined> {
+    const result = await this.meQuery.refetch();
+    if (result.data) {
+      this.user.set(result.data);
+      return result.data;
+    }
+    return undefined;
+  }
+
 }
