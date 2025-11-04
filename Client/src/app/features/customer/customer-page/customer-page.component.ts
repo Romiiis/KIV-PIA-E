@@ -22,7 +22,6 @@ export class CustomerPageComponent {
   showNewProject!: boolean
 
   openNewProject() {
-    console.log('clicked!');
     this.showNewProject = true;
   }
 

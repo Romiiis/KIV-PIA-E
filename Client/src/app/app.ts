@@ -8,15 +8,8 @@ import {AuthService} from '@core/auth/auth.service';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App implements OnInit{
+export class App{
   protected readonly title = signal('Client');
-  private auth = inject(AuthService);
 
-
-  async ngOnInit() {
-    console.log('App initialized');
-    await this.auth.initialize();
-
-  }
 
 }

@@ -2,6 +2,7 @@ import {Component, HostListener} from '@angular/core';
 import {NgIf} from '@angular/common';
 import {AuthService} from '@core/auth/auth.service';
 import {Router, RouterOutlet} from '@angular/router';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-layout',
@@ -14,7 +15,7 @@ export class LayoutComponent {
   showMenu = false;
   closeTimeout: any;
 
-  constructor(public authService: AuthService, private router: Router) {
+  constructor(public authService: AuthService, private router: Router, private toastr: ToastrService) {
   }
 
   toggleMenu() {
@@ -43,6 +44,7 @@ export class LayoutComponent {
   logout() {
     this.authService.logout().then(r => {
         this.router.navigate(['/']).then(() => {
+          this.toastr.success('Logged out successfully!');
         });
       }
     );

@@ -9,12 +9,16 @@
         <span class="icon">📄</span>
         <span>{{ projectForm.value.file?.name || 'Choose a file' }}</span>
       </label>
-      <input id="fileInput" type="file" (change)="onFileSelected($event)" hidden />
+      <input id="fileInput" type="file" (change)="onFileSelected($event)" hidden/>
     </div>
 
     <!-- Target language -->
     <div class="form-group">
-      <app-language-select></app-language-select>
+      <app-language-select
+        [multiple]="false"
+        (selected)="projectForm.patchValue({ targetLang: $event })">
+        >
+      </app-language-select>
     </div>
 
     <!-- Submit -->

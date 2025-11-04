@@ -46,7 +46,7 @@
 <!-- Modal -->
 <div class="modal-backdrop" *ngIf="showNewProject" (click)="closeNewProject()"></div>
 <div class="mymodal" *ngIf="showNewProject" >
-  <app-customer-new-project></app-customer-new-project>
+  <app-customer-new-project (close)="closeNewProject()"></app-customer-new-project>
   <button class="close-btn" (click)="closeNewProject()">✖</button>
 </div>
 

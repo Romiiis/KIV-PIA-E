@@ -1,5 +1,6 @@
 // base-api.service.ts
 import { Injectable } from '@angular/core';
+import {AuthApiService} from '@api/apiServices/auth-api.service';
 
 export interface ApiResult<T> {
   ok: boolean;
@@ -14,6 +15,8 @@ export abstract class BaseApiService {
     credentials: 'include',
   };
 
+
+
   protected handleResponse<T>(
     response: { status: number; data?: any },
     okStatuses: number[] = [200, 201, 204]
@@ -25,10 +28,9 @@ export abstract class BaseApiService {
         data: response.data as T,
       };
     }
-
     return {
-      ok: false,
       status: response.status,
+      ok: false,
       error: this.mapErrorMessage(response.status),
     };
   }

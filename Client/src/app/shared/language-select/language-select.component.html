@@ -1,15 +1,20 @@
 <div class="language-select">
-  <div class="input-area" (click)="focusInput(input)">
-    <div class="tags-wrapper">
+  <div class="input-area" (click)="focusInput()">
+    <!-- MULTISELECT -->
+    <div class="tags-wrapper" *ngIf="multiple; else singleMode">
       <div class="tag" *ngFor="let lang of selectedLanguages">
         {{ lang.name }}
-        <button type="button" class="remove-btn" (click)="removeLanguage(lang)">
+        <button
+          type="button"
+          class="remove-btn"
+          (click)="removeLanguage(lang)"
+        >
           ×
         </button>
       </div>
 
       <input
-        #input
+        #inputEl
         type="text"
         [(ngModel)]="searchTerm"
         (input)="onSearch()"
@@ -17,6 +22,18 @@
         placeholder="Type to search..."
       />
     </div>
+
+    <!-- SINGLE SELECT MODE -->
+    <ng-template #singleMode>
+      <input
+        #inputEl
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        (focus)="showDropdown = true"
+        placeholder="Select language..."
+      />
+    </ng-template>
   </div>
 
   <div class="dropdown" *ngIf="showDropdown">

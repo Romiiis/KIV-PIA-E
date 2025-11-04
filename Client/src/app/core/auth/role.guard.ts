@@ -9,14 +9,13 @@ export class RoleRedirectGuard implements CanActivate {
 
   async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
 
-    while (this.auth.isInitializing()) {
+    while (this.auth.isInitializing() || this.auth.isRefreshing()) {
       await new Promise(r => setTimeout(r, 50));
     }
 
     console.log("User logged in:", this.auth.isLoggedIn());
 
     if (!this.auth.isLoggedIn()) {
-      // If goint to auth page from auth page, do not redirect (to avoid loop)
       if (state.url === '/auth') {
         return true;
       }

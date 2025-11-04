@@ -1,8 +1,15 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
-import { useLoginMutation, useLogoutMutation, useRegisterMutation, useMeQuery } from '@api/queries/auth.query';
+import {Injectable, signal, computed, effect, inject} from '@angular/core';
+import {
+  useLoginMutation,
+  useLogoutMutation,
+  useRegisterMutation,
+  useMeQuery,
+} from '@api/queries/auth.query';
 import { UserDomain } from '@core/models/user.model';
 import { UserRoleDomain } from '@core/models/userRole.model';
 import {injectQueryClient} from '@tanstack/angular-query-experimental';
+import { AuthApiService } from '@api/apiServices/auth-api.service';
+
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -10,6 +17,7 @@ export class AuthService {
   readonly isLoggedIn = computed(() => !!this.user());
   readonly role = computed(() => this.user()?.role);
   readonly isInitializing = signal(true);
+  readonly isRefreshing = signal(false);
 
 
   private readonly queryClient = injectQueryClient();
@@ -18,7 +26,9 @@ export class AuthService {
   private readonly logoutMutation = useLogoutMutation();
   private readonly meQuery = useMeQuery();
 
-  constructor() {
+
+
+  constructor(private authApi: AuthApiService) {
     effect(() => {
       const me = this.meQuery.data();
       if (me) {
@@ -29,13 +39,42 @@ export class AuthService {
 
   async initialize(): Promise<void> {
     this.isInitializing.set(true);
-    const result = await this.meQuery.refetch();
-    if (result.data) this.user.set(result.data);
-    else this.user.set(undefined);
+    try {
+      const result = await this.meQuery.refetch();
+      if (result.data) {
+        this.user.set(result.data);
+      } else {
+        this.user.set(undefined);
+      }
+    } catch (error) {
+      this.user.set(undefined);
+  }
     this.isInitializing.set(false);
   }
 
 
+
+  async refreshIfNeeded(): Promise<void> {
+    if (this.isRefreshing()) return;
+    this.isRefreshing.set(true);
+    try {
+      const refreshRes = await this.authApi.refresh();
+      if (refreshRes.ok) {
+        console.log('[AuthService] Token refresh successful');
+        const meRes = await this.authApi.me();
+        if (meRes.ok) {
+          this.user.set(meRes.data);
+        }
+      } else {
+        console.warn('[AuthService] Refresh failed');
+        this.user.set(undefined);
+      }
+    } finally {
+      this.isRefreshing.set(false);
+    }
+  }
+
+  // Login user and update the user signal
   async login(email: string, password: string): Promise<void> {
     await this.loginMutation.mutateAsync({ emailAddress: email, password });
     const result = await this.meQuery.refetch();
@@ -44,6 +83,7 @@ export class AuthService {
     }
   }
 
+  // Register user and update the user signal
   async register(email: string, password: string, name: string): Promise<void> {
     await this.registerMutation.mutateAsync({ emailAddress: email, password, name });
     const result = await this.meQuery.refetch();
@@ -51,6 +91,7 @@ export class AuthService {
       this.user.set(result.data);
     }  }
 
+  // Logout user and clear the user signal
   async logout(): Promise<void> {
     await this.logoutMutation.mutateAsync(undefined);
     this.user.set(undefined);
@@ -79,6 +120,10 @@ export class AuthService {
     }
   }
 
+  /**
+   * Refresh the current user data
+   * Manually refetches the user data from the server and updates the user signal.
+   */
   async refreshUser(): Promise<UserDomain | undefined> {
     const result = await this.meQuery.refetch();
     if (result.data) {

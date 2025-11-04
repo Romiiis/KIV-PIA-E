@@ -1,10 +1,10 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {AuthService} from '@core/auth/auth.service';
 import {NotificationService} from '@core/services/notification.service';
 import {NgIf, NgOptimizedImage} from '@angular/common';
-import {UserRoleDomain} from '@core/models/userRole.model';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-auth-page',
@@ -42,7 +42,8 @@ export class AuthPageComponent implements OnInit {
     private fb: FormBuilder,
     private auth: AuthService,
     private notify: NotificationService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {
   }
 
@@ -57,16 +58,15 @@ export class AuthPageComponent implements OnInit {
 
       this.auth.login(email, password)
         .then(() => {
-          this.notify.success('Login successful!');
+          this.toastr.success('Login successful!');
           let currentUser = this.auth.user()
           if (!currentUser) {
-            this.notify.error('Unable to retrieve user information.');
+            this.toastr.error('Unable to retrieve user information.');
           }
           this.router.navigate([this.auth.resolvePath(currentUser?.role)]);
         })
         .catch(err => {
-          console.error('Login error:', err);
-          this.notify.error('Login failed. Please check your credentials.');
+          this.toastr.error('Login failed. Please check your credentials.');
         });
 
     }
@@ -82,10 +82,10 @@ export class AuthPageComponent implements OnInit {
         this.registerForm.value.fullname
       )
         .then(() => {
-          this.notify.success('Registration successful! You can now log in.');
+          this.toastr.success('Registration successful!');
           let currentUser = this.auth.user()
           if (!currentUser) {
-            this.notify.error('Unable to retrieve user information.');
+            this.toastr.error('Unable to retrieve user information.');
           }
           this.router.navigate([this.auth.resolvePath(currentUser?.role)]);
         });

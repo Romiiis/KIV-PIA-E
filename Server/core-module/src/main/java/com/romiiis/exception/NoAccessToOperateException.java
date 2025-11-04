@@ -10,6 +10,6 @@ import com.romiiis.configuration.ErrorCode;
 public class NoAccessToOperateException extends BaseException {
 
     public NoAccessToOperateException(String message) {
-        super(message, ErrorCode.FORBIDDEN);
+        super(message, ErrorCode.UNAUTHORIZED);
     }
 }

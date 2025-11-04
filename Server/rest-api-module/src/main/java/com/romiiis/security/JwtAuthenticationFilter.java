@@ -37,6 +37,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Value("${refreshtoken.name}")
     private String refreshTokenCookieName;
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.startsWith("/auth/login")
+                || path.startsWith("/auth/register")
+                || path.startsWith("/auth/refresh");
+    }
 
     @Override
     protected void doFilterInternal(
@@ -66,7 +73,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (!jwtService.validateToken(jwt)) {
-            filterChain.doFilter(request, response);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 

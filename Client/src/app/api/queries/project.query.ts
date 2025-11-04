@@ -25,7 +25,7 @@ export function useCreateProjectMutation() {
   const projectsApi = inject(ProjectsApiService);
   const queryClient = injectQueryClient();
   return injectMutation(() => ({
-    mutationFn: (payload: CreateProjectRequest) => queryFromApi(projectsApi.create(payload)),
+    mutationFn: (input:  { languageCode: string; content: Blob} ) => queryFromApi(projectsApi.create(input)),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projects'] }),
   }));
 }

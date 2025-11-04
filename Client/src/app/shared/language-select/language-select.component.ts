@@ -1,4 +1,13 @@
-import {Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -17,8 +26,9 @@ interface Language {
 })
 export class LanguageSelectComponent implements OnInit {
   @Input() multiple = true;
-  @Output() selected = new EventEmitter<string[]>();
-
+  @Input() selectedValues: string[] | string | null = null;
+  @Output() selected = new EventEmitter<string[] | string>();
+  @ViewChild('inputEl') inputElement?: ElementRef<HTMLInputElement>;
 
   languages: Language[] = [];
   filteredLanguages: Language[] = [];
@@ -26,14 +36,25 @@ export class LanguageSelectComponent implements OnInit {
   searchTerm = '';
   showDropdown = false;
 
-
-
   constructor(private http: HttpClient, private elementRef: ElementRef) {}
 
   ngOnInit(): void {
     this.http.get<Language[]>('languages.json').subscribe((data) => {
       this.languages = data;
       this.filteredLanguages = data;
+
+      if (this.selectedValues) {
+        if (this.multiple && Array.isArray(this.selectedValues)) {
+          this.selectedLanguages = this.languages.filter((l) =>
+            this.selectedValues?.includes(l.code)
+          );
+        } else if (!this.multiple && typeof this.selectedValues === 'string') {
+          const found = this.languages.find(
+            (l) => l.code === this.selectedValues
+          );
+          if (found) this.selectedLanguages = [found];
+        }
+      }
     });
   }
 
@@ -48,13 +69,19 @@ export class LanguageSelectComponent implements OnInit {
   }
 
   selectLanguage(lang: Language) {
-    if (this.isSelected(lang)) {
-      this.removeLanguage(lang);
-      return;
+    if (this.multiple) {
+      if (this.isSelected(lang)) {
+        this.removeLanguage(lang);
+      } else {
+        this.selectedLanguages.push(lang);
+      }
+    } else {
+      this.selectedLanguages = [lang];
+      this.searchTerm = lang.name; // zobrazí vybraný jazyk v inputu
+      this.showDropdown = false;
     }
-    this.selectedLanguages.push(lang);
+
     this.emitSelection();
-    this.searchTerm = '';
   }
 
   removeLanguage(lang: Language) {
@@ -68,12 +95,17 @@ export class LanguageSelectComponent implements OnInit {
     return this.selectedLanguages.some((l) => l.code === lang.code);
   }
 
-  focusInput(input: HTMLInputElement) {
-    input.focus();
+  focusInput() {
+    this.inputElement?.nativeElement.focus();
+    this.filteredLanguages = this.languages; // zobrazí všechny
+    this.showDropdown = true;
   }
-
   private emitSelection() {
-    this.selected.emit(this.selectedLanguages.map((l) => l.code));
+    if (this.multiple) {
+      this.selected.emit(this.selectedLanguages.map((l) => l.code));
+    } else {
+      this.selected.emit(this.selectedLanguages[0]?.code ?? '');
+    }
   }
 
   @HostListener('document:click', ['$event'])

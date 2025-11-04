@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CookiesUtil {
@@ -32,12 +34,22 @@ public class CookiesUtil {
      * @param tokens   TokenPair containing access and refresh tokens
      */
     public void setCookies(HttpServletResponse response, TokenPair tokens) {
+
+        long accessLifetime = jwtService.getRemainingLifetime(tokens.accessToken());
+        long refreshLifetime = jwtService.getRemainingLifetime(tokens.refreshToken());
+
+        long accessCookieMaxAge = (accessLifetime + (5 * 60 * 1000)) / 1000;
+        long refreshCookieMaxAge = (refreshLifetime + (5 * 60 * 1000)) / 1000;
+
+        log.debug("accessLifetime: {}, refreshLifetime: {}", accessLifetime, refreshLifetime);
+        log.debug("accessCookieMaxAge: {}, refreshCookieMaxAge: {}", accessCookieMaxAge, refreshCookieMaxAge);
+
         ResponseCookie accessCookie = ResponseCookie.from(accessTokenCookieName, tokens.accessToken())
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
                 .sameSite("Lax")
-                .maxAge(jwtService.getRemainingLifetime(tokens.accessToken()) / 1000)
+                .maxAge(accessCookieMaxAge)
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from(refreshTokenCookieName, tokens.refreshToken())
@@ -45,7 +57,7 @@ public class CookiesUtil {
                 .secure(false)
                 .path("/")
                 .sameSite("Lax")
-                .maxAge(jwtService.getRemainingLifetime(tokens.refreshToken()) / 1000)
+                .maxAge(refreshCookieMaxAge)
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());

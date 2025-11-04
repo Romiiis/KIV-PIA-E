@@ -5,22 +5,24 @@ import {queryFromApi} from '@api/query.utils';
 import type {LoginUserRequest, RegisterUserRequest} from '@generated/model';
 import {inject} from '@angular/core';
 
-
-function hasAuthCookies(accessName = 'accessToken', refreshName = 'refreshToken'): boolean {
-  if (typeof document === 'undefined') return false;
-  const cookies = document.cookie.split(';').map(c => c.trim());
-  return cookies.some(c => c.startsWith(`${accessName}=`)) ||
-    cookies.some(c => c.startsWith(`${refreshName}=`));
-}
-
-export function useMeQuery() {
+export function useMeQuery(enabled = false) {
   const authApi = inject(AuthApiService);
 
   return injectQuery(() => ({
     queryKey: ['me'],
-    queryFn: () => queryFromApi(authApi.me()),
+    queryFn: async () => {
+      try {
+        return await queryFromApi(authApi.me());
+      } catch (err: any) {
+        if (err.status === 401 || err.status === 403) {
+          // Unauthorized or Forbidden - return undefined user
+          return null;
+        }
+        throw err;
+      }
+    },
     staleTime: 1000 * 60 * 5,
-    enabled: hasAuthCookies(),
+    enabled: enabled,
     retry: false,
     refetchOnWindowFocus: true,
   }));

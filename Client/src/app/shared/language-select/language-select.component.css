@@ -16,7 +16,7 @@
 }
 
 /* === Input area === */
-.input-area {
+.input-area input{
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   background: #f8fafc;
