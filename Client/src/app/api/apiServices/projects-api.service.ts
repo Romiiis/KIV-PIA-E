@@ -14,13 +14,19 @@ const {
   downloadOriginalContent,
 } = getProjects();
 
+
 /**
- * Fasáda pro práci s projekty — CRUD, upload/download souborů.
+ * Facade for project-related API calls.
+ * Handles listing, detailing, creating projects and downloading content.
+ *
  */
 @Injectable({providedIn: 'root'})
 export class ProjectsApiService extends BaseApiService {
 
-  /** Vrátí všechny projekty, podle oprávnění přihlášeného uživatele. */
+  /**
+   * List all projects.
+   * Returns an array of ProjectDomain.
+   */
   listAll(): Observable<ProjectDomain[]> {
     return this.wrapPromise(listAllProjects()).pipe(
       map((response) =>
@@ -29,7 +35,11 @@ export class ProjectsApiService extends BaseApiService {
     );
   }
 
-  /** Vrátí detail projektu podle ID. */
+  /**
+   * Get project details by ID.
+   * @param id  Project ID.
+   * Returns a ProjectDomain.
+   */
   detail(id: string): Observable<ProjectDomain> {
     return this.wrapPromise(getProjectDetails(id)).pipe(
       map((response) => ProjectMapper.mapApiProjectToDomain(response))
@@ -37,9 +47,9 @@ export class ProjectsApiService extends BaseApiService {
   }
 
   /**
-   * Vytvoří nový projekt (CUSTOMER)
-   * @param languageCode cílový jazyk (např. "de")
-   * @param file obsah překladu jako File
+   * Create a new project with specified language code and file.
+   * @param languageCode Language code for the project.
+   * @param file File to be uploaded for the project.
    */
   create(languageCode: string, file: File): Observable<ProjectDomain> {
     return this.wrapPromise(
@@ -47,12 +57,18 @@ export class ProjectsApiService extends BaseApiService {
     ).pipe(map((apiProject) => ProjectMapper.mapApiProjectToDomain(apiProject)));
   }
 
-  /** Stáhne originální soubor projektu. */
+  /**
+   * Download the original content of a project by ID.
+   * @param id Project ID.
+   */
   downloadOriginal(id: string): Observable<Blob> {
     return this.wrapPromise(downloadOriginalContent(id));
   }
 
-  /** Stáhne přeložený soubor projektu. */
+  /**
+   * Download the translated content of a project by ID.
+   * @param id Project ID.
+   */
   downloadTranslated(id: string): Observable<Blob> {
     return this.wrapPromise(downloadTranslatedContent(id));
   }

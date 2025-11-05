@@ -1,21 +1,11 @@
-import { NgModule, Optional, SkipSelf } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-
-import { AuthService } from './auth/auth.service';
-import { AuthGuard } from './auth/auth.guard';
-import { ApiService } from './services/api.service';
-import { NotificationService } from './services/notification.service';
-import { ErrorInterceptor } from './interceptors/error.interceptor';
+import {NgModule, Optional, SkipSelf} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {AuthManager} from './auth/auth.manager';
 
 @NgModule({
   imports: [CommonModule],
   providers: [
-    AuthService,
-    ApiService,
-    NotificationService,
-    AuthGuard,
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+    AuthManager,
   ]
 })
 export class CoreModule {

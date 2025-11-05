@@ -1,11 +1,13 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { LanguageSelectComponent } from '@shared/language-select/language-select.component';
-import { useChangeUserRoleMutation } from '@api/queries/users.query';
-import { AuthService } from '@core/auth/auth.service';
-import { Router } from '@angular/router';
-import { UserRoleDomain } from '@core/models/userRole.model';
+import {Component} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {LanguageSelectComponent} from '@shared/language-select/language-select.component';
+import {useChangeUserRoleMutation} from '@api/queries/users.query';
+import {AuthManager} from '@core/auth/auth.manager';
+import {Router} from '@angular/router';
+import {UserRoleDomain} from '@core/models/userRole.model';
+import {ToastrService} from 'ngx-toastr';
+import {AuthRoutingHelper} from '@core/auth/auth-routing.helper';
 
 @Component({
   selector: 'app-init-user',
@@ -14,68 +16,113 @@ import { UserRoleDomain } from '@core/models/userRole.model';
   templateUrl: './init-user.component.html',
   styleUrls: ['./init-user.component.css'],
 })
+
+/**
+ * Component for initializing user role and preferences after registration.
+ */
 export class InitUserComponent {
+
+  // Reactive form for user role and language selection
   form: FormGroup;
+  // Selected languages for translator role
   selectedLanguages: string[] = [];
 
+  /** Mutation hook to change user role */
   readonly changeRoleMutation = useChangeUserRoleMutation();
 
+
+  /** Expose UserRoleDomain enum to template */
+  protected readonly UserRoleDomain = UserRoleDomain;
+
+
+  /**
+   * Constructor to initialize form and inject dependencies
+   * @param fb FormBuilder
+   * @param auth AuthManager
+   * @param router Router
+   * @param toastr ToastrService
+   */
   constructor(
     private fb: FormBuilder,
-    private auth: AuthService,
-    private router: Router
+    private auth: AuthManager,
+    private router: Router,
+    private toastr: ToastrService,
   ) {
+
+    // Initialize the reactive form with default values
     this.form = this.fb.group({
-      role: ['customer'],
+      role: [UserRoleDomain.CUSTOMER],
       languages: [[]],
     });
   }
 
-  selectRole(role: 'customer' | 'translator') {
+  /**
+   * Select user role and reset languages if customer
+   * @param role Selected user role
+   */
+  selectRole(role: UserRoleDomain.CUSTOMER | UserRoleDomain.TRANSLATOR) {
+
+    // Update form role value
     this.form.get('role')?.setValue(role);
 
-    if (role === 'customer') {
+    // Reset languages if role is customer
+    if (role === UserRoleDomain.CUSTOMER) {
       this.selectedLanguages = [];
       this.form.get('languages')?.setValue([]);
     }
   }
 
+  /**
+   * Handle language selection changes
+   * @param selected Selected languages
+   */
   onLanguagesSelected(selected: string[] | string) {
+    // Ensure selected is an array
     const langs = Array.isArray(selected) ? selected : [selected];
+    // Update selected languages and form value
     this.form.get('languages')?.setValue(langs);
   }
 
+  /**
+   * Save the selected role and languages, then navigate accordingly
+   */
   saveSelection() {
+
+    // Get form data and user ID
     const userData = this.form.value;
+
+    // Get current user ID from auth manager
     const userId = this.auth.user()?.id;
 
+    // Ensure user ID is defined
     if (!userId) {
       console.error('User ID is undefined. Cannot change role.');
       return;
     }
 
+    // Call mutation to change user role
     this.changeRoleMutation.mutate(
       {
         id: userId,
-        role: userData.role.toUpperCase() as UserRoleDomain,
+        role: userData.role,
         languages: userData.languages,
       },
       {
         onSuccess: async () => {
-          console.log('✅ User role changed successfully.');
+          this.toastr.success('User role and preferences updated successfully!', 'Success');
+          // Refresh user data in auth manager
+          await this.auth.refreshUserData();
 
-          // refetch /me
-          await this.auth.refetchCurrentUser();
+          // Get updated user and navigate based on role
           const updatedUser = this.auth.user();
-          console.log('🧠 Updated user after role change:', updatedUser);
 
           if (updatedUser) {
-            const targetPath = this.auth.resolvePath(updatedUser.role);
-            console.log('➡️ Navigating to:', targetPath);
-            this.router.navigate([targetPath]);
+            console.log('Navigating based on role:', updatedUser.role);
+            AuthRoutingHelper.navigateToRole(this.router, updatedUser.role).then();
           }
         },
       }
     );
   }
+
 }

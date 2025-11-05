@@ -4,7 +4,6 @@ import {ProjectState, UserRole} from '@generated/models';
 
 /**
  * Mapper for enumerations between API and domain models
- *
  */
 export class EnumMapper {
 

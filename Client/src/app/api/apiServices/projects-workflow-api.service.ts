@@ -14,13 +14,16 @@ const {
   closeProject,
 } = getProjectsWorkflow();
 
-/**
- * Fasáda pro workflow projektů (překlad, schválení, zamítnutí, uzavření).
- */
+
 @Injectable({ providedIn: 'root' })
 export class ProjectsWorkflowApiService extends BaseApiService {
 
-  /** Upload přeloženého obsahu (TRANSLATOR). */
+  /**
+   * Upload translated content for a project.
+   * @param id Project ID.
+   * @param file Translated content file.
+   * Returns updated ProjectDomain.
+   */
   uploadTranslated(id: string, file: File): Observable<ProjectDomain> {
     const form = new FormData();
     form.append('file', file);
@@ -30,14 +33,23 @@ export class ProjectsWorkflowApiService extends BaseApiService {
     );
   }
 
-  /** Schválení překladu (CUSTOMER). */
+  /**
+   * Approve translated content for a project.
+   * @param id Project ID.
+   * Returns updated ProjectDomain.
+   */
   approveTranslated(id: string): Observable<ProjectDomain> {
     return this.wrapPromise(approveTranslatedContent(id)).pipe(
       map((p) => ProjectMapper.mapApiProjectToDomain(p))
     );
   }
 
-  /** Zamítnutí překladu (CUSTOMER) + přidání feedbacku. */
+  /**
+   * Reject translated content for a project with feedback.
+   * @param id Project ID.
+   * @param feedback Feedback text for rejection.
+   * Returns updated ProjectDomain.
+   */
   rejectTranslated(id: string, feedback: string): Observable<ProjectDomain> {
     const body: ProjectFeedbackRequest = { text: feedback };
     return this.wrapPromise(rejectTranslatedContent(id, body)).pipe(
@@ -45,7 +57,11 @@ export class ProjectsWorkflowApiService extends BaseApiService {
     );
   }
 
-  /** Uzavření projektu (ADMIN). */
+  /**
+   * Close a project.
+   * @param id Project ID.
+   * Returns updated ProjectDomain.
+   */
   close(id: string): Observable<ProjectDomain> {
     return this.wrapPromise(closeProject(id)).pipe(
       map((p) => ProjectMapper.mapApiProjectToDomain(p))

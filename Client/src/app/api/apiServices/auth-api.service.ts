@@ -11,42 +11,47 @@ const {loginUser, registerUser, logoutUser, refreshToken} = getAuth();
 const {getCurrentUser} = getMe();
 
 /**
- * Fasáda pro autentizační API — přihlášení, registrace, odhlášení, zjištění aktuálního uživatele.
+ * Facade for authentication-related API calls.
+ * Handles login, registration, logout, token refresh, and fetching current user.
  */
 @Injectable({providedIn: 'root'})
 export class AuthApiService extends BaseApiService {
 
   /**
-   * Přihlášení uživatele podle e-mailu a hesla.
-   * Po úspěchu volá /me a vrací domain model UserDomain.
-   */
+   * Log in user with email and password.
+   * On success, calls /me and returns domain model UserDomain.
+   * */
   login(email: string, password: string): Observable<UserDomain> {
     return this.wrapPromise(loginUser({emailAddress: email, password}))
       .pipe(switchMap(() => this.me()));
   }
 
   /**
-   * Registrace nového uživatele (customer/translator).
-   * Po úspěchu volá /me a vrací domain model UserDomain.
-   */
+   * Register a new user with name, email and password.
+   * On success, calls /me and returns domain model UserDomain.
+   * */
   register(name: string, email: string, password: string): Observable<UserDomain> {
     return this.wrapPromise(registerUser({name, emailAddress: email, password}))
       .pipe(switchMap(() => this.me()));
   }
 
+  /**
+   * Refresh authentication token.
+   * */
   refreshToken(): Observable<void> {
     return this.wrapPromise(refreshToken()).pipe(map(() => void 0));
   }
 
   /**
-   * Odhlášení aktuálního uživatele — smaže session cookies na backendu.
+   * Logout current user.
    */
   logout(): Observable<void> {
     return this.wrapPromise(logoutUser()).pipe(map(() => void 0));
   }
 
   /**
-   * Vrátí aktuálně přihlášeného uživatele na základě cookie session.
+   * Get current logged in user.
+   * Returns domain model UserDomain.
    */
   me(): Observable<UserDomain> {
     return this.wrapPromise(getCurrentUser()).pipe(

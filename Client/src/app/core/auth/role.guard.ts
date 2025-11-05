@@ -1,55 +1,51 @@
 import {Injectable} from '@angular/core';
-import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
-import {AuthService} from '@core/auth/auth.service';
+import {CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree} from '@angular/router';
+import {AuthManager} from '@core/auth/auth.manager';
 import {UserRoleDomain} from '@core/models/userRole.model';
+import {AuthRoutingHelper} from '@core/auth/auth-routing.helper';
 
-@Injectable({ providedIn: 'root' })
+
+@Injectable({providedIn: 'root'})
 export class RoleRedirectGuard implements CanActivate {
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthManager, private router: Router) {
+  }
 
   async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
+    const {isLoggedIn, user} = this.auth;
 
-    await this.auth.checkAndRestoreSession();
+    // Not logged in → auth
+    if (!isLoggedIn()) {
 
-
-    console.log("User logged in:", this.auth.isLoggedIn());
-
-    if (!this.auth.isLoggedIn()) {
-      if (state.url === '/auth') {
+      // already on auth path
+      if (state.url === AuthRoutingHelper.AUTH_PATH) {
         return true;
       }
-
-      // Otherwise, redirect to auth page
-      return this.router.parseUrl('/auth');
+      // redirect to auth
+      return AuthRoutingHelper.redirectToAuth(this.router);
     }
 
+    const role = user()?.role;
 
-    // Get the role of the current user
-    const role = this.auth.user()?.role;
-
-    // If no role (logged in but not initialised) -> just route to initial page
+    // logged in but no role → init
     if (!role) {
-      if (state.url === '/init') {
+      if (state.url === AuthRoutingHelper.INIT_PATH) {
         return true;
       }
-      return this.router.parseUrl('/init');
+      return AuthRoutingHelper.redirectToInit(this.router);
     }
 
-    // If user has a role, check if they are going to the right place
-    if (role === UserRoleDomain.CUSTOMER && state.url.startsWith('/customer')) return true;
-    if (role === UserRoleDomain.TRANSLATOR && state.url.startsWith('/translator')) return true;
-    if (role === UserRoleDomain.ADMINISTRATOR && state.url.startsWith('/admin')) return true;
+    // logged in with role → check access
+    const allowedPath = AuthRoutingHelper.pathForRole(role);
+    if (state.url.startsWith(allowedPath)) {
+      return true;
+    }
 
-    // If user is going to root or wildcard, redirect based on role
+    // redirect to role's default path
     if (state.url === '/' || route.routeConfig?.path === '**') {
-      switch (role) {
-        case UserRoleDomain.CUSTOMER: return this.router.parseUrl('/customer');
-        case UserRoleDomain.TRANSLATOR: return this.router.parseUrl('/translator');
-        case UserRoleDomain.ADMINISTRATOR: return this.router.parseUrl('/admin');
-      }
+      return AuthRoutingHelper.redirectToRole(this.router, role);
     }
 
-    // If none of the above, redirect to auth page (could also show a "not authorized" page)
+    // fallback – go to home
     return this.router.parseUrl('/');
   }
 }

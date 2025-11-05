@@ -1,18 +1,18 @@
 import { inject } from '@angular/core';
-import { injectQuery } from '@tanstack/angular-query-experimental';
+import { injectMutation } from '@tanstack/angular-query-experimental';
 import { ProjectsFeedbackApiService } from '@api/apiServices/projects-feedback-api.service';
-import { QK } from './query-keys';
 import { toPromise } from './utils';
 import { ProjectFeedback } from '@generated/models';
 
+
 /**
- * Query: načte feedback konkrétního projektu.
+ * Get feedback for a project by its projectId.
+ * @return Mutation hook to fetch project feedback.
  */
-export function useProjectFeedbackQuery(projectId: string) {
+export function useProjectFeedbackMutation() {
   const api = inject(ProjectsFeedbackApiService);
-  return injectQuery(() => ({
-    queryKey: QK.projectFeedback(projectId),
-    queryFn: () => toPromise(api.getFeedback(projectId)),
-    enabled: !!projectId,
+
+  return injectMutation<ProjectFeedback, Error, string>(() => ({
+    mutationFn: (projectId: string) => toPromise(api.getFeedback(projectId)),
   }));
 }

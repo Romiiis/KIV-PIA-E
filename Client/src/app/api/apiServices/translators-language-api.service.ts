@@ -8,12 +8,15 @@ import { ListLanguagesResponse, ReplaceLanguagesRequest } from '@generated/model
 const { listUserLanguages, replaceUserLanguages } = getTranslatorsLanguage();
 
 /**
- * Fasáda pro správu jazyků překladatelů — načítání a nahrazování jazyků.
+ * Facade for translator language-related API calls.
+ * Handles listing and replacing languages for translators.
  */
 @Injectable({ providedIn: 'root' })
 export class TranslatorsLanguageApiService extends BaseApiService {
+
   /**
-   * Načte seznam jazyků daného uživatele (ADMIN nebo překladatel sám).
+   * List languages for a translator by ID.
+   * @param id Translator ID.
    */
   list(id: string): Observable<string[]> {
     return this.wrapPromise(listUserLanguages(id)).pipe(
@@ -22,7 +25,9 @@ export class TranslatorsLanguageApiService extends BaseApiService {
   }
 
   /**
-   * Nahradí všechny jazyky překladatele novými.
+   * Replace languages for a translator by ID.
+   * @param id Translator ID.
+   * @param languages Array of language codes to set.
    */
   replace(id: string, languages: string[]): Observable<string[]> {
     const body: ReplaceLanguagesRequest = languages;

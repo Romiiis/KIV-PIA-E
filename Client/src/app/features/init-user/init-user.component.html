@@ -7,15 +7,15 @@
     <div class="role-tabs">
       <button
         type="button"
-        (click)="selectRole('customer')"
-        [class.active]="form.get('role')?.value === 'customer'"
+        (click)="selectRole(UserRoleDomain.CUSTOMER)"
+        [class.active]="form.get('role')?.value === UserRoleDomain.CUSTOMER"
       >
         Customer
       </button>
       <button
         type="button"
-        (click)="selectRole('translator')"
-        [class.active]="form.get('role')?.value === 'translator'"
+        (click)="selectRole(UserRoleDomain.TRANSLATOR)"
+        [class.active]="form.get('role')?.value === UserRoleDomain.TRANSLATOR"
       >
         Translator
       </button>
@@ -23,7 +23,7 @@
   </div>
 
   <!-- Show language select if translator -->
-  <div *ngIf="form.get('role')?.value === 'translator'" style="width: 100%; margin: 20px 0;">
+  <div *ngIf="form.get('role')?.value === UserRoleDomain.TRANSLATOR" style="width: 100%; margin: 20px 0;">
     <span>Languages you know:</span>
     <app-language-select
       [multiple]="true"

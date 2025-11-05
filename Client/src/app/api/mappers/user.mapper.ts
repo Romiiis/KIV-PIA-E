@@ -1,10 +1,13 @@
 import {UserDomain} from '@core/models/user.model';
-import {UserRoleDomain} from '@core/models/userRole.model';
 import {EnumMapper} from './enum.mapper';
 import {User} from 'generatedAPI/models/user';
 
-export class UserMapper {
 
+/**
+ * Mapper for User objects between API and Domain models.
+ * Handles conversion of user data structures.
+ */
+export class UserMapper {
 
 
   /**
@@ -21,7 +24,6 @@ export class UserMapper {
       createdAt: apiUser.createdAt.toString()
     }
   }
-
 
 
 }

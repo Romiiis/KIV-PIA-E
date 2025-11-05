@@ -20,7 +20,6 @@ import {ProjectStatusDomain} from '@core/models/projectStatus.model';
 export class CustomerPageComponent {
 
   showNewProject!: boolean
-
   openNewProject() {
     this.showNewProject = true;
   }

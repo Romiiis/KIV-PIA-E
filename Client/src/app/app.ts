@@ -1,6 +1,6 @@
 import {Component, inject, OnInit, signal} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import {AuthService} from '@core/auth/auth.service';
+import {AuthManager} from '@core/auth/auth.manager';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +10,5 @@ import {AuthService} from '@core/auth/auth.service';
 })
 export class App{
   protected readonly title = signal('Client');
-
 
 }

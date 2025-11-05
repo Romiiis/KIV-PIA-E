@@ -13,13 +13,10 @@ import {routes} from './app.routes';
 import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {provideAngularQuery} from '@tanstack/angular-query-experimental';
 import {QueryClient} from '@tanstack/query-core';
-import {AuthService} from '@core/auth/auth.service';
+import {AuthManager} from '@core/auth/auth.manager';
 import {ToastrModule} from 'ngx-toastr';
 import {provideAnimations} from '@angular/platform-browser/animations';
 
-export function initializeAuth(auth: AuthService) {
-  return () => auth.checkAndRestoreSession();
-}
 
 export const appConfig: ApplicationConfig = {
 
@@ -30,13 +27,15 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(NgOptimizedImage),
     provideHttpClient(withInterceptorsFromDi()),
     provideAngularQuery(new QueryClient()),
+    provideAnimations(),
+    // app.config.ts
     {
       provide: APP_INITIALIZER,
-      useFactory: initializeAuth,
-      deps: [AuthService],
+      useFactory: (auth: AuthManager) => () => auth.init(),
+      deps: [AuthManager],
       multi: true
     },
-    provideAnimations(),
+
     importProvidersFrom(
       ToastrModule.forRoot({
         positionClass: 'toast-top-right',

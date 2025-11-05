@@ -3,6 +3,10 @@ import {ProjectDomain} from '@core/models/project.model';
 import {UserMapper} from './user.mapper';
 import {Project} from '@generated/models';
 
+/**
+ * Mapper for converting API Project objects to domain ProjectDomain objects.
+ * Handles the transformation of project data between API and domain layers.
+ */
 export class ProjectMapper {
 
   /**

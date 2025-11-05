@@ -9,16 +9,26 @@
   import {toPromise} from './utils';
 
 
+  /**
+   * Get current logged in user (me).
+   * @return Query with user data.
+   */
   export function useMeQuery() {
     const api = inject(AuthApiService);
     return injectQuery(() => ({
       queryKey: QK.me,
       queryFn: () => toPromise(api.me()),
-      staleTime: 60_000,
-      retry: 1,
+      enabled: false,
+      retry: 0,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     }));
   }
 
+  /**
+   * Mutation: login user.
+   * @return Mutation for logging in.
+   */
   export function useLoginMutation() {
     const api = inject(AuthApiService);
     const qc = injectQueryClient();
@@ -32,6 +42,11 @@
     }));
   }
 
+
+  /**
+   * Mutation: register new user.
+   * @return Mutation for registering.
+   */
   export function useRegisterMutation() {
     const api = inject(AuthApiService);
     const qc = injectQueryClient();
@@ -45,6 +60,10 @@
     }));
   }
 
+  /**
+   * Mutation: logout user.
+   * @return Mutation for logging out.
+   */
   export function useLogoutMutation() {
     const api = inject(AuthApiService);
     const qc = injectQueryClient();
@@ -58,6 +77,10 @@
     }));
   }
 
+  /**
+   * Mutation: refresh token.
+   * @return Mutation for refreshing token.
+   */
   export function useRefresh() {
     const api = inject(AuthApiService);
     const qc = injectQueryClient();

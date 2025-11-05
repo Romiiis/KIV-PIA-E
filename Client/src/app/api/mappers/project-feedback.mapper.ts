@@ -1,8 +1,9 @@
-import {EnumMapper} from './enum.mapper';
-import {ProjectDomain} from '@core/models/project.model';
 import {FeedbackDomain} from '@core/models/feedback.model';
 import {ProjectFeedback} from '@generated/models';
 
+/**
+ * Mapper for project feedback between API and domain models.
+ */
 export class ProjectFeedbackMapper {
 
   /**
