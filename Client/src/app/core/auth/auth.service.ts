@@ -19,6 +19,8 @@ export class AuthService {
   readonly isInitializing = signal(true);
   readonly isRefreshing = signal(false);
 
+  private refreshPromise: Promise<void> | null = null;
+
 
   private readonly queryClient = injectQueryClient();
   private readonly loginMutation = useLoginMutation();
@@ -55,24 +57,42 @@ export class AuthService {
 
 
   async refreshIfNeeded(): Promise<void> {
-    if (this.isRefreshing()) return;
-    this.isRefreshing.set(true);
-    try {
-      const refreshRes = await this.authApi.refresh();
-      if (refreshRes.ok) {
-        console.log('[AuthService] Token refresh successful');
-        const meRes = await this.authApi.me();
-        if (meRes.ok) {
-          this.user.set(meRes.data);
-        }
-      } else {
-        console.warn('[AuthService] Refresh failed');
-        this.user.set(undefined);
-      }
-    } finally {
-      this.isRefreshing.set(false);
+    // Pokud už probíhá refresh → počkej na stejný Promise (nepouštěj víckrát)
+    if (this.refreshPromise) {
+      console.log('[AuthService] Waiting for ongoing refresh...');
+      return this.refreshPromise;
     }
+
+    this.isRefreshing.set(true);
+    this.refreshPromise = (async () => {
+      try {
+        console.log('[AuthService] Attempting token refresh...');
+        const refreshRes = await this.authApi.refresh();
+
+        if (refreshRes.ok) {
+          console.log('[AuthService] Token refresh successful');
+          const meRes = await this.authApi.me();
+
+          if (meRes.ok && meRes.data) {
+            this.user.set(meRes.data);
+          }
+        } else {
+          console.warn('[AuthService] Refresh failed');
+          this.user.set(undefined);
+        }
+      } catch (err) {
+        console.error('[AuthService] Refresh exception:', err);
+        this.user.set(undefined);
+      } finally {
+        this.isRefreshing.set(false);
+        this.refreshPromise = null;
+      }
+    })();
+
+    return this.refreshPromise;
   }
+
+
 
   // Login user and update the user signal
   async login(email: string, password: string): Promise<void> {
