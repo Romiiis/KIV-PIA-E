@@ -1,6 +1,6 @@
 import {UserRoleDomain} from '@core/models/userRole.model';
 import {ProjectStatusDomain} from '@core/models/projectStatus.model';
-import {ProjectState, UserRole} from '@generated/model';
+import {ProjectState, UserRole} from '@generated/models';
 
 /**
  * Mapper for enumerations between API and domain models

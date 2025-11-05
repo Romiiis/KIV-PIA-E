@@ -1,67 +1,56 @@
 import {Injectable} from '@angular/core';
-import {ApiResult, BaseApiService} from './base-api.service';
-import {loginUser, logoutUser, refreshToken, registerUser,} from '@generated/auth/auth';
-import {getCurrentUser} from '@generated/me/me';
-import type {AuthJWTResponse, LoginUserRequest, RegisterUserRequest,} from '@generated/model';
-import {UserMapper} from '@api/mappers/user.mapper';
+import {map, switchMap} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {BaseApiService} from './base-api.service';
 import {UserDomain} from '@core/models/user.model';
+import {UserMapper} from '@api/mappers/user.mapper';
+import {getAuth} from '@generated/auth/auth';
+import {getMe} from '@generated/me/me';
 
+const {loginUser, registerUser, logoutUser, refreshToken} = getAuth();
+const {getCurrentUser} = getMe();
+
+/**
+ * Fasáda pro autentizační API — přihlášení, registrace, odhlášení, zjištění aktuálního uživatele.
+ */
 @Injectable({providedIn: 'root'})
 export class AuthApiService extends BaseApiService {
-  async login(payload: LoginUserRequest): Promise<ApiResult<AuthJWTResponse>> {
-    try {
-      const res = await loginUser(payload, this.defaultOptions);
-      return this.handleResponse<AuthJWTResponse>(res, [200]);
-    } catch (err: any) {
-      return {ok: false, status: 500, error: err.message};
-    }
-  }
 
-  async register(
-    payload: RegisterUserRequest
-  ): Promise<ApiResult<AuthJWTResponse>> {
-    try {
-      const res = await registerUser(payload, this.defaultOptions);
-      return this.handleResponse<AuthJWTResponse>(res, [201]);
-    } catch (err: any) {
-      return {ok: false, status: 500, error: err.message};
-    }
-  }
-
-  async logout(): Promise<ApiResult<void>> {
-    try {
-      const res = await logoutUser(this.defaultOptions);
-      return this.handleResponse<void>(res, [204]);
-    } catch (err: any) {
-      return {ok: false, status: 500, error: err.message};
-    }
-  }
-
-  async refresh(): Promise<ApiResult<AuthJWTResponse>> {
-    try {
-      const res = await refreshToken(this.defaultOptions);
-      return this.handleResponse<AuthJWTResponse>(res, [200]);
-    } catch (err: any) {
-      return {ok: false, status: 500, error: err.message};
-    }
+  /**
+   * Přihlášení uživatele podle e-mailu a hesla.
+   * Po úspěchu volá /me a vrací domain model UserDomain.
+   */
+  login(email: string, password: string): Observable<UserDomain> {
+    return this.wrapPromise(loginUser({emailAddress: email, password}))
+      .pipe(switchMap(() => this.me()));
   }
 
   /**
-   * Fetch current authenticated user
-   * Maps API user → domain user
+   * Registrace nového uživatele (customer/translator).
+   * Po úspěchu volá /me a vrací domain model UserDomain.
    */
-  async me(): Promise<ApiResult<UserDomain>> {
-    try {
-      const res = await getCurrentUser(this.defaultOptions);
+  register(name: string, email: string, password: string): Observable<UserDomain> {
+    return this.wrapPromise(registerUser({name, emailAddress: email, password}))
+      .pipe(switchMap(() => this.me()));
+  }
 
-      if (res.status === 200 && res.data) {
-        const mapped = UserMapper.mapApiUserToUser(res.data);
-        return this.handleResponse<UserDomain>({...res, data: mapped}, [200]);
-      }
+  refreshToken(): Observable<void> {
+    return this.wrapPromise(refreshToken()).pipe(map(() => void 0));
+  }
 
-      return this.handleResponse<UserDomain>(res, [200]);
-    } catch (err: any) {
-      return {ok: false, status: 500, error: err.message};
-    }
+  /**
+   * Odhlášení aktuálního uživatele — smaže session cookies na backendu.
+   */
+  logout(): Observable<void> {
+    return this.wrapPromise(logoutUser()).pipe(map(() => void 0));
+  }
+
+  /**
+   * Vrátí aktuálně přihlášeného uživatele na základě cookie session.
+   */
+  me(): Observable<UserDomain> {
+    return this.wrapPromise(getCurrentUser()).pipe(
+      map((response) => UserMapper.mapApiUserToUser(response))
+    );
   }
 }

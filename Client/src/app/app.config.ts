@@ -1,6 +1,6 @@
 import {
   APP_INITIALIZER,
-  ApplicationConfig, EnvironmentInjector,
+  ApplicationConfig,
   importProvidersFrom,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection
@@ -10,23 +10,20 @@ import {NgOptimizedImage} from '@angular/common';
 
 
 import {routes} from './app.routes';
-import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {provideAngularQuery} from '@tanstack/angular-query-experimental';
 import {QueryClient} from '@tanstack/query-core';
 import {AuthService} from '@core/auth/auth.service';
 import {ToastrModule} from 'ngx-toastr';
 import {provideAnimations} from '@angular/platform-browser/animations';
-import {AuthInterceptor} from '@core/interceptors/auth.interceptor';
-import {setupFetchInterceptor} from '@core/interceptors/fetch-interceptor';
 
 export function initializeAuth(auth: AuthService) {
-  return () => auth.initialize();
+  return () => auth.checkAndRestoreSession();
 }
 
 export const appConfig: ApplicationConfig = {
 
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes),
@@ -48,14 +45,6 @@ export const appConfig: ApplicationConfig = {
         closeButton: true,
       })
     ),
-    {
-      provide: 'APP_BOOTSTRAP_LISTENER',
-      multi: true,
-      useFactory: (env: EnvironmentInjector) => () => {
-        setupFetchInterceptor(env);
-      },
-      deps: [EnvironmentInjector],
-    },
 
 
   ]

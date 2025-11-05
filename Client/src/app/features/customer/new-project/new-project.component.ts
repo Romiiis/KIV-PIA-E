@@ -65,13 +65,13 @@ export class NewProjectComponent implements OnInit {
       this.createMutation.mutate(
         {
           languageCode: this.projectForm.value.targetLang,
-          content: file
+          file: file
         },
         {
           onSuccess: (data) => {
             this.toastr.success('Project created successfully!');
             // Reset form or provide feedback to user
-            this.close.emit(); // ✅ zavře modal
+            this.close.emit();
           },
           onError: (error) => {
             this.toastr.error('Failed to create project. Please try again.');

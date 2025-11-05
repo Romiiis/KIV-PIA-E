@@ -1,7 +1,7 @@
 import {UserDomain} from '@core/models/user.model';
 import {UserRoleDomain} from '@core/models/userRole.model';
 import {EnumMapper} from './enum.mapper';
-import {User} from '@generated/model/user';
+import {User} from 'generatedAPI/models/user';
 
 export class UserMapper {
 

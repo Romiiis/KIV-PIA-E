@@ -1,72 +1,36 @@
 import { Injectable } from '@angular/core';
-import { BaseApiService, ApiResult } from './base-api.service';
-import {
-  listAllUsers,
-  getUserDetails,
-  changeUserRole,
-} from '@generated/users/users';
-import type {
-  ListAllUsersParams,
-  ListUsersResponse,
-  User,
-  InitializeUserRequest,
-} from '@generated/model';
-import { UserMapper } from '@api/mappers/user.mapper';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { BaseApiService } from '@api/apiServices/base-api.service';
 import { UserDomain } from '@core/models/user.model';
+import { UserMapper } from '@api/mappers/user.mapper';
+import { getUsers } from '@generated/users/users';
+import { UserRoleDomain } from '@core/models/userRole.model';
 
+const { listAllUsers, getUserDetails, changeUserRole } = getUsers();
+
+/**
+ * Fasáda pro práci s uživateli — listování, detaily, jazyky a role.
+ */
 @Injectable({ providedIn: 'root' })
 export class UsersApiService extends BaseApiService {
-  /**
-   * Get all users (ADMIN only)
-   */
-  async getAll(
-    params?: ListAllUsersParams
-  ): Promise<ApiResult<UserDomain[]>> {
-    try {
-      const res = await listAllUsers(params, this.defaultOptions);
-
-      if (res.status === 200 && Array.isArray(res.data)) {
-        const mapped = res.data.map(UserMapper.mapApiUserToUser);
-        return this.handleResponse<UserDomain[]>({ ...res, data: mapped }, [200]);
-      }
-
-      // pokud API vrátí něco nečekaného, vrať prázdné pole
-      return this.handleResponse<UserDomain[]>({ ...res, data: [] }, [200]);
-    } catch (err: any) {
-      return { ok: false, status: 500, error: err.message ?? 'Network error' };
-    }
+  /** Načte všechny uživatele (jen ADMIN). */
+  listAll(): Observable<UserDomain[]> {
+    return this.wrapPromise(listAllUsers()).pipe(
+      map((users) => users.map((u) => UserMapper.mapApiUserToUser(u)))
+    );
   }
 
-  /**
-   * Get user by ID (any role can view their own)
-   */
-  async getById(id: string): Promise<ApiResult<UserDomain>> {
-    try {
-      const res = await getUserDetails(id, this.defaultOptions);
-
-      if (res.status === 200 && res.data) {
-        const mapped = UserMapper.mapApiUserToUser(res.data);
-        return this.handleResponse<UserDomain>({ ...res, data: mapped }, [200]);
-      }
-
-      return this.handleResponse<UserDomain>(res, [200]);
-    } catch (err: any) {
-      return { ok: false, status: 500, error: err.message ?? 'Network error' };
-    }
+  /** Načte detail uživatele podle ID. */
+  detail(id: string): Observable<UserDomain> {
+    return this.wrapPromise(getUserDetails(id)).pipe(
+      map((u) => UserMapper.mapApiUserToUser(u))
+    );
   }
 
-  /**
-   * Change role for a specific user (only if current role is null)
-   */
-  async changeRole(
-    id: string,
-    payload: InitializeUserRequest
-  ): Promise<ApiResult<void>> {
-    try {
-      const res = await changeUserRole(id, payload, this.defaultOptions);
-      return this.handleResponse<void>(res, [200]);
-    } catch (err: any) {
-      return { ok: false, status: 500, error: err.message ?? 'Network error' };
-    }
+  /** Změní roli uživatele (používá se jen při inicializaci účtu). */
+  changeRole(id: string, role: UserRoleDomain, languages?: string[]): Observable<void> {
+    const body = { role, languages: languages ?? [] };
+    return this.wrapPromise(changeUserRole(id, body)).pipe(map(() => void 0));
   }
 }

@@ -1,136 +1,108 @@
-import {Injectable, signal, computed, effect, inject} from '@angular/core';
+import {computed, effect, Injectable, signal} from '@angular/core';
+import {UserDomain} from '@core/models/user.model';
 import {
   useLoginMutation,
   useLogoutMutation,
-  useRegisterMutation,
   useMeQuery,
+  useRefresh,
+  useRegisterMutation
 } from '@api/queries/auth.query';
-import { UserDomain } from '@core/models/user.model';
-import { UserRoleDomain } from '@core/models/userRole.model';
 import {injectQueryClient} from '@tanstack/angular-query-experimental';
-import { AuthApiService } from '@api/apiServices/auth-api.service';
-
+import {AuthApiService} from '@api/apiServices/auth-api.service';
+import {UserRoleDomain} from '@core/models/userRole.model';
+import {firstValueFrom} from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+
+
   readonly user = signal<UserDomain | undefined>(undefined);
   readonly isLoggedIn = computed(() => !!this.user());
   readonly role = computed(() => this.user()?.role);
-  readonly isInitializing = signal(true);
-  readonly isRefreshing = signal(false);
-
 
   private readonly queryClient = injectQueryClient();
   private readonly loginMutation = useLoginMutation();
   private readonly registerMutation = useRegisterMutation();
   private readonly logoutMutation = useLogoutMutation();
   private readonly meQuery = useMeQuery();
-
-
+  private readonly refreshTokenMutation = useRefresh();
 
   constructor(private authApi: AuthApiService) {
+    (globalThis as any).__authService = this;
     effect(() => {
       const me = this.meQuery.data();
-      if (me) {
-        this.user.set(me);
-      }
+      if (me) this.user.set(me);
     });
   }
 
-  async initialize(): Promise<void> {
-    this.isInitializing.set(true);
+  async checkAndRestoreSession(): Promise<boolean> {
+    if (this.isLoggedIn()) return true;
+
     try {
-      const result = await this.meQuery.refetch();
-      if (result.data) {
-        this.user.set(result.data);
-      } else {
-        this.user.set(undefined);
-      }
-    } catch (error) {
-      this.user.set(undefined);
-  }
-    this.isInitializing.set(false);
-  }
+      const me = await firstValueFrom(this.authApi.me());
+      this.user.set(me);
+      return true;
 
-
-
-  async refreshIfNeeded(): Promise<void> {
-    if (this.isRefreshing()) return;
-    this.isRefreshing.set(true);
-    try {
-      const refreshRes = await this.authApi.refresh();
-      if (refreshRes.ok) {
-        console.log('[AuthService] Token refresh successful');
-        const meRes = await this.authApi.me();
-        if (meRes.ok) {
-          this.user.set(meRes.data);
+    } catch (err: any) {
+      if (err?.status === 401 || err?.response?.status === 401) {
+        try {
+          await firstValueFrom(this.authApi.refreshToken());
+          const refreshed = await firstValueFrom(this.authApi.me());
+          this.user.set(refreshed);
+          return true;
+        } catch (refreshErr) {
+          console.warn('[Auth] Refresh failed ❌', refreshErr);
+          this.user.set(undefined);
+          return false;
         }
-      } else {
-        console.warn('[AuthService] Refresh failed');
-        this.user.set(undefined);
       }
-    } finally {
-      this.isRefreshing.set(false);
+
+      console.error('[Auth] checkAndRestoreSession failed:', err);
+      this.user.set(undefined);
+      return false;
     }
   }
 
-  // Login user and update the user signal
+
+  async refetchCurrentUser(): Promise<void> {
+    const me = await this.meQuery.refetch();
+    if (me.data) {
+      this.user.set(me.data);
+    }
+
+  }
+
   async login(email: string, password: string): Promise<void> {
-    await this.loginMutation.mutateAsync({ emailAddress: email, password });
-    const result = await this.meQuery.refetch();
-    if (result.data) {
-      this.user.set(result.data);
+    const user = await this.loginMutation.mutateAsync({ email, password });
+    if (user) {
+      this.user.set(user);
+      this.queryClient.setQueryData(['me'], user);
     }
   }
 
-  // Register user and update the user signal
-  async register(email: string, password: string, name: string): Promise<void> {
-    await this.registerMutation.mutateAsync({ emailAddress: email, password, name });
-    const result = await this.meQuery.refetch();
-    if (result.data) {
-      this.user.set(result.data);
-    }  }
+  async register(name: string, email: string, password: string): Promise<void> {
+    const user = await this.registerMutation.mutateAsync({ name, email, password });
+    if (user) {
+      this.user.set(user);
+      this.queryClient.setQueryData(['me'], user);
+    }
+  }
 
-  // Logout user and clear the user signal
   async logout(): Promise<void> {
-    await this.logoutMutation.mutateAsync(undefined);
+    await this.logoutMutation.mutateAsync();
     this.user.set(undefined);
     this.queryClient.removeQueries({ queryKey: ['me'] });
-
   }
 
-  get currentUser(): UserDomain | undefined {
-    return this.user();
-  }
+  get currentUser() { return this.user(); }
+  get currentRole() { return this.role(); }
 
-  get currentRole(): UserRoleDomain | undefined {
-    return this.role();
-  }
-
-  resolvePath(userRole: UserRoleDomain | undefined): string {
-    switch (userRole) {
-      case UserRoleDomain.CUSTOMER:
-        return '/customer';
-      case UserRoleDomain.TRANSLATOR:
-        return '/translator';
-      case UserRoleDomain.ADMINISTRATOR:
-        return '/admin';
-      default:
-        return '/init';
+  resolvePath(role: UserRoleDomain | undefined): string {
+    switch (role) {
+      case UserRoleDomain.CUSTOMER: return '/customer';
+      case UserRoleDomain.TRANSLATOR: return '/translator';
+      case UserRoleDomain.ADMINISTRATOR: return '/admin';
+      default: return '/init';
     }
   }
-
-  /**
-   * Refresh the current user data
-   * Manually refetches the user data from the server and updates the user signal.
-   */
-  async refreshUser(): Promise<UserDomain | undefined> {
-    const result = await this.meQuery.refetch();
-    if (result.data) {
-      this.user.set(result.data);
-      return result.data;
-    }
-    return undefined;
-  }
-
 }

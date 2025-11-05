@@ -6,7 +6,7 @@
     "start": "ng serve",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "generate:api": "npx orval --config ./orval.config.cjs",
+    "generate:api": "npx orval",
     "prebuild": "npm run generate:api",
     "build": "npm run generate:api && ng build"
   },
@@ -54,7 +54,8 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.9.2",
-    "orval": "^8.0.0-rc.0"
+    "orval":"^7.16.0",
+    "axios": "^1.13.2"
   }
 
 

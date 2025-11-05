@@ -9,9 +9,8 @@ export class RoleRedirectGuard implements CanActivate {
 
   async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
 
-    while (this.auth.isInitializing() || this.auth.isRefreshing()) {
-      await new Promise(r => setTimeout(r, 50));
-    }
+    await this.auth.checkAndRestoreSession();
+
 
     console.log("User logged in:", this.auth.isLoggedIn());
 

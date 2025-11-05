@@ -1,39 +1,38 @@
 import { inject } from '@angular/core';
-import { injectQuery, injectMutation, injectQueryClient } from '@tanstack/angular-query-experimental';
-import type { ReplaceLanguagesRequest, ListLanguagesResponse } from '@generated/model';
-import {TranslatorsApiService} from '@api/apiServices/translators-api.service';
-import {queryFromApi} from '@api/query.utils';
+import {
+  injectQuery,
+  injectMutation,
+  injectQueryClient,
+} from '@tanstack/angular-query-experimental';
+import { TranslatorsLanguageApiService } from '@api/apiServices/translators-language-api.service';
+import { QK } from './query-keys';
+import { toPromise } from './utils';
 
 /**
- * Fetch languages known by a specific user
- * (ADMIN or translator themselves)
+ * Query: načtení jazyků daného uživatele (translator nebo admin).
  */
-export function useUserLanguagesQuery(userId: string) {
-  const translatorsApi = inject(TranslatorsApiService);
-
+export function useTranslatorLanguagesQuery(id: string) {
+  const api = inject(TranslatorsLanguageApiService);
   return injectQuery(() => ({
-    queryKey: ['user', userId, 'languages'],
-    queryFn: () => queryFromApi(translatorsApi.getUserLanguages(userId)),
-    staleTime: 1000 * 60 * 5, // cache 5 minut
-    refetchOnWindowFocus: true,
+    queryKey: QK.userLanguages(id),
+    queryFn: () => toPromise(api.list(id)),
+    enabled: !!id,
   }));
 }
 
 /**
- * Replace all languages of a translator
- * (only the translator themselves)
+ * Mutation: náhrada jazyků překladatele (TRANSLATOR role).
  */
-export function useReplaceUserLanguagesMutation() {
-  const translatorsApi = inject(TranslatorsApiService);
-  const queryClient = injectQueryClient();
+export function useReplaceTranslatorLanguagesMutation(id: string) {
+  const api = inject(TranslatorsLanguageApiService);
+  const qc = injectQueryClient();
 
   return injectMutation(() => ({
-    mutationFn: (input: { userId: string; payload: ReplaceLanguagesRequest }) =>
-      queryFromApi(translatorsApi.replaceUserLanguages(input.userId, input.payload)),
-
-    // Po úspěchu refreshneme jazykovou cache konkrétního uživatele
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['user', variables.userId, 'languages'] });
+    mutationFn: (languages: string[]) => toPromise(api.replace(id, languages)),
+    onSuccess: (updatedLanguages) => {
+      // aktualizace cache jazyků a invalidace detailu uživatele
+      qc.setQueryData(QK.userLanguages(id), updatedLanguages);
+      qc.invalidateQueries({ queryKey: QK.user(id) });
     },
   }));
 }

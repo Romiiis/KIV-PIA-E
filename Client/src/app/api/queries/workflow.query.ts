@@ -1,48 +1,72 @@
-// api/queries/workflow.query.ts
 import { inject } from '@angular/core';
-import { injectMutation, injectQueryClient } from '@tanstack/angular-query-experimental';
-import type { ProjectFeedbackRequest, UploadTranslatedContentBody } from '@generated/model';
-import {ProjectWorkflowApiService} from '@api/apiServices/project-workflow-api.service';
-import {queryFromApi} from '@api/query.utils';
+import {
+  injectMutation,
+  injectQueryClient,
+} from '@tanstack/angular-query-experimental';
+import { ProjectsWorkflowApiService } from '@api/apiServices/projects-workflow-api.service';
+import { QK } from './query-keys';
+import { toPromise } from './utils';
 
-export function useUploadTranslationMutation() {
-  const workflowApi = inject(ProjectWorkflowApiService);
-  const queryClient = injectQueryClient();
+/**
+ * Mutation: Upload přeloženého obsahu (TRANSLATOR).
+ */
+export function useUploadTranslatedMutation(id: string) {
+  const api = inject(ProjectsWorkflowApiService);
+  const qc = injectQueryClient();
 
   return injectMutation(() => ({
-    mutationFn: (input: { projectId: string; payload: UploadTranslatedContentBody }) =>
-      queryFromApi(workflowApi.uploadTranslatedContent(input.projectId, input.payload)),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projects'] }),
+    mutationFn: (file: File) => toPromise(api.uploadTranslated(id, file)),
+    onSuccess: (updatedProject) => {
+      qc.setQueryData(QK.project(id), updatedProject);
+      qc.invalidateQueries({ queryKey: QK.projects });
+    },
   }));
 }
 
-export function useApproveTranslationMutation() {
-  const workflowApi = inject(ProjectWorkflowApiService);
-  const queryClient = injectQueryClient();
+/**
+ * Mutation: Schválení překladu (CUSTOMER).
+ */
+export function useApproveTranslatedMutation(id: string) {
+  const api = inject(ProjectsWorkflowApiService);
+  const qc = injectQueryClient();
 
   return injectMutation(() => ({
-    mutationFn: (projectId: string) => queryFromApi(workflowApi.approve(projectId)),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projects'] }),
+    mutationFn: () => toPromise(api.approveTranslated(id)),
+    onSuccess: (updatedProject) => {
+      qc.setQueryData(QK.project(id), updatedProject);
+      qc.invalidateQueries({ queryKey: QK.projects });
+    },
   }));
 }
 
-export function useRejectTranslationMutation() {
-  const workflowApi = inject(ProjectWorkflowApiService);
-  const queryClient = injectQueryClient();
+/**
+ * Mutation: Zamítnutí překladu (CUSTOMER) s feedbackem.
+ */
+export function useRejectTranslatedMutation(id: string) {
+  const api = inject(ProjectsWorkflowApiService);
+  const qc = injectQueryClient();
 
   return injectMutation(() => ({
-    mutationFn: (input: { projectId: string; feedback: ProjectFeedbackRequest }) =>
-      queryFromApi(workflowApi.reject(input.projectId, input.feedback)),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projects'] }),
+    mutationFn: (feedback: string) => toPromise(api.rejectTranslated(id, feedback)),
+    onSuccess: (updatedProject) => {
+      qc.setQueryData(QK.project(id), updatedProject);
+      qc.invalidateQueries({ queryKey: QK.projects });
+    },
   }));
 }
 
-export function useCloseProjectMutation() {
-  const workflowApi = inject(ProjectWorkflowApiService);
-  const queryClient = injectQueryClient();
+/**
+ * Mutation: Uzavření projektu (ADMIN).
+ */
+export function useCloseProjectMutation(id: string) {
+  const api = inject(ProjectsWorkflowApiService);
+  const qc = injectQueryClient();
 
   return injectMutation(() => ({
-    mutationFn: (projectId: string) => queryFromApi(workflowApi.close(projectId)),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projects'] }),
+    mutationFn: () => toPromise(api.close(id)),
+    onSuccess: (closedProject) => {
+      qc.setQueryData(QK.project(id), closedProject);
+      qc.invalidateQueries({ queryKey: QK.projects });
+    },
   }));
 }

@@ -1,8 +1,7 @@
 import {EnumMapper} from './enum.mapper';
 import {ProjectDomain} from '@core/models/project.model';
-import {Project} from '@generated/model';
 import {UserMapper} from './user.mapper';
-import {UserRoleDomain} from '@core/models/userRole.model';
+import {Project} from '@generated/models';
 
 export class ProjectMapper {
 

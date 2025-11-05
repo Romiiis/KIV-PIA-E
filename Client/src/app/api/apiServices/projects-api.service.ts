@@ -1,96 +1,59 @@
-import { Injectable } from '@angular/core';
-import { BaseApiService, ApiResult } from './base-api.service';
-import {
+import {Injectable} from '@angular/core';
+import {map} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {BaseApiService} from '@api/apiServices/base-api.service';
+import {ProjectDomain} from '@core/models/project.model';
+import {ProjectMapper} from '@api/mappers/project.mapper';
+import {getProjects} from '@generated/projects/projects';
+
+const {
   createProject,
   listAllProjects,
   getProjectDetails,
-  downloadOriginalContent,
   downloadTranslatedContent,
-} from '@generated/projects/projects';
-import type {
-  CreateProjectRequest,
-  ListAllProjectsParams,
-} from '@generated/model';
-import { ProjectMapper } from '@api/mappers/project.mapper';
-import { ProjectDomain } from '@core/models/project.model';
+  downloadOriginalContent,
+} = getProjects();
 
-@Injectable({ providedIn: 'root' })
+/**
+ * Fasáda pro práci s projekty — CRUD, upload/download souborů.
+ */
+@Injectable({providedIn: 'root'})
 export class ProjectsApiService extends BaseApiService {
-  /**
-   * Creates a new translation project (CUSTOMER only)
-   */
-  async create(payload: CreateProjectRequest): Promise<ApiResult<ProjectDomain>> {
-    try {
-      const res = await createProject(payload, this.defaultOptions);
 
-      if (res.status === 201 && res.data) {
-        const mapped = ProjectMapper.mapApiProjectToDomain(res.data);
-        return this.handleResponse<ProjectDomain>({ ...res, data: mapped }, [201]);
-      }
+  /** Vrátí všechny projekty, podle oprávnění přihlášeného uživatele. */
+  listAll(): Observable<ProjectDomain[]> {
+    return this.wrapPromise(listAllProjects()).pipe(
+      map((response) =>
+        response.map((p) => ProjectMapper.mapApiProjectToDomain(p))
+      )
+    );
+  }
 
-      return this.handleResponse<ProjectDomain>(res, [201]);
-    } catch (err: any) {
-      return { ok: false, status: 500, error: err.message ?? 'Network error' };
-    }
+  /** Vrátí detail projektu podle ID. */
+  detail(id: string): Observable<ProjectDomain> {
+    return this.wrapPromise(getProjectDetails(id)).pipe(
+      map((response) => ProjectMapper.mapApiProjectToDomain(response))
+    );
   }
 
   /**
-   * Lists all projects (all roles can access, but only their own)
+   * Vytvoří nový projekt (CUSTOMER)
+   * @param languageCode cílový jazyk (např. "de")
+   * @param file obsah překladu jako File
    */
-  async getAll(params?: ListAllProjectsParams): Promise<ApiResult<ProjectDomain[]>> {
-    try {
-      const res = await listAllProjects(params, this.defaultOptions);
-
-      if (res.status === 200 && Array.isArray(res.data)) {
-        const mapped = res.data.map(ProjectMapper.mapApiProjectToDomain);
-        return this.handleResponse<ProjectDomain[]>({ ...res, data: mapped }, [200]);
-      }
-
-      return this.handleResponse<ProjectDomain[]>({ ...res, data: [] }, [200]);
-    } catch (err: any) {
-      return { ok: false, status: 500, error: err.message ?? 'Network error' };
-    }
+  create(languageCode: string, file: File): Observable<ProjectDomain> {
+    return this.wrapPromise(
+      createProject({languageCode, content: file})
+    ).pipe(map((apiProject) => ProjectMapper.mapApiProjectToDomain(apiProject)));
   }
 
-  /**
-   * Get project details by ID
-   */
-  async getById(id: string): Promise<ApiResult<ProjectDomain>> {
-    try {
-      const res = await getProjectDetails(id, this.defaultOptions);
-
-      if (res.status === 200 && res.data) {
-        const mapped = ProjectMapper.mapApiProjectToDomain(res.data);
-        return this.handleResponse<ProjectDomain>({ ...res, data: mapped }, [200]);
-      }
-
-      return this.handleResponse<ProjectDomain>(res, [200]);
-    } catch (err: any) {
-      return { ok: false, status: 500, error: err.message ?? 'Network error' };
-    }
+  /** Stáhne originální soubor projektu. */
+  downloadOriginal(id: string): Observable<Blob> {
+    return this.wrapPromise(downloadOriginalContent(id));
   }
 
-  /**
-   * Download original content file of a project
-   */
-  async downloadOriginal(id: string): Promise<ApiResult<Blob>> {
-    try {
-      const res = await downloadOriginalContent(id, this.defaultOptions);
-      return this.handleResponse<Blob>(res, [200]);
-    } catch (err: any) {
-      return { ok: false, status: 500, error: err.message ?? 'Network error' };
-    }
-  }
-
-  /**
-   * Download translated content file of a project
-   */
-  async downloadTranslated(id: string): Promise<ApiResult<Blob>> {
-    try {
-      const res = await downloadTranslatedContent(id, this.defaultOptions);
-      return this.handleResponse<Blob>(res, [200]);
-    } catch (err: any) {
-      return { ok: false, status: 500, error: err.message ?? 'Network error' };
-    }
+  /** Stáhne přeložený soubor projektu. */
+  downloadTranslated(id: string): Observable<Blob> {
+    return this.wrapPromise(downloadTranslatedContent(id));
   }
 }
