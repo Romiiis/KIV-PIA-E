@@ -38,8 +38,8 @@ public class CookiesUtil {
         long accessLifetime = jwtService.getRemainingLifetime(tokens.accessToken());
         long refreshLifetime = jwtService.getRemainingLifetime(tokens.refreshToken());
 
-        long accessCookieMaxAge = (accessLifetime + (5 * 60 * 1000)) / 1000;
-        long refreshCookieMaxAge = (refreshLifetime + (5 * 60 * 1000)) / 1000;
+        long accessCookieMaxAge = (accessLifetime * 2) / 1000;
+        long refreshCookieMaxAge = (refreshLifetime + accessLifetime) / 1000;
 
         log.debug("accessLifetime: {}, refreshLifetime: {}", accessLifetime, refreshLifetime);
         log.debug("accessCookieMaxAge: {}, refreshCookieMaxAge: {}", accessCookieMaxAge, refreshCookieMaxAge);

@@ -3,9 +3,10 @@ import {map, switchMap} from 'rxjs/operators';
 import {Observable} from 'rxjs';
 import {BaseApiService} from './base-api.service';
 import {UserDomain} from '@core/models/user.model';
-import {UserMapper} from '@api/mappers/user.mapper';
 import {getAuth} from '@generated/auth/auth';
 import {getMe} from '@generated/me/me';
+import {User} from '@generated/models';
+import {plainToInstance} from 'class-transformer';
 
 const {loginUser, registerUser, logoutUser, refreshToken} = getAuth();
 const {getCurrentUser} = getMe();
@@ -55,7 +56,11 @@ export class AuthApiService extends BaseApiService {
    */
   me(): Observable<UserDomain> {
     return this.wrapPromise(getCurrentUser()).pipe(
-      map((response) => UserMapper.mapApiUserToUser(response))
+      map((response: User) => {
+        return plainToInstance(UserDomain, response, {
+          excludeExtraneousValues: true,
+        });
+      })
     );
   }
 }

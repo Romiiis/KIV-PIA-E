@@ -1,10 +1,25 @@
-import {UserRoleDomain} from '@core/models/userRole.model';
+import { Expose } from 'class-transformer';
+import { UserRoleDomain } from '@core/models/userRole.model';
 
-export interface UserDomain {
-  id: string;
-  name: string;
-  emailAddress: string;
-  role: UserRoleDomain
-  languages?: string[];
-  createdAt: string;
+/**
+ * Domain model for a user.
+ */
+export class UserDomain {
+  @Expose()
+  id!: string;
+
+  @Expose()
+  name!: string;
+
+  @Expose()
+  emailAddress!: string;
+
+  @Expose()
+  role!: UserRoleDomain;
+
+  @Expose()
+  languages!: string[];
+
+  @Expose()
+  createdAt!: string;
 }

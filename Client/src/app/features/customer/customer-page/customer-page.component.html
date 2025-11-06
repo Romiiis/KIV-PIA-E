@@ -4,7 +4,7 @@
 </button>
 <div class="dashboard">
   <div class="header">
-    <div class="stat-card">📄 {{ projects | filterByStatus:ProjectStatusDomain.CREATED | length }} to translate</div>
+    <div class="stat-card">📄 {{ projects | filterByStatus:ProjectStatusDomain.ASSIGNED | length }} to translate</div>
     <div class="stat-card">📝 {{ projects | filterByStatus:ProjectStatusDomain.COMPLETED | length }} feedback</div>
     <div class="stat-card">✅ {{ projects | filterByStatus:ProjectStatusDomain.APPROVED | length }} done</div>
   </div>
@@ -12,9 +12,9 @@
   <div class="timeline-board">
     <div class="stage created">
       <h3>Waiting for translation</h3>
-      @for (p of projects | filterByStatus:ProjectStatusDomain.CREATED; track p.id) {
+      @for (p of projects | filterByStatus:ProjectStatusDomain.ASSIGNED; track p.id) {
         <div class="project-card">
-          <div class="title">{{ p.customer.id }}</div>
+          <div class="title">{{ p.originalFileName }}</div>
           <div class="lang">English → {{ p.targetLanguage }}</div>
         </div>
       } @empty { <p class="empty">No projects</p> }

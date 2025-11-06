@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { injectMutation } from '@tanstack/angular-query-experimental';
-import { ProjectsWorkflowApiService } from '@api/apiServices/projects-workflow-api.service';
+import { ProjectsWorkflowApiService } from '@api/services/projects-workflow-api.service';
 import { toPromise } from './utils';
 
 /**

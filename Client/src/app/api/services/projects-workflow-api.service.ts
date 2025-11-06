@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { BaseApiService } from '@api/apiServices/base-api.service';
+import { BaseApiService } from '@api/services/base-api.service';
 import { ProjectDomain } from '@core/models/project.model';
-import { ProjectMapper } from '@api/mappers/project.mapper';
 import { getProjectsWorkflow } from '@generated/projects-workflow/projects-workflow';
-import {ProjectFeedbackRequest, UploadTranslatedContentBody} from '@generated/models';
+import {Project as ProjectDto, ProjectFeedbackRequest, UploadTranslatedContentBody} from '@generated/models';
+import { plainToInstance } from 'class-transformer';
 
 const {
   uploadTranslatedContent,
@@ -29,7 +29,11 @@ export class ProjectsWorkflowApiService extends BaseApiService {
     form.append('file', file);
 
     return this.wrapPromise(uploadTranslatedContent(id, form as unknown as UploadTranslatedContentBody)).pipe(
-      map((p) => ProjectMapper.mapApiProjectToDomain(p))
+      map((p: ProjectDto) =>
+        plainToInstance(ProjectDomain, p, {
+          excludeExtraneousValues: true,
+        })
+      )
     );
   }
 
@@ -40,7 +44,11 @@ export class ProjectsWorkflowApiService extends BaseApiService {
    */
   approveTranslated(id: string): Observable<ProjectDomain> {
     return this.wrapPromise(approveTranslatedContent(id)).pipe(
-      map((p) => ProjectMapper.mapApiProjectToDomain(p))
+      map((p: ProjectDto) =>
+        plainToInstance(ProjectDomain, p, {
+          excludeExtraneousValues: true,
+        })
+      )
     );
   }
 
@@ -53,7 +61,11 @@ export class ProjectsWorkflowApiService extends BaseApiService {
   rejectTranslated(id: string, feedback: string): Observable<ProjectDomain> {
     const body: ProjectFeedbackRequest = { text: feedback };
     return this.wrapPromise(rejectTranslatedContent(id, body)).pipe(
-      map((p) => ProjectMapper.mapApiProjectToDomain(p))
+      map((p: ProjectDto) =>
+        plainToInstance(ProjectDomain, p, {
+          excludeExtraneousValues: true,
+        })
+      )
     );
   }
 
@@ -64,7 +76,11 @@ export class ProjectsWorkflowApiService extends BaseApiService {
    */
   close(id: string): Observable<ProjectDomain> {
     return this.wrapPromise(closeProject(id)).pipe(
-      map((p) => ProjectMapper.mapApiProjectToDomain(p))
+      map((p: ProjectDto) =>
+        plainToInstance(ProjectDomain, p, {
+          excludeExtraneousValues: true,
+        })
+      )
     );
   }
 }

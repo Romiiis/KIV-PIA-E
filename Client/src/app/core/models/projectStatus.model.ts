@@ -1,7 +1,7 @@
 export enum ProjectStatusDomain {
-  CREATED = 'created',
-  ASSIGNED = 'assigned',
-  COMPLETED = 'completed',
-  APPROVED = 'approved',
-  CLOSED = 'closed'
+  CREATED = 'CREATED',
+  ASSIGNED = 'ASSIGNED',
+  COMPLETED = 'COMPLETED',
+  APPROVED = 'APPROVED',
+  CLOSED = 'CLOSED'
 }

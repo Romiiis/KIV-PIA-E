@@ -1,6 +1,6 @@
 import {inject} from '@angular/core';
 import {injectMutation} from '@tanstack/angular-query-experimental';
-import {UsersApiService} from '@api/apiServices/users-api.service';
+import {UsersApiService} from '@api/services/users-api.service';
 import {toPromise} from './utils';
 import {UserRoleDomain} from '@core/models/userRole.model';
 

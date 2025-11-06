@@ -173,12 +173,6 @@ paths:
     # ------ END Auth Endpoints ------
 
 
-
-
-
-    # ----- Project Endpoints -----
-
-
   # ----- User Endpoints -----
   /users:
     get:
@@ -790,25 +784,7 @@ components:
         - CUSTOMER
         - TRANSLATOR
         - ADMINISTRATOR
-    
-    #??? MAYBE HEADERS ???
-    UserHeader:
-      type: object
-      description: A lightweight user representation for headers
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
-        name:
-          type: string
-          example: "John Doe"
-        role:
-          $ref: '#/components/schemas/UserRole'
-      required:
-        - id
-        - name
-        - role
+
     ### USER REQUESTS ###
     InitializeUserRequest:
       type: object
@@ -889,7 +865,7 @@ components:
     #----- Project Schemas -----
     Project:
       type: object
-      required: [ id, targetLanguage, customer, state, createdAt ]
+      required: [ id, targetLanguage, customer, originalFileName, state, createdAt ]
       additionalProperties: false
       properties:
         id:
@@ -965,7 +941,7 @@ components:
         createdAt:
           type: string
           format: date-time
-      required: [ projectId, text ]
+      required: [ projectId, text, createdAt]
 
     ### PROJECT FEEDBACK REQUESTS ###
     ProjectFeedbackRequest:

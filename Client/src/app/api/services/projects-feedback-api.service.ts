@@ -1,10 +1,13 @@
 import {Injectable} from '@angular/core';
 import {map} from 'rxjs/operators';
 import {Observable} from 'rxjs';
-import {BaseApiService} from '@api/apiServices/base-api.service';
+import {plainToInstance} from 'class-transformer';
+
+import {BaseApiService} from '@api/services/base-api.service';
 import {getProjectsFeedback} from '@generated/projects-feedback/projects-feedback';
 import {FeedbackDomain} from '@core/models/feedback.model';
-import {ProjectFeedbackMapper} from '@api/mappers/project-feedback.mapper';
+import {ProjectFeedback as FeedbackDTO} from '@generated/models';
+
 
 const {getProjectFeedback} = getProjectsFeedback();
 
@@ -22,7 +25,11 @@ export class ProjectsFeedbackApiService extends BaseApiService {
    */
   getFeedback(projectId: string): Observable<FeedbackDomain> {
     return this.wrapPromise(getProjectFeedback(projectId)).pipe(
-      map((response) => ProjectFeedbackMapper.mapApiProjectFeedbackToDomain(response))
+      map((response: FeedbackDTO) =>
+        plainToInstance(FeedbackDomain, response, {
+          excludeExtraneousValues: true,
+        })
+      )
     );
   }
 }

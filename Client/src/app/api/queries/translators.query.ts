@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { injectMutation } from '@tanstack/angular-query-experimental';
-import { TranslatorsLanguageApiService } from '@api/apiServices/translators-language-api.service';
+import { TranslatorsLanguageApiService } from '@api/services/translators-language-api.service';
 import { toPromise } from './utils';
 
 

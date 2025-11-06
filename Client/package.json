@@ -55,7 +55,9 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.9.2",
     "orval":"^7.16.0",
-    "axios": "^1.13.2"
+    "axios": "^1.13.2",
+    "class-transformer": "^0.5.1",
+    "reflect-metadata": "^0.2.2"
   }
 
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { BaseApiService } from '@api/apiServices/base-api.service';
+import { BaseApiService } from '@api/services/base-api.service';
 import { getTranslatorsLanguage } from '@generated/translators-language/translators-language';
 import { ListLanguagesResponse, ReplaceLanguagesRequest } from '@generated/models';
 

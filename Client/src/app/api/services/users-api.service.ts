@@ -1,11 +1,12 @@
 import {Injectable} from '@angular/core';
 import {map} from 'rxjs/operators';
 import {Observable} from 'rxjs';
-import {BaseApiService} from '@api/apiServices/base-api.service';
+import {BaseApiService} from '@api/services/base-api.service';
 import {UserDomain} from '@core/models/user.model';
-import {UserMapper} from '@api/mappers/user.mapper';
 import {getUsers} from '@generated/users/users';
 import {UserRoleDomain} from '@core/models/userRole.model';
+import { plainToInstance } from 'class-transformer';
+import { User as UserDto } from '@generated/models';
 
 const {listAllUsers, getUserDetails, changeUserRole} = getUsers();
 
@@ -21,7 +22,11 @@ export class UsersApiService extends BaseApiService {
    * */
   listAll(): Observable<UserDomain[]> {
     return this.wrapPromise(listAllUsers()).pipe(
-      map((users) => users.map((u) => UserMapper.mapApiUserToUser(u)))
+      map((users: UserDto[]) =>
+        plainToInstance(UserDomain, users, {
+          excludeExtraneousValues: true,
+        })
+      )
     );
   }
 
@@ -32,7 +37,11 @@ export class UsersApiService extends BaseApiService {
    */
   detail(id: string): Observable<UserDomain> {
     return this.wrapPromise(getUserDetails(id)).pipe(
-      map((u) => UserMapper.mapApiUserToUser(u))
+      map((u: UserDto) =>
+        plainToInstance(UserDomain, u, {
+          excludeExtraneousValues: true,
+        })
+      )
     );
   }
 

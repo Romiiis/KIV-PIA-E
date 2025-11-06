@@ -4,7 +4,7 @@
     injectMutation,
     injectQueryClient,
   } from '@tanstack/angular-query-experimental';
-  import {AuthApiService} from '@api/apiServices/auth-api.service';
+  import {AuthApiService} from '@api/services/auth-api.service';
   import {QK} from './query-keys';
   import {toPromise} from './utils';
 

@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { injectMutation } from '@tanstack/angular-query-experimental';
-import { ProjectsApiService } from '@api/apiServices/projects-api.service';
+import { ProjectsApiService } from '@api/services/projects-api.service';
 import { toPromise } from './utils';
 import { ProjectDomain } from '@core/models/project.model';
 
