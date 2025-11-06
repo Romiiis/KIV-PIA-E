@@ -1,95 +1,141 @@
-.new-project-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-  padding: 2rem;
-  max-width: 500px;
-  margin: 2rem auto;
-  text-align: left;
-  font-family: 'Inter', sans-serif;
+/*
+  ======================================================================
+  Vylepšený designový systém pro prémiový vzhled modálního okna
+  ======================================================================
+*/
+:host {
+  /* Rafinovaná barevná paleta */
+  --brand-primary: #4f46e5; /* Moderní, sytá modrá/fialová */
+  --brand-primary-hover: #4338ca;
+  --text-title: #1f2937; /* Tmavá, ale ne úplně černá */
+  --text-body: #4b5563;
+  --text-light: #9ca3af;
+  --border-color: #d1d5db;
+  --background-light: #f9fafb;
+  --background-hover: #f3f4f6;
+  --shadow-color-subtle: rgba(0, 0, 0, 0.04);
 }
 
-.new-project-card h2 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-bottom: 0.2rem;
-  color: #2c3e50;
+/* --- Hlavní kontejner a titulek --- */
+.dialog-wrapper {
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
-.new-project-card .subtitle {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 1.5rem;
+[mat-dialog-title] {
+  font-size: 1.75rem;
+  font-weight: 700; /* Výraznější tloušťka */
+  color: var(--text-title);
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  letter-spacing: -0.02em; /* Jemné stažení pro moderní vzhled */
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text-body);
+  max-width: 380px;
+  margin: 0.5rem auto 2.5rem auto;
+  line-height: 1.6;
+}
+
+/* --- Kontejner pro formulář --- */
+[mat-dialog-content] {
+  padding: 0 !important;
+  overflow: visible !important;
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.25rem;
 }
 
-.form-group label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  margin-bottom: 0.4rem;
-  color: #333;
-}
-
-/* File upload button */
-.file-upload .file-label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  background: #f8f9fa;
-  border: 2px dashed #ccc;
-  border-radius: 12px;
-  padding: 1rem;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  font-weight: 500;
-  color: #555;
-}
-
-.file-upload .file-label:hover {
-  background: #eef6ff;
-  border-color: #007bff;
-  color: #007bff;
-}
-
-.file-upload .icon {
-  font-size: 1.2rem;
-}
-
-
-
-input:focus,
-select:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-  outline: none;
-}
-
-/* Button */
-button {
+/* --- Vylepšené tlačítko pro nahrání souboru --- */
+.file-upload-button {
   width: 100%;
-  padding: 0.9rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #fff;
-  background: #007bff;
+  border-radius: 16px;
+  border: 1.5px dashed var(--border-color);
+  background-color: var(--background-light);
+  padding: 1.5rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-body);
+  /* Plynulé přechody pro všechny vlastnosti */
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+  background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.file-upload-button:hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+  background-color: #f0f2ff;
+  transform: scale(1.02); /* Jemné zvětšení při najetí */
+}
+
+/* Efekt stisknutí tlačítka */
+.file-upload-button:active {
+  transform: scale(0.99);
+}
+
+.file-upload-button .icon {
+  margin-right: 0.5rem;
+  opacity: 0.7;
+}
+
+/* --- Patička s tlačítky --- */
+[mat-dialog-actions] {
+  padding: 1.5rem 0 0 0;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  /* Jemná linka pro oddělení od obsahu */
+  border-top: 1px solid var(--border-color);
+  margin-top: 1rem;
+}
+
+[mat-dialog-actions] button {
+  border-radius: 16px;
+  padding: 0.8rem 1.6rem;
+  font-weight: 600; /* Tučnější písmo na tlačítkách */
+  font-size: 0.95rem;
   border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.25s ease, transform 0.1s ease;
+  transition: all 0.2s ease-in-out;
 }
 
-button:hover:not(:disabled) {
-  background: #0056b3;
-  transform: translateY(-2px);
+/* "Cancel" tlačítko */
+[mat-button] {
+  color: var(--text-body);
+  background-color: transparent;
 }
 
-button:disabled {
-  background: #a0c4ff;
-  cursor: not-allowed;
+[mat-button]:hover {
+  background-color: var(--background-hover);
+}
+
+/* "Submit" tlačítko - hlavní akce */
+.submit-button {
+  min-width: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.submit-button:not(:disabled) {
+  background-color: var(--brand-primary);
+  color: #fff;
+  /* Jemný stín pro pocit hloubky */
+  box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.3);
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: var(--brand-primary-hover);
+  transform: translateY(-2px); /* Efekt "vystoupení" */
+  box-shadow: 0 6px 20px 0 rgba(79, 70, 229, 0.35);
+}
+
+.submit-button:disabled {
+  background-color: #e5e7eb;
+  color: var(--text-light);
 }

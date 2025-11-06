@@ -1,141 +1,78 @@
-.language-select {
-  width: 100%;
+/*
+ * Díky ViewEncapsulation.None se tyto styly aplikují globálně,
+ * ale protože jsou všechny vnořené v .custom-language-select,
+ * ovlivní pouze tuto komponentu.
+*/
 
-  font-family: 'Inter', sans-serif;
+/* --- Hlavní kontejner --- */
+.custom-language-select {
   position: relative;
-  color: #1e293b;
+  width: 100%;
 }
 
-/* Label */
-.label {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 0.4rem;
-  color: #334155;
-}
-
-/* === Input area === */
-.input-area input{
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  background: #f8fafc;
-  padding: 0.45rem 0.6rem;
-  transition: all 0.2s ease;
-  cursor: text;
+/* --- Vzhled Inputu --- */
+.custom-language-select .language-input {
   width: 100%;
   box-sizing: border-box;
-}
-
-.input-area:focus-within {
   background: #fff;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border: 1px solid #d1d5db; /* Světle šedý rámeček */
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: #1a1a1a;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Wrapper — roztahuje se jen do výšky */
-.tags-wrapper {
-  display: flex;
-  flex-wrap: wrap;         /* ✅ roztahuje do výšky */
-  gap: 0.4rem;
-  align-items: center;
-  width: 100%;
+.custom-language-select .language-input::placeholder {
+  color: #9ca3af;
 }
 
-/* === Tag === */
-.tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  background: #e0f2fe;
-  color: #0369a1;
-  font-size: 0.85rem;
-  font-weight: 500;
-  padding: 0.25rem 0.6rem;
-  border-radius: 9999px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: background 0.2s;
-}
-
-.tag:hover {
-  background: #bae6fd;
-}
-
-.remove-btn {
-  border: none;
-  background: transparent;
-  color: #0369a1;
-  font-size: 0.85rem;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-}
-
-.remove-btn:hover {
-  color: #dc2626;
-}
-
-/* === Input === */
-.tags-wrapper input {
-  border: none;
+.custom-language-select .language-input:focus {
   outline: none;
-  background: transparent;
-  font-size: 0.9rem;
-  color: #1e293b;
-  flex-grow: 1;            /* ✅ přirozeně vyplní zbytek řádku */
-  min-width: 60px;
-  width: auto;
-  box-sizing: border-box;
+  border-color: #3b82f6; /* Modrý rámeček při focusu */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-.tags-wrapper input::placeholder {
-  color: #94a3b8;
+/* --- Vzhled Autocomplete Panelu (Dropdown) --- */
+.language-autocomplete-panel {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+  background: #fff !important;
+  margin-top: 0.4rem !important;
 }
 
-/* === Dropdown === */
-.dropdown {
-  position: absolute;
-  top: calc(100% + 0.4rem);
-  left: 0;
-  width: 100%;
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-  overflow: hidden;
-  max-height: 240px;
-  overflow-y: auto;
-  animation: fadeIn 0.15s ease-in;
-  z-index: 10;
+/* --- Vzhled jednotlivých možností (mat-option) --- */
+.language-autocomplete-panel .mat-mdc-option {
+  padding: 0 1rem !important;
+  min-height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
 }
 
-/* === Dropdown option === */
-.option {
+.language-autocomplete-panel .mat-mdc-option:hover:not(.mdc-list-item--disabled) {
+  background: #f1f5f9 !important;
+}
+
+/* Vybraná možnost (pro single-select) */
+.language-autocomplete-panel .mat-mdc-option.mdc-list-item--selected {
+  background: #eff6ff !important;
+}
+
+/* --- Obsah možnosti --- */
+.option-content {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.55rem 0.9rem;
-  cursor: pointer;
-  transition: background 0.15s;
+  align-items: center; /* Zarovnání checkboxu a textu */
 }
 
-.option:hover {
-  background: #f1f5f9;
-}
-
-.option.selected {
-  background: #eff6ff;
-}
-
-.checkmark {
-  color: #2563eb;
-  font-weight: bold;
-  margin-right: 0.5rem;
+/* --- NOVÉ: Styl pro Pseudo Checkbox --- */
+.option-content .mat-pseudo-checkbox {
+  margin-right: 12px; /* Odsazení checkboxu od textu */
 }
 
 .name {
-  flex: 1;
   font-size: 0.9rem;
   color: #0f172a;
   font-weight: 500;
@@ -147,22 +84,140 @@
   margin-left: 0.5rem;
 }
 
-/* === No results === */
-.no-results {
-  padding: 0.75rem;
+/* Fajfka pro vybranou možnost (v single-select módu) */
+.checkmark {
+  color: #2563eb;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+/* Zpráva "No results" */
+.language-autocomplete-panel .no-results {
+  padding: 0.75rem !important;
   text-align: center;
   color: #94a3b8;
   font-size: 0.9rem;
+  cursor: default !important;
+  background: #fff !important;
 }
 
-/* Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.option-content .custom-checkbox {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #9ca3af; /* Šedý rámeček */
+  border-radius: 4px;
+  margin-right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0; /* Zabrání smrštění, pokud by byl text moc dlouhý */
+}
+
+/* Stav "checked" */
+.option-content .custom-checkbox.checked {
+  background-color: #3b82f6; /* Modré pozadí (stejné jako focus inputu) */
+  border-color: #3b82f6;
+}
+
+.custom-language-select-wrapper {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #d1d5db; /* Světle šedý rámeček */
+  border-radius: 12px;
+  padding: 0.5rem 1rem; /* Padding pro štítky */
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: #1a1a1a;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  max-height: 112px;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  cursor: text;
+  min-height: 48px;
+  /* NOVÉ: padding pro šipku v single-módu */
+  padding-right: 2.5rem;
+}
+
+/* Při focusu (nyní řízeno třídou .is-focused) */
+.custom-language-select-wrapper.is-focused {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* Při focusu na input uvnitř */
+.custom-language-select-wrapper:focus-within {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.selected-value {
+  font-size: 0.9rem;
+  color: #1a1a1a;
+  /* Zabrání výběru textu při klikání */
+  user-select: none;
+  flex-grow: 1; /* Roztáhne se */
+  padding: 4px 0; /* Stejné jako input-field */
+}
+.selected-value.is-placeholder {
+  color: #9ca3af;
+}
+
+/* Speciální chování pro single-select */
+/* Když NENÍ focus, input je "neviditelný" (nulová šířka) */
+.custom-language-select-wrapper:not(.is-focused):not(:has(mat-chip-grid)) .language-input-field {
+  min-width: 0;
+  width: 0;
+  flex-grow: 0;
+  padding: 0 !important;
+}
+
+/* --- NOVÉ: Ikona šipky (Single-select) --- */
+.dropdown-icon {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  transition: transform 0.2s ease;
+  user-select: none; /* Nejde vybrat */
+}
+.dropdown-icon.is-focused {
+  transform: translateY(-50%) rotate(180deg); /* Otočení při otevření */
+}
+
+/* Input pole uvnitř wrapperu */
+.language-input-field {
+  flex-grow: 1;
+  border: none !important;
+  outline: none !important;
+  padding: 4px 0 !important;
+  font-family: inherit;
+  font-size: inherit;
+  background: transparent;
+  box-shadow: none !important;
+  min-width: 120px;
+}
+
+/* Vzhled štítků (chips) */
+.custom-language-select-wrapper .mat-mdc-chip-row {
+  background-color: #e0e7ff; /* Světle fialová */
+  color: #4338ca; /* Tmavě fialová */
+  font-weight: 500;
+  font-size: 0.85rem;
+  height: 28px;
+  padding: 4px 10px;
+}
+
+.custom-language-select-wrapper .mat-mdc-chip-row .mat-mdc-icon-button {
+  color: #4338ca;
+  width: 18px;
+  height: 18px;
 }

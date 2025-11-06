@@ -1,0 +1,119 @@
+
+
+.modal-content {
+  background: white;
+  border-radius: 16px; /* Sjednoceno s .mymodal */
+  padding: 2rem; /* Sjednoceno s .mymodal */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 600px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.close-btn {
+  position: absolute;
+  top: 0.8rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #888;
+  cursor: pointer;
+}
+.close-btn:hover {
+  color: var(--text-dark);
+}
+
+/* --- Header and Meta Info --- */
+h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: var(--text-dark);
+  word-break: break-all;
+}
+
+.subtitle.meta-info {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  align-items: center;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  color: white;
+  background-color: #6c757d; /* Default */
+}
+
+/* Status colors */
+.status-created, .status-assigned { background-color: var(--primary-color); }
+.status-completed { background-color: #ffc107; color: var(--text-dark); }
+.status-approved, .status-closed { background-color: #198754; }
+
+/* --- Modal Body --- */
+.detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.detail-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 0.8rem 0;
+  color: var(--text-dark);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.detail-section .icon {
+  font-size: 1.1rem;
+  color: var(--primary-color);
+}
+
+.info-item {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  align-items: start;
+}
+
+.info-item label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.info-item strong {
+  color: var(--text-dark);
+}
+
+.info-item span, .info-item div {
+  font-size: 0.95rem;
+  color: var(--text-medium);
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+.info-item .muted {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: normal;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

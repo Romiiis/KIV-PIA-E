@@ -1,27 +1,39 @@
-<div class="new-project-card">
-  <h2>Create New Project</h2>
-  <p class="subtitle">Upload your file in English and select the target language</p>
+<div class="dialog-wrapper">
+  <h2 mat-dialog-title>Create New Project</h2>
 
-  <form [formGroup]="projectForm" (ngSubmit)="submitProject()">
-    <!-- File upload -->
-    <div class="form-group file-upload">
-      <label for="fileInput" class="file-label">
-        <span class="icon">📄</span>
-        <span>{{ projectForm.value.file?.name || 'Choose a file' }}</span>
-      </label>
-      <input id="fileInput" type="file" (change)="onFileSelected($event)" hidden/>
-    </div>
+  <mat-dialog-content>
+    <p class="subtitle">Upload your file in English and select the target language(s).</p>
 
-    <!-- Target language -->
-    <div class="form-group">
-      <app-language-select
-        [multiple]="false"
-        (selected)="projectForm.patchValue({ targetLang: $event })">
-        >
-      </app-language-select>
-    </div>
+    <form [formGroup]="projectForm">
+      <div class="form-group">
+        <button type="button" mat-stroked-button class="file-upload-button" (click)="fileInput.click()">
+          <span class="icon">📄</span>
+          <span>{{ projectForm.get('file')?.value?.name || 'Choose a file' }}</span>
+        </button>
+        <input hidden #fileInput type="file" (change)="onFileSelected($event)">
+      </div>
 
-    <!-- Submit -->
-    <button type="submit" [disabled]="projectForm.invalid">🚀 Submit Project</button>
-  </form>
+      <div class="form-group">
+        <app-language-select
+          formControlName="targetLang"
+          [isMulti]="false"
+          [placeholder]="'Select target language(s)'"
+        ></app-language-select>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button
+      mat-flat-button
+      class="submit-button"
+      [disabled]="projectForm.invalid || isLoading"
+      (click)="submitProject()">
+      @if (!isLoading) {
+        <span>Submit Project(s)</span> } @else {
+        <mat-spinner [diameter]="24"></mat-spinner>
+      }
+    </button>
+  </mat-dialog-actions>
 </div>

@@ -26,8 +26,7 @@
   <div *ngIf="form.get('role')?.value === UserRoleDomain.TRANSLATOR" style="width: 100%; margin: 20px 0;">
     <span>Languages you know:</span>
     <app-language-select
-      [multiple]="true"
-      (selected)="onLanguagesSelected($event)">
+    [isMulti]="true">
     </app-language-select>
   </div>
 

@@ -1,0 +1,53 @@
+
+<div class="modal-content">
+  <button class="close-btn" (click)="onClose()">✖</button>
+
+  <h2>{{ project.originalFileName }}</h2>
+  <div class="subtitle meta-info">
+    <span class="status-badge" [ngClass]="'status-' + project.status">
+      {{ project.status | titlecase }}
+    </span>
+    <span><strong>Language:</strong> English → {{ project.targetLanguage }}</span>
+    <span><strong>Created:</strong> {{ project.createdAt | date:'medium' }}</span>
+  </div>
+
+  <div class="detail-body">
+    <section class="detail-section">
+      <h3><span class="icon">📄</span> Files</h3>
+      <div class="info-item">
+        <label>Original:</label>
+        <span>{{ project.originalFileName }}</span>
+      </div>
+      <div class="info-item">
+        <label>Translation:</label>
+        @if (project.translatedFileName) {
+          <span>{{ project.translatedFileName }}</span>
+        } @else {
+          <span class="muted">Not translated yet</span>
+        }
+      </div>
+    </section>
+
+    <section class="detail-section">
+      <h3><span class="icon">👥</span> Users</h3>
+      <div class="info-item">
+        <label>Customer:</label>
+        <div>
+          <strong>{{ project.customer.name }}</strong>
+          <span class="muted">{{ project.customer.emailAddress }}</span>
+        </div>
+      </div>
+      <div class="info-item">
+        <label>Translator:</label>
+        @if (project.translator) {
+          <div>
+            <strong>{{ project.translator.name }}</strong>
+            <span class="muted">{{ project.translator.emailAddress }}</span>
+          </div>
+        } @else {
+          <span class="muted">Not assigned yet</span>
+        }
+      </div>
+    </section>
+  </div>
+</div>

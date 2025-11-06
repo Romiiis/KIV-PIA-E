@@ -1,69 +1,76 @@
-import {Component, OnInit} from '@angular/core';
-import {FilterByStatusPipe} from '@shared/pipes/filter-by-status-pipe';
-import {LengthPipe} from '@shared/pipes/length-pipe';
-import {NewProjectComponent} from '@features/customer/new-project/new-project.component';
-import {NgIf} from '@angular/common';
-import {ProjectDomain} from '@core/models/project.model';
-import {ProjectStatusDomain} from '@core/models/projectStatus.model';
-import {useListProjectsMutation} from '@api/queries/project.query';
+import { Component, OnInit } from '@angular/core';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog'; // <-- Import MatDialog
+import { FilterByStatusPipe } from '@shared/pipes/filter-by-status-pipe';
+import { LengthPipe } from '@shared/pipes/length-pipe';
+import { NewProjectComponent } from '@features/customer/new-project/new-project.component';
+import { ProjectDomain } from '@core/models/project.model';
+import { ProjectStatusDomain } from '@core/models/projectStatus.model';
+import { useListProjectsMutation } from '@api/queries/project.query';
+import { ProjectDetailModalComponent } from '@shared/project-detail-modal/project-detail-modal.component';
 
 @Component({
   selector: 'app-customer-page',
-  templateUrl: './customer-page.component.html',
+  standalone: true,
   imports: [
     FilterByStatusPipe,
     LengthPipe,
-    NewProjectComponent,
-    NgIf
+    MatDialogModule
   ],
+  templateUrl: './customer-page.component.html',
   styleUrls: ['./customer-page.component.css']
 })
-
-/**
- * Customer page component that displays customer projects
- * and allows creating new projects.
- */
 export class CustomerPageComponent implements OnInit {
-
-  // Boolean to control the visibility of the new project modal dialog
-  showNewProject!: boolean;
-
-  // Exposes project status domain to the template
   protected readonly ProjectStatusDomain = ProjectStatusDomain;
-
-  // List of projects for the customer
   projects: ProjectDomain[] = [];
-
+  isLoading = false;
   readonly getAllProjectsMutation = useListProjectsMutation();
 
-
+  // Vložíme si službu MatDialog
+  constructor(public dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.fetchCustomerProjects().then();
   }
 
-  /**
-   * Fetches projects asynchronously and updates the component's state.
-   */
   async fetchCustomerProjects() {
+    this.isLoading = true;
     try {
       this.projects = await this.getAllProjectsMutation.mutateAsync();
     } catch (error) {
       console.error('Failed to fetch customer projects:', error);
+    } finally {
+      this.isLoading = false;
     }
   }
 
   /**
-   * Opens the new project modal dialog.
+   * Opens the new project modal dialog using Angular Material.
    */
-  openNewProject() {
-    this.showNewProject = true;
+  openNewProjectModal(): void {
+    const dialogRef = this.dialog.open(NewProjectComponent, {
+      width: '600px',
+      maxWidth: '95vw',
+      panelClass: 'clean-dialog-panel', // <-- POUŽÍVÁME NOVOU TŘÍDU
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'created') {
+        this.fetchCustomerProjects();
+      }
+    });
   }
 
   /**
-   * Closes the new project modal dialog.
+   * Opens the project details modal dialog using Angular Material.
+   * @param project The project to display.
    */
-  closeNewProject() {
-    this.showNewProject = false;
+  openProjectDetails(project: ProjectDomain): void {
+    this.dialog.open(ProjectDetailModalComponent, {
+      data: { project: project },
+      width: '650px',       // Pevná šířka pro desktopy
+      maxWidth: '95vw',     // Zajistí, že na mobilu nebude širší než obrazovka
+      maxHeight: '90vh',    // Maximální výška je 90% výšky obrazovky
+    });
   }
 }

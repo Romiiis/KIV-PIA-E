@@ -1,55 +1,72 @@
-<div class="language-select">
-  <div class="input-area" (click)="focusInput()">
-    <!-- MULTISELECT -->
-    <div class="tags-wrapper" *ngIf="multiple; else singleMode">
-      <div class="tag" *ngFor="let lang of selectedLanguages">
-        {{ lang.name }}
-        <button
-          type="button"
-          class="remove-btn"
-          (click)="removeLanguage(lang)"
-        >
-          ×
-        </button>
+<div class="custom-language-select-wrapper"
+     [class.is-focused]="isFocused"
+     (click)="languageInput.focus()"
+     matAutocompleteOrigin
+     #origin="matAutocompleteOrigin">
+
+  @if (isMulti) {
+    <mat-chip-grid #chipGrid>
+      @for (lang of selectedLanguages; track lang.code) {
+        <mat-chip-row (removed)="removeLanguage(lang)">
+          {{ lang.name }}
+          <button matChipRemove>
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip-row>
+      }
+    </mat-chip-grid>
+  } @else {
+    @if (!isFocused) {
+      <span class="selected-value" [class.is-placeholder]="!selectedLanguages.length">
+        {{ selectedLanguages[0]?.name || placeholder }}
+      </span>
+    }
+  }
+
+  <input
+    #languageInput
+    [placeholder]="(isFocused || (isMulti && !selectedLanguages.length)) ? placeholder : ''"
+    class="language-input-field"
+    [formControl]="searchControl"
+    [matAutocomplete]="auto"
+    [matAutocompleteConnectedTo]="origin"
+    (blur)="onBlur()"
+    (focus)="onFocus()"
+  />
+
+  @if (!isMulti) {
+    <mat-icon class="dropdown-icon" [class.is-focused]="isFocused">expand_more</mat-icon>
+  }
+
+</div>
+
+
+<mat-autocomplete #auto="matAutocomplete"
+                  [displayWith]="displayFn"
+                  class="language-autocomplete-panel">
+
+  @for (lang of filteredLanguages$ | async; track lang.code) {
+    <mat-option [value]="lang" (mousedown)="onToggleLanguage($event, lang)">
+
+      <div class="option-content">
+        <span class="name">{{ lang.name }}</span>
+        <span class="code">{{ lang.code }}</span>
       </div>
 
-      <input
-        #inputEl
-        type="text"
-        [(ngModel)]="searchTerm"
-        (input)="onSearch()"
-        (focus)="showDropdown = true"
-        placeholder="Type to search..."
-      />
-    </div>
+      @if (isSelected(lang)) {
+        <span class="checkmark">✓</span>
+      }
 
-    <!-- SINGLE SELECT MODE -->
-    <ng-template #singleMode>
-      <input
-        #inputEl
-        type="text"
-        [(ngModel)]="searchTerm"
-        (input)="onSearch()"
-        (focus)="showDropdown = true"
-        placeholder="Select language..."
-      />
-    </ng-template>
-  </div>
-
-  <div class="dropdown" *ngIf="showDropdown">
-    <div
-      *ngFor="let lang of filteredLanguages"
-      class="option"
-      [class.selected]="isSelected(lang)"
-      (click)="selectLanguage(lang)"
-    >
-      <span class="checkmark" *ngIf="isSelected(lang)">✔</span>
-      <span class="name">{{ lang.name }}</span>
-      <span class="code">{{ lang.code }}</span>
-    </div>
-
-    <div class="no-results" *ngIf="filteredLanguages.length === 0">
+    </mat-option>
+  }
+  @if (!(filteredLanguages$ | async)?.length && searchControl.value) {
+    <mat-option disabled class="no-results">
       No matching languages
-    </div>
-  </div>
-</div>
+    </mat-option>
+  }
+  @if (!(filteredLanguages$ | async)?.length && !searchControl.value) {
+    <mat-option disabled class="no-results">
+      Type to search...
+    </mat-option>
+  }
+</mat-autocomplete>
