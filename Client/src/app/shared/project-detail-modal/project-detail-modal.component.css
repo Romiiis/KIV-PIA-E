@@ -53,37 +53,7 @@
   width: auto;
 }
 
-/* --- Status Badge Styles --- */
-.status-box {
-  padding: 0.1rem 0.4rem;
-  border-radius: 8px;
-  background: var(--background-page);
-}
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-.status-badge.ASSIGNED {
-  background-color: var(--color-yellow-bg);
-  color: var(--color-yellow-text);
-}
-.status-badge.COMPLETED {
-  background-color: var(--color-blue-bg);
-  color: var(--color-blue-text);
-}
-.status-badge.APPROVED {
-  background-color: var(--color-green-bg);
-  color: var(--color-green-text);
-}
-.status-badge.CLOSED, .status-badge.CREATED {
-  background-color: var(--color-light-gray-bg);
-  color: var(--color-gray-text);
-}
+
 
 
 /* --- Obsah a Sekce --- */

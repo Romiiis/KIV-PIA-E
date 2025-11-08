@@ -15,8 +15,6 @@ import {MatIconModule} from '@angular/material/icon'; // Přidáno pro použití
     CommonModule,
     MatDialogModule,
     DatePipe,
-    FilterByStatusPipe,
-    LengthPipe,
     MatIconModule // Přidáno
   ],
   templateUrl: './translator-page.component.html',

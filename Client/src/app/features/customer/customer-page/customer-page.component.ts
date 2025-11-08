@@ -5,7 +5,8 @@ import { ProjectStatusDomain } from '@core/models/projectStatus.model';
 import { NewProjectComponent } from '@features/customer/new-project/new-project.component';
 import { useListProjectsMutation } from '@api/queries/project.query';
 import { ProjectDetailModalComponent } from '@shared/project-detail-modal/project-detail-modal.component';
-import { DatePipe } from '@angular/common'; // We still need DatePipe
+import { DatePipe } from '@angular/common';
+import {ProjectReviewComponent} from '@features/customer/project-review/project-review.component'; // We still need DatePipe
 
 @Component({
   selector: 'app-customer-page',
@@ -113,6 +114,16 @@ export class CustomerPageComponent implements OnInit {
    */
   openProjectDetails(project: ProjectDomain): void {
     this.dialog.open(ProjectDetailModalComponent, {
+      data: { project: project },
+      width: '600px',
+      maxWidth: '95vw',
+      panelClass: 'clean-dialog-panel',
+      disableClose: false
+    });
+  }
+
+  openProjectReview(project: ProjectDomain): void {
+    this.dialog.open(ProjectReviewComponent, {
       data: { project: project },
       width: '600px',
       maxWidth: '95vw',

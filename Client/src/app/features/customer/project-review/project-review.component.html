@@ -1,0 +1,83 @@
+<div class="dialog-wrapper">
+  <!-- Header s názvem a křížkem -->
+  <div class="dialog-header">
+    <h2 mat-dialog-title>Review Translation: {{ project.originalFileName }}</h2>
+
+    <button mat-icon-button
+            class="close-icon-btn"
+            aria-label="Close dialog"
+            (click)="isRejecting ? toggleRejectMode() : onClose()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="content-wrapper">
+    <div class="meta-info-header">
+      <div class="status-box">
+      <span class="status-badge" [ngClass]="project.status">
+        {{ project.status | titlecase }}
+      </span>
+      </div>
+      <div class="meta-item">
+        <mat-icon>calendar_today</mat-icon>
+        <span>Created: {{ project.createdAt | date:'mediumDate' }}</span>
+      </div>
+      <div class="meta-item">
+        <mat-icon>translate</mat-icon>
+        <span>{{ sourceLanguageTag }} → {{ targetLanguageTag }}</span>
+      </div>
+    </div>
+
+    <section class="detail-section files-section">
+      <h3><mat-icon>folder</mat-icon> Review File</h3>
+      <div class="file-action-note">
+        <mat-icon>visibility</mat-icon>
+        <span>Download and carefully review the file before proceeding with acceptance or rejection.</span>
+      </div>
+
+      <button mat-stroked-button
+              (click)="onDownload()"
+              [disabled]="isDownloading || !project.translatedFileName"
+              class="download-link-btn">
+        @if (isDownloading) {
+          <mat-spinner [diameter]="20"></mat-spinner>
+        } @else {
+          <mat-icon>cloud_download</mat-icon>
+        }
+        <span>Download Translated File</span>
+      </button>
+    </section>
+
+    <form [formGroup]="feedbackForm" class="detail-section feedback-area" *ngIf="isRejecting">
+      <h3><mat-icon>edit_note</mat-icon> Provide Rejection Feedback</h3>
+      <mat-form-field appearance="outline" class="full-width-input">
+        <mat-label>Reason for Rejection</mat-label>
+        <textarea matInput
+                  formControlName="feedback"
+                  rows="4"
+                  placeholder="Explain what needs to be fixed or why the translation is unsatisfactory."></textarea>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <div class="actions-container">
+      <button mat-button
+              class="action-btn reject-btn"
+              [class.reject-active]="isRejecting"
+              [disabled]="isLoading"
+              (click)="isRejecting ? onReject() : toggleRejectMode()">
+        <mat-icon>{{ isRejecting ? 'cancel' : 'thumb_down' }}</mat-icon>
+        <span>{{ isRejecting ? 'Reject' : 'Reject' }}</span>
+      </button>
+
+      <button mat-button
+              class="action-btn accept-btn"
+              [disabled]="isLoading || isRejecting"
+              (click)="onApprove()">
+        <mat-icon>check_circle</mat-icon>
+        <span>Accept</span>
+      </button>
+    </div>
+  </mat-dialog-actions>
+</div>
