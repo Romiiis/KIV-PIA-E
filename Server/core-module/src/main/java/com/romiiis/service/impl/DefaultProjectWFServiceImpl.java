@@ -142,7 +142,7 @@ public class DefaultProjectWFServiceImpl implements IProjectWFService {
         }
 
         // Delete existing feedback
-        feedbackService.deleteProjectFeedback(projectId);
+        feedbackService.deleteProjectFeedbackByProjectId(projectId);
 
         // Create feedback
         Feedback feedbackObject = project.reject(feedback);

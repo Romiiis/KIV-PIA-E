@@ -1,34 +1,50 @@
-<div class="init-container">
-  <h1 class="title">Welcome to LinguaFlow 🌍</h1>
-  <p class="subtitle">Let's set up your account</p>
+<div class="page-background">
+  <form class="init-container" [formGroup]="form">
+    <h1 class="title">Welcome to LinguaFlow 🌍</h1>
+    <p class="subtitle">Please confirm your primary role to set up your dashboard.</p>
 
-  <div class="role-selection">
-    <span>Select your role:</span>
-    <div class="role-tabs">
-      <button
-        type="button"
-        (click)="selectRole(UserRoleDomain.CUSTOMER)"
-        [class.active]="form.get('role')?.value === UserRoleDomain.CUSTOMER"
-      >
-        Customer
-      </button>
-      <button
-        type="button"
-        (click)="selectRole(UserRoleDomain.TRANSLATOR)"
-        [class.active]="form.get('role')?.value === UserRoleDomain.TRANSLATOR"
-      >
-        Translator
-      </button>
+    <div class="form-section">
+      <label class="section-label">1. Select your primary role:</label>
+      <div class="role-tabs">
+
+        <button
+          type="button"
+          class="role-card"
+          (click)="selectRole(UserRoleDomain.CUSTOMER)"
+          [class.active]="form.get('role')?.value === UserRoleDomain.CUSTOMER"
+        >
+          <span class="icon">💼</span>
+          <span class="role-name">Customer</span>
+          <span class="role-desc">Need translations done.</span>
+        </button>
+
+        <button
+          type="button"
+          class="role-card"
+          (click)="selectRole(UserRoleDomain.TRANSLATOR)"
+          [class.active]="form.get('role')?.value === UserRoleDomain.TRANSLATOR"
+        >
+          <span class="icon">✍️</span>
+          <span class="role-name">Translator</span>
+          <span class="role-desc">Provide translation services.</span>
+        </button>
+      </div>
     </div>
-  </div>
 
-  <!-- Show language select if translator -->
-  <div *ngIf="form.get('role')?.value === UserRoleDomain.TRANSLATOR" style="width: 100%; margin: 20px 0;">
-    <span>Languages you know:</span>
-    <app-language-select
-    [isMulti]="true">
-    </app-language-select>
-  </div>
+    <div class="form-section" *ngIf="form.get('role')?.value === UserRoleDomain.TRANSLATOR">
+      <label class="section-label">2. Select languages you translate:</label>
 
-  <button class="save-btn" (click)="saveSelection()">Finish</button>
+      <app-language-select
+        [isMulti]="true"
+        formControlName="languages">
+      </app-language-select>
+
+      <p class="lang-note">You must select at least one language pair (English source is implicit).</p>
+    </div>
+
+    <button class="save-btn" (click)="saveSelection()">
+      <span class="icon">🚀</span>
+      Finish Setup
+    </button>
+  </form>
 </div>

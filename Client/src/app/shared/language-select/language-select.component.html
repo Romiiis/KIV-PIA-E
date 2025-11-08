@@ -5,7 +5,7 @@
      #origin="matAutocompleteOrigin">
 
   @if (isMulti) {
-    <mat-chip-grid #chipGrid>
+    <mat-chip-listbox #chipGrid>
       @for (lang of selectedLanguages; track lang.code) {
         <mat-chip-row (removed)="removeLanguage(lang)">
           {{ lang.name }}
@@ -14,7 +14,13 @@
           </button>
         </mat-chip-row>
       }
-    </mat-chip-grid>
+    </mat-chip-listbox>
+
+    <!-- PŘIDÁNO: Zobrazí placeholder, pokud nejsou vybrány žádné jazyky a pole není aktivní -->
+    @if (!selectedLanguages.length && !isFocused) {
+      <span class="selected-value is-placeholder">{{ placeholder }}</span>
+    }
+
   } @else {
     @if (!isFocused) {
       <span class="selected-value" [class.is-placeholder]="!selectedLanguages.length">
@@ -25,7 +31,7 @@
 
   <input
     #languageInput
-    [placeholder]="(isFocused || (isMulti && !selectedLanguages.length)) ? placeholder : ''"
+    [placeholder]="isFocused ? placeholder : ''"
     class="language-input-field"
     [formControl]="searchControl"
     [matAutocomplete]="auto"
@@ -39,7 +45,6 @@
   }
 
 </div>
-
 
 <mat-autocomplete #auto="matAutocomplete"
                   [displayWith]="displayFn"

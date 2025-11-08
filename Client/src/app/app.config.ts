@@ -38,7 +38,7 @@ export const appConfig: ApplicationConfig = {
 
     importProvidersFrom(
       ToastrModule.forRoot({
-        positionClass: 'toast-top-right',
+        positionClass: 'toast-top-left',
         timeOut: 3000,
         progressBar: true,
         closeButton: true,

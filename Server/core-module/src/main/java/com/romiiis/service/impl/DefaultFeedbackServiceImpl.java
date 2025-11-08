@@ -90,7 +90,7 @@ public class DefaultFeedbackServiceImpl implements IFeedbackService {
      * @param projectId ID of the project whose feedback is to be deleted
      */
     @Override
-    public void deleteProjectFeedback(UUID projectId) throws UserNotFoundException, ProjectNotFoundException {
+    public void deleteProjectFeedbackByProjectId(UUID projectId) throws UserNotFoundException, ProjectNotFoundException {
 
         User user = fetchUserFromContext();
         Project project = fetchProject(projectId);

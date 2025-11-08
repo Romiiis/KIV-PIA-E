@@ -1,113 +1,136 @@
+/* Globální pozadí pro celou stránku */
+.page-background {
+  background-color: var(--background-light, #f9fafb);
+  min-height: 100vh;
+  padding-top: 4rem; /* Posun formuláře dolů */
+}
+
 .init-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 420px;
-  margin: 4rem auto;
-  padding: 2.5rem 2rem;
-  border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  max-width: 480px; /* Větší šířka pro lepší layout */
+  margin: 0 auto 4rem auto; /* Vycentrování */
+  padding: 2.5rem 2.5rem;
+  border-radius: 24px; /* Větší radius */
+  background: var(--background-white, #fff);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1); /* Výraznější stín */
   text-align: center;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 .title {
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  color: #222;
+  color: var(--text-title);
+  letter-spacing: -0.05em;
 }
 
 .subtitle {
   font-size: 1rem;
-  color: #666;
-  margin-bottom: 2rem;
+  color: var(--text-body);
+  margin-bottom: 2.5rem;
 }
 
-.role-selection {
-  text-align: left;
+.form-section {
   width: 100%;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
 }
 
-.role-selection span {
+.section-label {
   display: block;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text-title);
 }
 
+/* --- Role Selection Tabs (Cards) --- */
 .role-tabs {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
+  width: 100%;
 }
 
-.role-tabs button {
+.role-card {
   flex: 1;
-  padding: 0.8rem;
-  border: none;
-  border-radius: 10px;
-  background: #f5f6fa;
-  color: #666;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  background: var(--background-light);
+  color: var(--text-body);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  min-height: 140px; /* Pevná výška pro vizuální balanc */
 }
 
-.role-tabs button.active {
-  background: #007bff;
-  color: #fff;
-}
-
-.role-tabs button:hover:not(.active) {
-  background: #e9ecef;
-}
-
-.language-selection {
-  width: 100%;
-  text-align: left;
-  margin-bottom: 2rem;
-}
-
-.language-selection span {
-  display: block;
-  font-weight: 500;
+.role-card .icon {
+  font-size: 2rem;
   margin-bottom: 0.5rem;
+  line-height: 1;
 }
 
-.languages {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.role-card .role-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-bottom: 0.2rem;
 }
 
-.languages label {
-  background: #f5f6fa;
-  border-radius: 8px;
-  padding: 0.4rem 0.7rem;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  cursor: pointer;
-  transition: background 0.2s;
+.role-card .role-desc {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-light);
+  text-align: center;
 }
 
-.languages label:hover {
-  background: #e9ecef;
+.role-card.active {
+  border-color: var(--brand-primary);
+  background: var(--background-white);
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.15); /* Jemný stín pro aktivní stav */
 }
 
+.role-card:hover:not(.active) {
+  border-color: var(--text-light);
+  background: var(--background-hover);
+}
+
+/* --- Language Note --- */
+.lang-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  padding-left: 0.5rem;
+}
+
+/* --- Save Button (CTA) --- */
 .save-btn {
-  padding: 0.9rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
   border: none;
-  border-radius: 10px;
-  background: #007bff;
+  border-radius: 16px;
+  background: var(--brand-primary);
   color: #fff;
   cursor: pointer;
-  transition: background 0.25s ease;
+  transition: all 0.25s ease;
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+  margin-top: 1rem;
 }
 
 .save-btn:hover {
-  background: #0056b3;
+  background: var(--brand-primary-hover);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.5);
+  transform: translateY(-2px);
 }

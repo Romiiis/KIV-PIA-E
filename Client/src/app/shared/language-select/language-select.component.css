@@ -1,21 +1,13 @@
-/*
- * Díky ViewEncapsulation.None se tyto styly aplikují globálně,
- * ale protože jsou všechny vnořené v .custom-language-select,
- * ovlivní pouze tuto komponentu.
-*/
-
-/* --- Hlavní kontejner --- */
 .custom-language-select {
   position: relative;
   width: 100%;
 }
 
-/* --- Vzhled Inputu --- */
 .custom-language-select .language-input {
   width: 100%;
   box-sizing: border-box;
   background: #fff;
-  border: 1px solid #d1d5db; /* Světle šedý rámeček */
+  border: 1px solid #d1d5db;
   border-radius: 12px;
   padding: 0.8rem 1rem;
   font-family: 'Inter', sans-serif;
@@ -30,11 +22,11 @@
 
 .custom-language-select .language-input:focus {
   outline: none;
-  border-color: #3b82f6; /* Modrý rámeček při focusu */
+  border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-/* --- Vzhled Autocomplete Panelu (Dropdown) --- */
+
 .language-autocomplete-panel {
   border: 1px solid #e2e8f0 !important;
   border-radius: 12px !important;
@@ -43,7 +35,7 @@
   margin-top: 0.4rem !important;
 }
 
-/* --- Vzhled jednotlivých možností (mat-option) --- */
+
 .language-autocomplete-panel .mat-mdc-option {
   padding: 0 1rem !important;
   min-height: 44px !important;
@@ -56,20 +48,19 @@
   background: #f1f5f9 !important;
 }
 
-/* Vybraná možnost (pro single-select) */
+
 .language-autocomplete-panel .mat-mdc-option.mdc-list-item--selected {
   background: #eff6ff !important;
 }
 
-/* --- Obsah možnosti --- */
+
 .option-content {
   display: flex;
-  align-items: center; /* Zarovnání checkboxu a textu */
+  align-items: center;
 }
 
-/* --- NOVÉ: Styl pro Pseudo Checkbox --- */
 .option-content .mat-pseudo-checkbox {
-  margin-right: 12px; /* Odsazení checkboxu od textu */
+  margin-right: 12px;
 }
 
 .name {
@@ -84,14 +75,14 @@
   margin-left: 0.5rem;
 }
 
-/* Fajfka pro vybranou možnost (v single-select módu) */
+
 .checkmark {
   color: #2563eb;
   font-weight: bold;
   font-size: 1rem;
 }
 
-/* Zpráva "No results" */
+
 .language-autocomplete-panel .no-results {
   padding: 0.75rem !important;
   text-align: center;
@@ -104,19 +95,19 @@
 .option-content .custom-checkbox {
   width: 16px;
   height: 16px;
-  border: 2px solid #9ca3af; /* Šedý rámeček */
+  border: 2px solid #9ca3af;
   border-radius: 4px;
   margin-right: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
-  flex-shrink: 0; /* Zabrání smrštění, pokud by byl text moc dlouhý */
+  flex-shrink: 0;
 }
 
-/* Stav "checked" */
+
 .option-content .custom-checkbox.checked {
-  background-color: #3b82f6; /* Modré pozadí (stejné jako focus inputu) */
+  background-color: #3b82f6;
   border-color: #3b82f6;
 }
 
@@ -125,9 +116,9 @@
   width: 100%;
   box-sizing: border-box;
   background: #fff;
-  border: 1px solid #d1d5db; /* Světle šedý rámeček */
+  border: 1px solid #d1d5db;
   border-radius: 12px;
-  padding: 0.5rem 1rem; /* Padding pro štítky */
+  padding: 0.5rem 1rem;
   font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
   color: #1a1a1a;
@@ -138,20 +129,17 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
-  cursor: text;
   min-height: 48px;
-  /* NOVÉ: padding pro šipku v single-módu */
+  cursor: text;
   padding-right: 2.5rem;
 }
 
-/* Při focusu (nyní řízeno třídou .is-focused) */
 .custom-language-select-wrapper.is-focused {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-/* Při focusu na input uvnitř */
 .custom-language-select-wrapper:focus-within {
   outline: none;
   border-color: #3b82f6;
@@ -161,17 +149,16 @@
 .selected-value {
   font-size: 0.9rem;
   color: #1a1a1a;
-  /* Zabrání výběru textu při klikání */
   user-select: none;
-  flex-grow: 1; /* Roztáhne se */
-  padding: 4px 0; /* Stejné jako input-field */
+  flex-grow: 1;
+  z-index: 2;
+  padding: 4px 0;
 }
+
 .selected-value.is-placeholder {
   color: #9ca3af;
 }
 
-/* Speciální chování pro single-select */
-/* Když NENÍ focus, input je "neviditelný" (nulová šířka) */
 .custom-language-select-wrapper:not(.is-focused):not(:has(mat-chip-grid)) .language-input-field {
   min-width: 0;
   width: 0;
@@ -179,7 +166,7 @@
   padding: 0 !important;
 }
 
-/* --- NOVÉ: Ikona šipky (Single-select) --- */
+
 .dropdown-icon {
   position: absolute;
   top: 50%;
@@ -187,13 +174,14 @@
   transform: translateY(-50%);
   color: #9ca3af;
   transition: transform 0.2s ease;
-  user-select: none; /* Nejde vybrat */
-}
-.dropdown-icon.is-focused {
-  transform: translateY(-50%) rotate(180deg); /* Otočení při otevření */
+  user-select: none;
 }
 
-/* Input pole uvnitř wrapperu */
+.dropdown-icon.is-focused {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+
 .language-input-field {
   flex-grow: 1;
   border: none !important;
@@ -203,13 +191,14 @@
   font-size: inherit;
   background: transparent;
   box-shadow: none !important;
-  min-width: 120px;
+
+  min-width: 150px;
 }
 
-/* Vzhled štítků (chips) */
+
 .custom-language-select-wrapper .mat-mdc-chip-row {
-  background-color: #e0e7ff; /* Světle fialová */
-  color: #4338ca; /* Tmavě fialová */
+  background-color: #e0e7ff;
+  color: #4338ca;
   font-weight: 500;
   font-size: 0.85rem;
   height: 28px;

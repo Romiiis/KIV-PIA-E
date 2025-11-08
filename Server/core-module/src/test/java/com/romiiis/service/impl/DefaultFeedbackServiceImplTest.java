@@ -3,7 +3,6 @@ package com.romiiis.service.impl;
 import com.romiiis.domain.Feedback;
 import com.romiiis.domain.Project;
 import com.romiiis.domain.User;
-import com.romiiis.domain.UserRole;
 import com.romiiis.exception.*;
 import com.romiiis.repository.IFeedbackRepository;
 import com.romiiis.security.CallerContextProvider;
@@ -266,7 +265,7 @@ class DefaultFeedbackServiceImplTest {
         when(callerContextProvider.getCaller()).thenReturn(customer);
         when(projectService.getProjectById(projectId)).thenReturn(mockProject);
 
-        feedbackService.deleteProjectFeedback(projectId);
+        feedbackService.deleteProjectFeedbackByProjectId(projectId);
 
         verify(feedbackRepository).deleteForProject(projectId);
     }
@@ -278,7 +277,7 @@ class DefaultFeedbackServiceImplTest {
         when(projectService.getProjectById(projectId)).thenReturn(mockProject);
 
         try {
-            feedbackService.deleteProjectFeedback(projectId);
+            feedbackService.deleteProjectFeedbackByProjectId(projectId);
             assert false;
         } catch (Exception e) {
             assert e instanceof NoAccessToOperateException;
@@ -292,7 +291,7 @@ class DefaultFeedbackServiceImplTest {
         when(callerContextProvider.getCaller()).thenReturn(null);
 
         try {
-            feedbackService.deleteProjectFeedback(projectId);
+            feedbackService.deleteProjectFeedbackByProjectId(projectId);
             assert false;
         } catch (Exception e) {
             assert e instanceof UserNotFoundException;
@@ -306,7 +305,7 @@ class DefaultFeedbackServiceImplTest {
         when(projectService.getProjectById(projectId)).thenReturn(null);
 
         try {
-            feedbackService.deleteProjectFeedback(projectId);
+            feedbackService.deleteProjectFeedbackByProjectId(projectId);
             assert false;
         } catch (Exception e) {
             assert e instanceof ProjectNotFoundException;

@@ -1,35 +1,78 @@
 <div *ngIf="this.user as user">
 
-<nav class="navbar">
-  <!-- Logo -->
-  <div class="brand">🌍 LinguaFlow</div>
-
-  <!-- Navigation tabs -->
-  <div class="nav-links">
-  </div>
-
-  <!-- User menu -->
-  <div class="user-menu"
-       (mouseenter)="openMenu()"
-       (mouseleave)="closeMenu()">
-    <div class="avatar-name" (click)="toggleMenu()">
-      <img class="avatar" src="https://www.svgrepo.com/show/452030/avatar-default.svg" alt="User"/>
-      <span class="username">{{ user.name }}</span>
-      <span class="caret">▾</span>
+  <nav class="navbar">
+    <div class="brand">
+      <mat-icon>translate</mat-icon>
+      <span class="logo-text">LinguaFlow</span>
     </div>
 
-    <div class="dropdown" *ngIf="showMenu">
-      <div class="role">
-        <p class="roleLabel">Role:&nbsp; </p><p> {{ user.role }}</p>
+    <div class="status-panel">
+      <span class="panel-icon"><mat-icon>waving_hand</mat-icon></span>
+      <span class="panel-text">Welcome, {{ user.role | titlecase }}</span>
+    </div>
+    <div class="user-controls-group">
+
+      <div class="language-dropdown-wrapper"
+           (mouseenter)="openLangDropdown()"
+           (mouseleave)="closeLangDropdown()"
+           (click)="toggleLangDropdown()">
+        <mat-icon>language</mat-icon>
+        <span class="active-lang-label">{{ activeLanguage() | uppercase }}</span>
+        <mat-icon class="caret">expand_more</mat-icon>
+
+        <div class="dropdown lang-dropdown" *ngIf="showLangDropdown">
+          <button
+            class="lang-item"
+            [class.active]="activeLanguage() === 'en'"
+            (click)="switchLanguage('en'); $event.stopPropagation()">
+            English (EN)
+          </button>
+          <button
+            class="lang-item"
+            [class.active]="activeLanguage() === 'cs'"
+            (click)="switchLanguage('cs'); $event.stopPropagation()">
+            Čeština (CZ)
+          </button>
+        </div>
       </div>
-      <button (click)="logout()">Logout</button>
-    </div>
-  </div>
-</nav>
 
-<!-- Obsah stránky -->
-<main class="content">
-  <router-outlet></router-outlet>
-</main>
+      <div class="user-menu-wrapper"
+           (mouseenter)="openMenu()"
+           (mouseleave)="closeMenu()">
+
+        <div class="avatar-name" (click)="toggleMenu()">
+          <span class="avatar">{{ user.name | slice:0:1 }}</span>
+          <span class="username">{{ user.name }}</span>
+          <mat-icon class="caret">expand_more</mat-icon>
+        </div>
+
+        <div class="dropdown" *ngIf="showMenu">
+
+          <div class="menu-header">
+            <p class="header-name">{{ user.name | titlecase }}</p>
+            <p class="header-role">{{ user.role | titlecase }}</p>
+          </div>
+
+          <div class="menu-items">
+            @if (user.role === 'TRANSLATOR') {
+              <button class="menu-item translator-settings-btn" (click)="toastr.info('Opening Language Settings... (MOCK)')">
+                <mat-icon>settings</mat-icon>
+                <span>My Translation Settings</span>
+              </button>
+            }
+
+            <button class="menu-item logout-btn" (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              <span>Log Out</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
 
 </div>

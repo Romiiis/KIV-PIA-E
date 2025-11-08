@@ -22,7 +22,7 @@ public class CoreUiApplication {
     @Bean
     CommandLineRunner logStartupInfo(
             Environment env,
-            @Value("${spring.data.mongodb.uri:}") String mongoUri
+            @Value("${spring.data.mongodb.database}") String mongoUri
     ) {
         return args -> {
 

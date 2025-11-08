@@ -1,53 +1,109 @@
+<div class="dialog-wrapper">
 
-<div class="modal-content">
-  <button class="close-btn" (click)="onClose()">✖</button>
+  <h2 mat-dialog-title [matTooltip]="project.originalFileName">
+    {{ project.originalFileName }}
+  </h2>
 
-  <h2>{{ project.originalFileName }}</h2>
-  <div class="subtitle meta-info">
-    <span class="status-badge" [ngClass]="'status-' + project.status">
-      {{ project.status | titlecase }}
-    </span>
-    <span><strong>Language:</strong> English → {{ project.targetLanguage }}</span>
-    <span><strong>Created:</strong> {{ project.createdAt | date:'medium' }}</span>
+  <div class="meta-info-header">
+    <div class="status-box">
+      <span class="status-badge" [ngClass]="project.status">
+        {{ project.status | titlecase }}
+      </span>
+    </div>
+    <div class="meta-item">
+      <mat-icon>calendar_today</mat-icon>
+      <span>Created: {{ project.createdAt | date:'mediumDate' }}</span>
+    </div>
+    <div class="meta-item">
+      <mat-icon>translate</mat-icon>
+      <span>{{ sourceLanguageTag }} → {{ targetLanguageTag }}</span>
+    </div>
   </div>
 
-  <div class="detail-body">
-    <section class="detail-section">
-      <h3><span class="icon">📄</span> Files</h3>
-      <div class="info-item">
-        <label>Original:</label>
-        <span>{{ project.originalFileName }}</span>
-      </div>
-      <div class="info-item">
-        <label>Translation:</label>
-        @if (project.translatedFileName) {
-          <span>{{ project.translatedFileName }}</span>
-        } @else {
-          <span class="muted">Not translated yet</span>
-        }
-      </div>
-    </section>
+  <mat-dialog-content>
 
     <section class="detail-section">
-      <h3><span class="icon">👥</span> Users</h3>
-      <div class="info-item">
-        <label>Customer:</label>
-        <div>
-          <strong>{{ project.customer.name }}</strong>
-          <span class="muted">{{ project.customer.emailAddress }}</span>
+      <h3><mat-icon>info</mat-icon> Project Details</h3>
+      <div class="info-list compact-list">
+
+        <div class="info-item">
+          <label>Target Language</label>
+          <span class="info-value primary-text">{{ targetLanguageName }} ({{ targetLanguageTag }})</span>
         </div>
-      </div>
-      <div class="info-item">
-        <label>Translator:</label>
-        @if (project.translator) {
-          <div>
-            <strong>{{ project.translator.name }}</strong>
-            <span class="muted">{{ project.translator.emailAddress }}</span>
+
+        <div class="info-item">
+          <label>Customer</label>
+          <div class="user-info info-value">
+            <strong>{{ project.customer.name }}</strong>
+            <span>{{ project.customer.emailAddress }}</span>
           </div>
-        } @else {
-          <span class="muted">Not assigned yet</span>
-        }
+        </div>
+
+        <div class="info-item">
+          <label>Translator</label>
+          @if (project.translator) {
+            <div class="user-info info-value">
+              <strong>{{ project.translator.name }}</strong>
+              <span>{{ project.translator.emailAddress }}</span>
+            </div>
+          } @else {
+            <span class="muted-text info-value">Not assigned yet</span>
+          }
+        </div>
+
       </div>
     </section>
-  </div>
+
+    <section class="detail-section files-section">
+      <h3><mat-icon>folder</mat-icon> Download Files</h3>
+      <div class="file-download-container">
+
+        <div class="file-item file-original" (click)="onDownload('original')" [class.disabled]="!!downloadingType">
+          <div class="file-description">
+            <mat-icon class="file-icon">description</mat-icon>
+            <div class="file-text-group">
+              <span class="file-title">Original File (Source)</span>
+              <span class="file-name" [matTooltip]="project.originalFileName">{{ project.originalFileName }}</span>
+            </div>
+          </div>
+          <div class="download-zone primary-download">
+            @if (downloadingType === 'original') {
+              <mat-spinner [diameter]="20"></mat-spinner>
+            } @else {
+              <mat-icon>file_download</mat-icon>
+            }
+          </div>
+        </div>
+
+        <div class="file-item file-translated" (click)="onDownload('translated')" [class.disabled]="!!downloadingType || !project.translatedFileName">
+          <div class="file-description">
+            <mat-icon class="file-icon translated-icon">check_circle</mat-icon>
+            <div class="file-text-group">
+              <span class="file-title">Translated File ({{ targetLanguageTag }})</span>
+              @if (project.translatedFileName) {
+                <span class="file-name" [matTooltip]="project.translatedFileName">{{ project.translatedFileName }}</span>
+              } @else {
+                <span class="file-name muted-text">File not yet available</span>
+              }
+            </div>
+          </div>
+          <div class="download-zone success-download">
+            @if (downloadingType === 'translated') {
+              <mat-spinner [diameter]="20"></mat-spinner>
+            } @else {
+              <mat-icon>file_download</mat-icon>
+            }
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <button mat-flat-button class="close-full-width-btn" (click)="onClose()">
+      <span>CLOSE PROJECT DETAILS</span>
+    </button>
+  </mat-dialog-actions>
 </div>

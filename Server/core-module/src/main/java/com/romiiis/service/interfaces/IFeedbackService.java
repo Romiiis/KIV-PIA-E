@@ -34,5 +34,5 @@ public interface IFeedbackService {
      *
      * @param projectId ID of the project whose feedback is to be deleted
      */
-    void deleteProjectFeedback(UUID projectId) throws UserNotFoundException, ProjectNotFoundException ;
+    void deleteProjectFeedbackByProjectId(UUID projectId) throws UserNotFoundException, ProjectNotFoundException ;
 }

@@ -1,45 +1,47 @@
-/*
-  ======================================================================
-  Vylepšený designový systém pro prémiový vzhled modálního okna
-  ======================================================================
-*/
+/* --- Definice proměnných pro moderní, světlý vzhled --- */
 :host {
-  /* Rafinovaná barevná paleta */
-  --brand-primary: #4f46e5; /* Moderní, sytá modrá/fialová */
-  --brand-primary-hover: #4338ca;
-  --text-title: #1f2937; /* Tmavá, ale ne úplně černá */
-  --text-body: #4b5563;
-  --text-light: #9ca3af;
-  --border-color: #d1d5db;
-  --background-light: #f9fafb;
-  --background-hover: #f3f4f6;
-  --shadow-color-subtle: rgba(0, 0, 0, 0.04);
+  --color-primary: #5a5be8; /* Deep Indigo - pro hlavní CTA */
+  --color-primary-hover: #4a4bcd;
+  --color-accent: #3498db; /* Blue for spinner */
+  --color-background-light: #f4f6f8; /* Velmi světlé pozadí pro formulář */
+  --color-border: #e0e6ed;
+  --color-text-title: #2c3e50;
+  --color-text-body: #607d8b;
+  --color-text-light: #b0bec5;
+  --color-danger: #e74c3c;
+  --shadow-subtle: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 /* --- Hlavní kontejner a titulek --- */
 .dialog-wrapper {
-  padding: 2.5rem;
+  padding: 3rem;
   display: flex;
   flex-direction: column;
+  min-width: 450px;
 }
 
 [mat-dialog-title] {
-  font-size: 1.75rem;
-  font-weight: 700; /* Výraznější tloušťka */
-  color: var(--text-title);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-text-title);
   padding: 0;
-  margin: 0;
+  margin: 0 0 0.5rem 0;
   text-align: center;
-  letter-spacing: -0.02em; /* Jemné stažení pro moderní vzhled */
+}
+
+.title-icon {
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
+  vertical-align: middle;
 }
 
 .subtitle {
   text-align: center;
   font-size: 1rem;
-  color: var(--text-body);
-  max-width: 380px;
-  margin: 0.5rem auto 2.5rem auto;
-  line-height: 1.6;
+  color: var(--color-text-body);
+  max-width: 450px;
+  margin: 0 auto 3rem auto;
+  line-height: 1.5;
 }
 
 /* --- Kontejner pro formulář --- */
@@ -48,57 +50,80 @@
   overflow: visible !important;
 }
 
+.form-section {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background-color: var(--color-background-light);
+}
+
+.section-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-title);
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+}
+
 .form-group {
-  margin-bottom: 1.25rem;
+  margin-top: 1rem;
 }
 
 /* --- Vylepšené tlačítko pro nahrání souboru --- */
 .file-upload-button {
   width: 100%;
-  border-radius: 16px;
-  border: 1.5px dashed var(--border-color);
-  background-color: var(--background-light);
-  padding: 1.5rem 1rem;
-  font-size: 0.95rem;
+  height: 80px; /* Pevná výška pro lepší vizuální oddělení */
+  border-radius: 10px;
+  border: 2px dashed var(--color-border);
+  background-color: #fff;
+  font-size: 1rem;
   font-weight: 500;
-  color: var(--text-body);
-  /* Plynulé přechody pro všechny vlastnosti */
-  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-  background-color 0.2s, border-color 0.2s, color 0.2s;
+  color: var(--color-text-body);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .file-upload-button:hover {
-  border-color: var(--brand-primary);
-  color: var(--brand-primary);
-  background-color: #f0f2ff;
-  transform: scale(1.02); /* Jemné zvětšení při najetí */
-}
-
-/* Efekt stisknutí tlačítka */
-.file-upload-button:active {
-  transform: scale(0.99);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background-color: #f7f7ff;
+  box-shadow: 0 4px 12px rgba(90, 91, 232, 0.1);
+  transform: translateY(-1px);
 }
 
 .file-upload-button .icon {
-  margin-right: 0.5rem;
-  opacity: 0.7;
+  margin-right: 1rem;
+  font-size: 1.5rem;
+  opacity: 0.8;
+}
+
+/* --- Error message (červeně) --- */
+.error-message {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-danger);
 }
 
 /* --- Patička s tlačítky --- */
 [mat-dialog-actions] {
-  padding: 1.5rem 0 0 0;
+  padding: 2rem 0 0 0;
   display: flex;
-  gap: 0.75rem;
+  gap: 1rem;
   justify-content: flex-end;
-  /* Jemná linka pro oddělení od obsahu */
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--color-border);
   margin-top: 1rem;
 }
 
 [mat-dialog-actions] button {
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 0.8rem 1.6rem;
-  font-weight: 600; /* Tučnější písmo na tlačítkách */
+  font-weight: 600;
   font-size: 0.95rem;
   border: none;
   transition: all 0.2s ease-in-out;
@@ -106,36 +131,41 @@
 
 /* "Cancel" tlačítko */
 [mat-button] {
-  color: var(--text-body);
+  color: var(--color-text-body);
   background-color: transparent;
 }
 
 [mat-button]:hover {
-  background-color: var(--background-hover);
+  background-color: var(--color-background-light);
+  color: var(--color-text-title);
 }
 
 /* "Submit" tlačítko - hlavní akce */
 .submit-button {
-  min-width: 150px;
+  min-width: 180px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .submit-button:not(:disabled) {
-  background-color: var(--brand-primary);
+  background-color: var(--color-primary);
   color: #fff;
-  /* Jemný stín pro pocit hloubky */
-  box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.3);
+  box-shadow: 0 4px 14px 0 rgba(90, 91, 232, 0.4);
 }
 
 .submit-button:hover:not(:disabled) {
-  background-color: var(--brand-primary-hover);
-  transform: translateY(-2px); /* Efekt "vystoupení" */
-  box-shadow: 0 6px 20px 0 rgba(79, 70, 229, 0.35);
+  background-color: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 rgba(90, 91, 232, 0.5);
 }
 
 .submit-button:disabled {
   background-color: #e5e7eb;
-  color: var(--text-light);
+  color: var(--color-text-light);
+}
+
+/* Styl pro spinner */
+mat-spinner {
+  margin: 0 auto;
 }

@@ -1,53 +1,124 @@
-<button class="fab-full" (click)="openNewProjectModal()">
-  <span class="icon">➕</span>
-  <span class="label">Create New Project</span>
-</button>
-
 <div class="page-content">
-  <div class="dashboard">
-    <div class="header">
-      <div class="stat-card">📄 {{ projects | filterByStatus:ProjectStatusDomain.ASSIGNED | length }} to translate</div>
-      <div class="stat-card">📝 {{ projects | filterByStatus:ProjectStatusDomain.COMPLETED | length }} feedback</div>
-      <div class="stat-card">✅ {{ projects | filterByStatus:ProjectStatusDomain.APPROVED | length }} done</div>
-    </div>
+  <div class="project-dashboard">
 
-    <div class="timeline-board">
-      @if (!isLoading) {
-        <div class="stage created">
-          <h3>Waiting for translation</h3>
-          @for (p of projects | filterByStatus:ProjectStatusDomain.ASSIGNED; track p.id) {
-            <div class="project-card" (click)="openProjectDetails(p)">
-              <div class="title">{{ p.originalFileName }}</div>
-              <div class="lang">English → {{ p.targetLanguage }}</div>
-            </div>
-          } @empty { <p class="empty">No projects</p> }
-        </div>
+    <header class="dashboard-header">
+      <div class="header-left">
+        <h1>My Projects</h1>
+        <nav class="project-view-toggle">
+          <button
+            [class.active]="currentView === 'action'"
+            (click)="setView('action')">
+            <span>Needs My Action</span>
+            @if (actionRequiredCount > 0) {
+              <span class="action-badge">{{ actionRequiredCount }}</span>
+            }
+          </button>
+          <button
+            [class.active]="currentView === 'progress'"
+            (click)="setView('progress')">
+            <span>In Progress</span>
+          </button>
+          <button
+            [class.active]="currentView === 'history'"
+            (click)="setView('history')">
+            <span>Project History</span>
+          </button>
+        </nav>
+      </div>
 
-        <div class="stage completed">
-          <h3>Waiting for feedback</h3>
-          @for (p of projects | filterByStatus:ProjectStatusDomain.COMPLETED; track p.id) {
-            <div class="project-card" (click)="openProjectDetails(p)">
-              <div class="title">{{ p.customer.id }}</div>
-              <div class="lang">English → {{ p.targetLanguage }}</div>
-            </div>
-          } @empty { <p class="empty">No projects</p> }
-        </div>
-
-        <div class="stage approved">
-          <h3>Completed</h3>
-          @for (p of projects | filterByStatus:ProjectStatusDomain.APPROVED; track p.id) {
-            <div class="project-card" (click)="openProjectDetails(p)">
-              <div class="title">{{ p.customer.id }}</div>
-              <div class="lang">English → {{ p.targetLanguage }}</div>
-            </div>
-          } @empty { <p class="empty">No projects</p> }
-        </div>
-      } @else {
+      <div class="header-right">
+        <button class="create-project-btn" (click)="openNewProjectModal()">
+          <span class="icon">➕</span>
+          <span class="label">Create New Project</span>
+        </button>
+      </div>
+    </header>
+<!--    <div class="project-status-legend">-->
+<!--      <div class="legend-item">-->
+<!--        <span class="color-swatch state-completed"></span>-->
+<!--        <span class="label">Needs My Action</span>-->
+<!--      </div>-->
+<!--      <div class="legend-item">-->
+<!--        <span class="color-swatch state-assigned"></span>-->
+<!--        <span class="label">In Progress</span>-->
+<!--      </div>-->
+<!--      <div class="legend-item">-->
+<!--        <span class="color-swatch state-approved"></span>-->
+<!--        <span class="label">Approved</span>-->
+<!--      </div>-->
+<!--      <div class="legend-item">-->
+<!--        <span class="color-swatch state-closed"></span>-->
+<!--        <span class="label">Closed / History</span>-->
+<!--      </div>-->
+<!--    </div>-->
+    <div class="project-grid">
+      @if (isLoading) {
         <div class="loading-indicator">
           <p>Loading projects...</p>
         </div>
+      } @else {
+
+        @for (p of projectsForCurrentView; track p.id) {
+
+          <div class="project-card" [class]="'state-' + p.status.toLowerCase()">
+
+            <div class="card-content">
+              <h3 class="card-title">{{ p.originalFileName }}</h3>
+
+              <div class="project-meta">
+                <span class="meta-item">
+                  <span class="icon">📅</span>
+                  <span>Created: {{ p.createdAt | date: 'mediumDate' }}</span>
+                </span>
+              </div>
+            </div>
+
+            <footer class="card-footer">
+              @switch (p.status) {
+                @case (ProjectStatusDomain.COMPLETED) {
+                  <button class="cta-button primary" (click)="openProjectDetails(p)">
+                    <span class="icon">🗣️</span>
+                    <span class="label">Review Translation</span>
+                  </button>
+                }
+                @case (ProjectStatusDomain.ASSIGNED) {
+                  <button class="cta-button" (click)="openProjectDetails(p)">
+                    <span class="icon">⏳</span>
+                    <span class="label">View Progress</span>
+                  </button>
+                }
+                @case (ProjectStatusDomain.APPROVED) {
+                  <button class="cta-button success" (click)="openProjectDetails(p)">
+                    <span class="icon">⬇️</span>
+                    <span class="label">Download Files</span>
+                  </button>
+                }
+                @case (ProjectStatusDomain.CLOSED) {
+                  <button class="cta-button ghost" (click)="openProjectDetails(p)">
+                    <span class="icon">🗄️</span>
+                    <span class="label">View Details</span>
+                  </button>
+                }
+              }
+            </footer>
+          </div>
+
+        } @empty {
+          <div class="empty-state">
+            @switch (currentView) {
+              @case ('action') {
+                <p>All caught up! Nothing needs your action.</p>
+              }
+              @case ('progress') {
+                <p>No projects are currently in progress.</p>
+              }
+              @case ('history') {
+                <p>You have no completed or archived projects.</p>
+              }
+            }
+          </div>
+        }
       }
     </div>
   </div>
 </div>
-

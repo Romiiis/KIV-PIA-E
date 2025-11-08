@@ -1,25 +1,42 @@
 <div class="dialog-wrapper">
-  <h2 mat-dialog-title>Create New Project</h2>
+
+  <h2 mat-dialog-title>
+    <span class="title-icon">✨</span>
+    Create New Translation Project
+  </h2>
 
   <mat-dialog-content>
-    <p class="subtitle">Upload your file in English and select the target language(s).</p>
+    <p class="subtitle">Upload your source document in English and specify the required target language(s). We'll handle the assignment.</p>
 
     <form [formGroup]="projectForm">
-      <div class="form-group">
-        <button type="button" mat-stroked-button class="file-upload-button" (click)="fileInput.click()">
-          <span class="icon">📄</span>
-          <span>{{ projectForm.get('file')?.value?.name || 'Choose a file' }}</span>
-        </button>
-        <input hidden #fileInput type="file" (change)="onFileSelected($event)">
+
+      <div class="form-section">
+        <label class="section-label">1. Upload Source File</label>
+        <div class="form-group file-group">
+
+          <button type="button" class="file-upload-button" (click)="fileInput.click()" mat-stroked-button>
+            <span class="icon">{{ projectForm.get('file')?.value ? '✅' : '⬆️' }}</span>
+            <span class="label">{{ projectForm.get('file')?.value?.name || 'Drag & Drop or Click to Select File (Max 5MB)' }}</span>
+          </button>
+
+          <input hidden #fileInput type="file" (change)="onFileSelected($event)">
+
+          @if (projectForm.get('file')?.hasError('required') && projectForm.get('file')?.touched) {
+            <div class="error-message">Source file is required.</div>
+          }
+        </div>
       </div>
 
-      <div class="form-group">
-        <app-language-select
-          formControlName="targetLang"
-          [isMulti]="false"
-          [placeholder]="'Select target language(s)'"
-        ></app-language-select>
+      <div class="form-section">
+        <label class="section-label">2. Select Target Language(s)</label>
+        <div class="form-group lang-group">
+          <app-language-select
+            formControlName="targetLang"
+            [isMulti]="true" [placeholder]="'Select one or more target languages'"
+          ></app-language-select>
+        </div>
       </div>
+
     </form>
   </mat-dialog-content>
 
@@ -31,8 +48,9 @@
       [disabled]="projectForm.invalid || isLoading"
       (click)="submitProject()">
       @if (!isLoading) {
-        <span>Submit Project(s)</span> } @else {
-        <mat-spinner [diameter]="24"></mat-spinner>
+        <span>Submit {{ (projectForm.get('targetLang')?.value?.length || 0) > 1 ? 'Projects' : 'Project' }}</span>
+      } @else {
+        <mat-spinner [diameter]="24" color="accent"></mat-spinner>
       }
     </button>
   </mat-dialog-actions>

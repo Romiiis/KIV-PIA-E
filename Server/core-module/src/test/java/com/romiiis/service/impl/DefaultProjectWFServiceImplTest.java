@@ -4,7 +4,6 @@ import com.romiiis.configuration.ResourceHeader;
 import com.romiiis.domain.Feedback;
 import com.romiiis.domain.Project;
 import com.romiiis.domain.User;
-import com.romiiis.domain.UserRole;
 import com.romiiis.exception.NoAccessToOperateException;
 import com.romiiis.exception.ProjectNotFoundException;
 import com.romiiis.security.CallerContextProvider;
@@ -179,7 +178,7 @@ class DefaultProjectWFServiceImplTest {
         Project result = wfService.rejectProject(projectId, "Bad translation");
 
         assert result != null;
-        verify(feedbackService).deleteProjectFeedback(projectId);
+        verify(feedbackService).deleteProjectFeedbackByProjectId(projectId);
         verify(feedbackService).saveFeedback(any(Feedback.class));
         verify(projectService).updateProject(mockProject);
     }

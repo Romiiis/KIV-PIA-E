@@ -1,47 +1,105 @@
+<div class="page-content">
+  <div class="project-dashboard">
 
-<div class="dashboard">
-  <div class="stat-card">✅ {{ projects | filterByStatus:ProjectStatusDomain.CLOSED | length }} completed overall </div>
+    <header class="dashboard-header">
+      <div class="header-left">
+        <h1>My Translation Tasks</h1>
+        <nav class="project-view-toggle">
+          <button
+            [class.active]="currentView === 'action'"
+            (click)="setView('action')">
+            <span>New Assignments</span>
+            @if (actionRequiredCount > 0) {
+              <span class="action-badge">{{ actionRequiredCount }}</span>
+            }
+          </button>
+          <button
+            [class.active]="currentView === 'waiting'"
+            (click)="setView('waiting')">
+            <span>Waiting Customer Review</span>
+          </button>
+          <button
+            [class.active]="currentView === 'history'"
+            (click)="setView('history')">
+            <span>Closed History</span>
+          </button>
+        </nav>
+      </div>
+      <div class="header-right"></div>
+    </header>
 
-  <div class="header">
-    <div class="stat-card">📄 {{ projects | filterByStatus:ProjectStatusDomain.ASSIGNED | length }} for translation</div>
-    <!-- TODO Assigned + with feedback -->
-    <div class="stat-card">📝 {{ projects | filterByStatus:ProjectStatusDomain.ASSIGNED | length }} for customer feedback </div>
-
-    <div class="stat-card">❌ {{ projects | filterByStatus:ProjectStatusDomain.APPROVED | length }} rejected </div>
-  </div>
-
-  <div class="timeline-board">
-    <div class="stage created">
-      <h3>Waiting for your translation</h3>
-      @for (p of projects | filterByStatus:ProjectStatusDomain.CREATED; track p.id) {
-        <div class="project-card">
-          <div class="title">{{ p.customer.id }}</div>
-          <div class="lang">English → {{ p.targetLanguage }}</div>
+    <div class="project-grid">
+      @if (isLoading) {
+        <div class="loading-indicator">
+          <p>Loading tasks...</p>
         </div>
-      } @empty { <p class="empty">No projects</p> }
-    </div>
+      } @else {
 
-    <div class="stage completed">
-      <h3>Waiting for feedback</h3>
-      @for (p of projects | filterByStatus:ProjectStatusDomain.COMPLETED; track p.id) {
-        <div class="project-card">
-          <div class="title">{{ p.customer.id }}</div>
-          <div class="lang">English → {{ p.targetLanguage }}</div>
-        </div>
-      } @empty { <p class="empty">No projects</p> }
-    </div>
+        @for (p of projectsForCurrentView; track p.id) {
 
-    <div class="stage approved">
-      <h3>Rejected</h3>
-      @for (p of projects | filterByStatus:ProjectStatusDomain.APPROVED; track p.id) {
-        <div class="project-card">
-          <div class="title">{{ p.customer.id }}</div>
-          <div class="lang">English → {{ p.targetLanguage }}</div>
-        </div>
-      } @empty { <p class="empty">No projects</p> }
+          <div class="project-card" [class]="'state-' + p.status.toLowerCase()" (click)="openProjectDetails(p)">
+
+            <div class="card-content">
+              <h3 class="card-title">{{ p.originalFileName }}</h3>
+
+              <div class="project-meta">
+                <span class="meta-item">
+                  <span class="icon">📅</span>
+                  <span>Assigned: {{ p.createdAt | date: 'mediumDate' }}</span>
+                </span>
+                <span class="meta-item">
+                  <span class="icon">↔️</span>
+                  <span>EN → {{ p.targetLanguage }}</span>
+                </span>
+              </div>
+            </div>
+
+            <footer class="card-footer">
+              @switch (p.status) {
+                @case (ProjectStatusDomain.ASSIGNED) {
+                  <button class="cta-button primary" (click)="openProjectDetails(p)">
+                    <span class="icon">⬆️</span>
+                    <span class="label">Upload Translation</span>
+                  </button>
+                }
+                @case (ProjectStatusDomain.COMPLETED) {
+                  <button class="cta-button ghost" (click)="openProjectDetails(p)">
+                    <span class="icon">👀</span>
+                    <span class="label">View Status (Waiting)</span>
+                  </button>
+                }
+                @case (ProjectStatusDomain.APPROVED) {
+                  <button class="cta-button success" (click)="openProjectDetails(p)">
+                    <span class="icon">✅</span>
+                    <span class="label">View Approved</span>
+                  </button>
+                }
+                @case (ProjectStatusDomain.CLOSED) {
+                  <button class="cta-button ghost" (click)="openProjectDetails(p)">
+                    <span class="icon">🗄️</span>
+                    <span class="label">View History</span>
+                  </button>
+                }
+              }
+            </footer>
+          </div>
+
+        } @empty {
+          <div class="empty-state">
+            @switch (currentView) {
+              @case ('action') {
+                <p>All clear! You have no current translation tasks.</p>
+              }
+              @case ('waiting') {
+                <p>No tasks waiting for customer review.</p>
+              }
+              @case ('history') {
+                <p>No closed projects found.</p>
+              }
+            }
+          </div>
+        }
+      }
     </div>
   </div>
 </div>
-
-
-

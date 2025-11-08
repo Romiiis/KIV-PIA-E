@@ -1,10 +1,46 @@
 /* You can add global styles to this file, and also import other style files */
 
+:root {
+  /* Rafinovaná barevná paleta (ZÁKLAD - Váš kód) */
+  --brand-primary: #4f46e5;
+  --brand-primary-hover: #4338ca;
+  --text-title: #1f2937;
+  --text-body: #4b5563;
+  --text-light: #9ca3af;
+  --border-color: #d1d5db;
+  --background-light: #f9fafb;
+  --background-hover: #f3f4f6;
+  --shadow-color-subtle: rgba(0, 0, 0, 0.04);
+
+  /* Barevné tokeny pro statusy (Váš kód) */
+  --color-yellow-bg: #fef9c3;
+  --color-yellow-text: #713f12;
+  --color-blue-bg: #dbeafe;
+  --color-blue-text: #1e3a8a;
+  --color-green-bg: #dcfce7;
+  --color-green-text: #155e2b;
+
+  /* SDÍLENÉ BAREVNÉ TOKENS Z CUSTOMER PAGE, Mapované na globální paletu */
+  --c-primary: #3498db;
+  --c-success: #2ecc71;
+  --c-warning: #f39c12;
+  --c-danger: #e74c3c;
+  --c-neutral: #95a5a6;
+  --c-bg-page: #f9fafc;
+  --c-bg-white: #fff;
+  --c-text-dark: #2c3e50;
+  --c-text-light: #7f8c8d;
+  --c-border: #eef2f7;
+  --c-shadow: rgba(0, 0, 0, 0.05);
+}
+
+
 
 html, body { height: 100%; }
 body { font-family: Roboto, "Helvetica Neue", sans-serif; }
+
 .clean-dialog-panel .mat-mdc-dialog-container .mdc-dialog__surface {
-  border-radius: 24px !important; /* Velký radius jako na obrázku */
+  border-radius: 24px !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
-  padding: 0 !important; /* Vnitřní styly si řídíme sami */
+  padding: 0 !important;
 }

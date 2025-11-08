@@ -31,7 +31,6 @@ public interface MongoFeedbackRepository extends MongoRepository<FeedbackDB, UUI
      *
      * @param projectId the UUID of the project whose feedback is to be deleted
      */
-    @Query(value = "{ 'project.$id': ?0 }", delete = true)
     void deleteByProjectId(UUID projectId);
 
 }
