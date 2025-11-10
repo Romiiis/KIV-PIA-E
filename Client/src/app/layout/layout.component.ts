@@ -5,54 +5,48 @@ import {Router, RouterOutlet, RouterModule} from '@angular/router';
 import {ToastrService} from 'ngx-toastr';
 import {AuthRoutingHelper} from '@core/auth/auth-routing.helper';
 import {MatIcon} from '@angular/material/icon';
+import {
+  TranslatorSettingsModalComponent
+} from '@features/translator/translator-settings.component/translator-settings-modal.component';
+import {MatDialog} from '@angular/material/dialog';
+import {LanguageService, SupportedLanguage} from '@core/services/language.service';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [NgIf, RouterOutlet, RouterModule, CommonModule, MatIcon],
+  imports: [NgIf, RouterOutlet, RouterModule, CommonModule, MatIcon, TranslatePipe],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.css',
 })
-/**
- * Layout component that manages the overall application layout,
- * including the user menu, language switching, and logout functionality.
- */
+
 export class LayoutComponent {
 
-  // Flag to show or hide the user menu
   showMenu = false;
-  // NOVÁ VLASTNOST: pro zobrazení dropdownu jazyka
   showLangDropdown = false;
-  // Current active language (mock signal for UI update)
-  activeLanguage = signal<'en' | 'cs'>('en');
-
-  // Timeout reference for closing the menu
   closeTimeout: any;
-
-  // Current authenticated user (read-only signal from AuthManager)
   user;
 
+  protected readonly SupportedLanguage = SupportedLanguage;
 
-  /**
-   * Constructor to inject dependencies.
-   */
   constructor(
     private authService: AuthManager,
     private router: Router,
-    protected toastr: ToastrService) {
+    protected toastr: ToastrService,
+    public dialog: MatDialog,
+    public languageService: LanguageService,
+    private translate: TranslateService
+  ){
 
     this.user = this.authService.user();
   }
 
-  /**
-   * Toggle the visibility of the user menu.
-   */
+
   toggleMenu() {
     this.showMenu = !this.showMenu;
   }
 
-  /**
-   * Open the user menu and clear any pending close timeout.
-   */
+
   openMenu() {
     if (this.closeTimeout) {
       clearTimeout(this.closeTimeout);
@@ -60,9 +54,7 @@ export class LayoutComponent {
     this.showMenu = true;
   }
 
-  /**
-   * Close the user menu after a short delay.
-   */
+
   closeMenu() {
     this.closeTimeout = setTimeout(() => (this.showMenu = false), 250);
   }
@@ -78,24 +70,12 @@ export class LayoutComponent {
     this.closeTimeout = setTimeout(() => (this.showLangDropdown = false), 250);
   }
 
-  /**
-   * MOCK: Switches the application language (English/Czech).
-   * @param lang The language code ('en' or 'cs').
-   */
-  switchLanguage(lang: 'en' | 'cs') {
-    this.activeLanguage.set(lang);
-    this.showLangDropdown = false; // Zavřít po výběru
-    this.toastr.info(`Language switched to ${lang.toUpperCase()}. (MOCK)`);
-  }
 
-  /**
-   * Detect clicks outside the user menu to close it.
-   * @param event Click event
-   */
+
   @HostListener('document:click', ['$event'])
   clickOutside(event: Event) {
     const target = event.target as HTMLElement;
-    // Kontrola kliknutí mimo OBA DROPDOWNY
+
     if (!target.closest('.user-menu-wrapper')) {
       this.showMenu = false;
     }
@@ -104,13 +84,23 @@ export class LayoutComponent {
     }
   }
 
-  /**
-   * Logout the user and navigate to the authentication page.
-   */
+  openSettingsModal(): void {
+    this.dialog.open(TranslatorSettingsModalComponent, {
+      width: '600px',
+      maxWidth: '95vw',
+      panelClass: 'clean-dialog-panel',
+      disableClose: true
+    });
+  }
+
+
   logout() {
     this.authService.logout().then(() => {
         AuthRoutingHelper.navigateToAuth(this.router).then(
-          () => this.toastr.success('Logged out successfully.')
+          () => {
+            let logoutSuccessText = this.translate.instant('layout.notifications.logoutSuccess_text');
+            this.toastr.success(logoutSuccessText);
+          }
         )
       }
     );

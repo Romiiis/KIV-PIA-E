@@ -36,7 +36,7 @@ public class ServiceConfiguration {
 
     @Bean
     public IFeedbackService feedbackService(IFeedbackRepository feedbackRepository, IProjectService projectService, CallerContextProvider callerContextProvider) {
-        return new DefaultFeedbackServiceImpl(feedbackRepository,projectService, callerContextProvider);
+        return new DefaultFeedbackServiceImpl(feedbackRepository, projectService, callerContextProvider);
     }
 
     @Bean
@@ -45,12 +45,12 @@ public class ServiceConfiguration {
     }
 
     @Bean
-    public IProjectService projectService(IUserService userService, IProjectRepository projectRepository, IFileSystemService fsService, CallerContextProvider callerContextProvider) {
-        return new DefaultProjectServiceImpl(userService, projectRepository, fsService, callerContextProvider);
+    public IProjectService projectService(IUserService userService, IProjectRepository projectRepository, IFileSystemService fsService, CallerContextProvider callerContextProvider, IFeedbackRepository feedbackRepository) {
+        return new DefaultProjectServiceImpl(userService, projectRepository, feedbackRepository, fsService,  callerContextProvider);
     }
 
     @Bean
-    public IProjectWFService projectWorkflowService(IFileSystemService fsService, IProjectService projectService, IFeedbackService feedbackService,  CallerContextProvider callerContextProvider) {
+    public IProjectWFService projectWorkflowService(IFileSystemService fsService, IProjectService projectService, IFeedbackService feedbackService, CallerContextProvider callerContextProvider) {
         return new DefaultProjectWFServiceImpl(fsService, projectService, feedbackService, callerContextProvider);
     }
 

@@ -1,0 +1,49 @@
+<div class="dialog-wrapper">
+
+  <div class="dialog-header">
+    <h2 mat-dialog-title>My Language Settings</h2>
+    <button mat-icon-button class="close-icon-btn" aria-label="Close dialog" (click)="onClose()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <form [formGroup]="form">
+      <section class="detail-section">
+        <h3>
+          <mat-icon>translate</mat-icon>
+          My Languages
+        </h3>
+
+        <p class="form-description">
+          Select the languages you want to translate. These will be used to assign you new projects.
+        </p>
+
+        <app-language-select
+          [isMulti]="true"
+          formControlName="languages"
+          [placeholder]="'Select languages...'"
+        ></app-language-select>
+
+      </section>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="actions-container">
+    <button mat-button (click)="onClose()">
+      Cancel
+    </button>
+    <button
+      mat-flat-button
+      class="submit-button"
+      (click)="saveSettings()"
+      [disabled]="isLoading || form.pristine || form.invalid">
+      @if (!isLoading) {
+        <span>Save Changes</span>
+      } @else {
+        <mat-spinner [diameter]="24" color="accent"></mat-spinner>
+      }
+    </button>
+  </mat-dialog-actions>
+
+</div>

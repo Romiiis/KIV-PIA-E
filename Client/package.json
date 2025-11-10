@@ -58,7 +58,9 @@
     "axios": "^1.13.2",
     "class-transformer": "^0.5.1",
     "reflect-metadata": "^0.2.2",
-    "@angular/material": "^20.2.12"
+    "@angular/material": "^20.2.12",
+    "@ngx-translate/core": "^17.0.0",
+    "@ngx-translate/http-loader": "^17.0.0"
   }
 
 

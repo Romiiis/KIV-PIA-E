@@ -1,0 +1,28 @@
+<div class="dialog-wrapper">
+
+  <ng-content select="[slot='header']"></ng-content>
+
+  <div class="meta-info-header">
+    <div class="status-box">
+      <span class="status-badge" [ngClass]="'status-badge-' + project.getStatusClass()">
+        {{ 'projectStatus.' + (project.getStatusClass() | lowercase) | translate }}
+      </span>
+    </div>
+    <div class="meta-item">
+      <mat-icon>calendar_today</mat-icon>
+      <span>{{"projectDetailTemplate.created" | translate}}: {{ project.createdAt | date:'mediumDate' }}</span>
+    </div>
+    <div class="meta-item">
+      <mat-icon>translate</mat-icon>
+      <span>{{ sourceLanguageTag }} → {{ targetLanguageTag }}</span>
+    </div>
+  </div>
+
+  <mat-dialog-content>
+    <ng-content select="[slot='content']"></ng-content>
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <ng-content select="[slot='actions']"></ng-content>
+  </mat-dialog-actions>
+</div>

@@ -1,6 +1,10 @@
-import {Component, inject, OnInit, signal} from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import {AuthManager} from '@core/auth/auth.manager';
+import {Component, signal} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
+import {LanguageService} from '@core/services/language.service';
+import {registerLocaleData} from '@angular/common';
+import localeCs from '@angular/common/locales/cs';
+import localeEn from '@angular/common/locales/en';
 
 @Component({
   selector: 'app-root',
@@ -8,7 +12,14 @@ import {AuthManager} from '@core/auth/auth.manager';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App{
+export class App {
   protected readonly title = signal('Client');
+  constructor(private langService: LanguageService) {
+
+    registerLocaleData(localeCs);
+    registerLocaleData(localeEn);
+
+
+  }
 
 }

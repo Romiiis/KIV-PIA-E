@@ -1,12 +1,18 @@
 package com.romiiis.configuration;
 
 import com.romiiis.filter.ProjectsFilter;
+import org.bson.Document;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
+
+import java.util.ArrayList;
 
 /**
  * Utility class for converting ProjectsFilter to MongoDB Criteria.
  */
 public class ProjectMongoFilter {
+
+    static MongoTemplate mongoTemplate;
 
     /**
      * Converts a ProjectsFilter object to a MongoDB Criteria object.
@@ -29,11 +35,6 @@ public class ProjectMongoFilter {
         if (filter.getLanguageCode() != null) {
             finalCriteria = finalCriteria.and("targetLanguage").is(filter.getLanguageCode());
         }
-
-        // TODO - This is not in project model
-//        if (filter.isHasFeedback()) {
-//            finalCriteria = finalCriteria.and("feedback").exists(true);
-//        }
 
 
         if (filter.getCustomerId() != null) {

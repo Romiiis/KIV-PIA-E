@@ -50,8 +50,8 @@ public class ProjectController implements ProjectsApi {
                 .setLanguageCode(languageCode)
                 .setStatus(commonMapper.mapProjectStateDTOToDomain(state));
 
-        var projects = projectService.getAllProjects(filter);
-        return ResponseEntity.ok(projectMapper.mapDomainListToDTO(projects));
+        var projects = projectService.getAllProjectsWithFeedback(filter);
+        return ResponseEntity.ok(projectMapper.mapListWrapperProjectFeedbackToDTO(projects));
     }
 
     /**

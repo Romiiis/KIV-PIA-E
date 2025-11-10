@@ -3,101 +3,121 @@
 
     <header class="dashboard-header">
       <div class="header-left">
-        <h1>My Projects</h1>
-        <nav class="project-view-toggle">
-          <button
-            [class.active]="currentView === 'action'"
-            (click)="setView('action')">
-            <span>Needs My Action</span>
-            @if (actionRequiredCount > 0) {
-              <span class="action-badge">{{ actionRequiredCount }}</span>
-            }
-          </button>
-          <button
-            [class.active]="currentView === 'progress'"
-            (click)="setView('progress')">
-            <span>In Progress</span>
-          </button>
-          <button
-            [class.active]="currentView === 'history'"
-            (click)="setView('history')">
-            <span>Project History</span>
-          </button>
-        </nav>
+        <h1>{{ "customerPage.myProjects" | translate }}</h1>
       </div>
-
+      <div class="project-status-legend">
+        <div class="legend-item">
+          <span class="color-swatch state-assigned"></span>
+          <span>{{ "customerPage.legend.assigned" | translate }}</span>
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-rework"></span>
+          {{ "customerPage.legend.rework" | translate }}
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-completed"></span>
+          {{ "customerPage.legend.completed" | translate }}
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-approved"></span>
+          {{ "customerPage.legend.approved" | translate }}
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-canceled"></span>
+          {{ "customerPage.legend.canceled" | translate }}
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-closed"></span>
+          {{ "customerPage.legend.closed_created" | translate }}
+        </div>
+      </div>
       <div class="header-right">
         <button class="create-project-btn" (click)="openNewProjectModal()">
           <span class="icon">➕</span>
-          <span class="label">Create New Project</span>
+          <span class="label">{{ "customerPage.createProjectButton" | translate }}</span>
         </button>
       </div>
     </header>
-<!--    <div class="project-status-legend">-->
-<!--      <div class="legend-item">-->
-<!--        <span class="color-swatch state-completed"></span>-->
-<!--        <span class="label">Needs My Action</span>-->
-<!--      </div>-->
-<!--      <div class="legend-item">-->
-<!--        <span class="color-swatch state-assigned"></span>-->
-<!--        <span class="label">In Progress</span>-->
-<!--      </div>-->
-<!--      <div class="legend-item">-->
-<!--        <span class="color-swatch state-approved"></span>-->
-<!--        <span class="label">Approved</span>-->
-<!--      </div>-->
-<!--      <div class="legend-item">-->
-<!--        <span class="color-swatch state-closed"></span>-->
-<!--        <span class="label">Closed / History</span>-->
-<!--      </div>-->
-<!--    </div>-->
+
+    <nav class="project-view-toggle">
+      <button
+        [class.active]="currentView === 'action'"
+        (click)="setView('action')">
+        <span>{{ 'customerPage.view.actionRequired' | translate }}</span>
+
+        @if (actionRequiredCount > 0) {
+          <span class="action-badge">{{ actionRequiredCount }}</span>
+        }
+
+      </button>
+      <button
+        [class.active]="currentView === 'progress'"
+        (click)="setView('progress')">
+        <span>{{ 'customerPage.view.inProgress' | translate }}</span>
+      </button>
+      <button
+        [class.active]="currentView === 'history'"
+        (click)="setView('history')">
+        <span>{{ 'customerPage.view.history' | translate }}</span>
+      </button>
+    </nav>
+
+
     <div class="project-grid">
       @if (isLoading) {
         <div class="loading-indicator">
-          <p>Loading projects...</p>
+          <p>{{ "customerPage.loadingProjects" | translate }}</p>
         </div>
+
       } @else {
 
         @for (p of projectsForCurrentView; track p.id) {
 
-          <div class="project-card" [class]="'state-' + p.status.toLowerCase()">
+          <div class="project-card" [class]="'status-badge-' + p.getStatusClass()">
 
             <div class="card-content">
-              <h3 class="card-title">{{ p.originalFileName }}</h3>
+              <div class="status-box">
+
+                <h3 class="card-title">{{ p.originalFileName }}</h3>
+                <span class="status-badge" [ngClass]="'status-badge-' + p.getStatusClass()">
+                      {{ 'projectStatus.' + (p.getStatusClass() | lowercase) | translate }}
+                </span>
+              </div>
+
 
               <div class="project-meta">
                 <span class="meta-item">
                   <span class="icon">📅</span>
-                  <span>Created: {{ p.createdAt | date: 'mediumDate' }}</span>
+                  <span>{{ "customerPage.created" | translate }}: {{ p.createdAt | date: 'mediumDate'  : this.languageService.activeLanguage()}}</span>
                 </span>
               </div>
             </div>
 
             <footer class="card-footer">
-              @switch (p.status) {
-                @case (ProjectStatusDomain.COMPLETED) {
+              @switch (currentView) {
+                @case ('action') {
                   <button class="cta-button primary" (click)="openProjectReview(p)">
-                    <span class="icon">🗣️</span>
-                    <span class="label">Review Translation</span>
+                    <span class="label"> {{ "customerPage.reviewButton" | translate }} </span>
                   </button>
                 }
-                @case (ProjectStatusDomain.ASSIGNED) {
+                @case ('progress') {
                   <button class="cta-button" (click)="openProjectDetails(p)">
-                    <span class="icon">⏳</span>
-                    <span class="label">View Progress</span>
+                    <span class="label"> {{ "customerPage.viewDetailsButton" | translate }} </span>
                   </button>
                 }
-                @case (ProjectStatusDomain.APPROVED) {
-                  <button class="cta-button success" (click)="openProjectDetails(p)">
-                    <span class="icon">⬇️</span>
-                    <span class="label">Download Files</span>
-                  </button>
-                }
-                @case (ProjectStatusDomain.CLOSED) {
-                  <button class="cta-button ghost" (click)="openProjectDetails(p)">
-                    <span class="icon">🗄️</span>
-                    <span class="label">View Details</span>
-                  </button>
+                @case ('history') {
+                  @switch (p.status) {
+                    @case (ProjectStatusDomain.APPROVED) {
+                      <button class="cta-button success" (click)="openProjectDetails(p)">
+                        <span class="label">{{ "customerPage.downloadButton" | translate }} </span>
+                      </button>
+                    }
+                    @case (ProjectStatusDomain.CLOSED) {
+                      <button class="cta-button ghost" (click)="openProjectDetails(p)">
+                        <span class="label">{{ "customerPage.viewArchiveButton" | translate }} </span>
+                      </button>
+                    }
+                  }
                 }
               }
             </footer>
@@ -107,13 +127,13 @@
           <div class="empty-state">
             @switch (currentView) {
               @case ('action') {
-                <p>All caught up! Nothing needs your action.</p>
+                <p>{{ "customerPage.noAction" | translate }}</p>
               }
               @case ('progress') {
-                <p>No projects are currently in progress.</p>
+                <p>{{ "customerPage.noInProgress" | translate }}</p>
               }
               @case ('history') {
-                <p>You have no completed or archived projects.</p>
+                <p>{{ "customerPage.noHistory" | translate }}</p>
               }
             }
           </div>

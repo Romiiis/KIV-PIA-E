@@ -21,17 +21,17 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ProjectDB {
     @Id
-    private UUID id;
+    protected UUID id;
 
     @DBRef
-    private UserDB customer;
+    protected UserDB customer;
     @DBRef
-    private UserDB translator;
+    protected UserDB translator;
 
-    private Locale targetLanguage;
-    private String originalFileName;
-    private String translatedFileName;
-    private ProjectStateDB state;
-    private Instant createdAt;
+    protected Locale targetLanguage;
+    protected String originalFileName;
+    protected String translatedFileName;
+    protected ProjectStateDB state;
+    protected Instant createdAt;
 
 }

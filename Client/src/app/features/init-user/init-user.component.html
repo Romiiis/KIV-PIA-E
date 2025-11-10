@@ -1,10 +1,12 @@
 <div class="page-background">
   <form class="init-container" [formGroup]="form">
-    <h1 class="title">Welcome to LinguaFlow 🌍</h1>
-    <p class="subtitle">Please confirm your primary role to set up your dashboard.</p>
+    <h1 class="title">
+      <mat-icon>translate</mat-icon>
+      {{ 'initPage.title' | translate }}</h1>
+    <p class="subtitle">{{ 'initPage.subtitle' | translate }}</p>
 
     <div class="form-section">
-      <label class="section-label">1. Select your primary role:</label>
+      <label class="section-label">{{ 'initPage.role.label' | translate }}</label>
       <div class="role-tabs">
 
         <button
@@ -14,8 +16,8 @@
           [class.active]="form.get('role')?.value === UserRoleDomain.CUSTOMER"
         >
           <span class="icon">💼</span>
-          <span class="role-name">Customer</span>
-          <span class="role-desc">Need translations done.</span>
+          <span class="role-name">{{ 'global.customer' | translate }}</span>
+          <span class="role-desc">{{ 'initPage.role.customer.description' | translate }}</span>
         </button>
 
         <button
@@ -25,26 +27,28 @@
           [class.active]="form.get('role')?.value === UserRoleDomain.TRANSLATOR"
         >
           <span class="icon">✍️</span>
-          <span class="role-name">Translator</span>
-          <span class="role-desc">Provide translation services.</span>
+          <span class="role-name">{{ 'global.translator' | translate }}</span>
+          <span class="role-desc">{{ 'initPage.role.translator.description' | translate }}</span>
         </button>
       </div>
     </div>
 
-    <div class="form-section" *ngIf="form.get('role')?.value === UserRoleDomain.TRANSLATOR">
-      <label class="section-label">2. Select languages you translate:</label>
+    @if (form.get('role')?.value === UserRoleDomain.TRANSLATOR) {
+      <div class="form-section">
+        <label class="section-label">{{ 'initPage.language.label' | translate }}</label>
 
-      <app-language-select
-        [isMulti]="true"
-        formControlName="languages">
-      </app-language-select>
+        <app-language-select
+          [isMulti]="true"
+          formControlName="languages">
+        </app-language-select>
 
-      <p class="lang-note">You must select at least one language pair (English source is implicit).</p>
-    </div>
+        <p class="lang-note">{{ 'initPage.language.note' | translate }}</p>
+      </div>
+    }
 
     <button class="save-btn" (click)="saveSelection()">
       <span class="icon">🚀</span>
-      Finish Setup
+      {{ 'initPage.button.finish' | translate }}
     </button>
   </form>
 </div>

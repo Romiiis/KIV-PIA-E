@@ -1,7 +1,7 @@
-<div class="dialog-wrapper">
-  <!-- Header s názvem a křížkem -->
-  <div class="dialog-header">
-    <h2 mat-dialog-title>Review Translation: {{ project.originalFileName }}</h2>
+<app-project-modal-layout [project]="project">
+
+  <div class="dialog-header" slot="header">
+    <h2 mat-dialog-title>{{ "projectReviewModal.title" | translate }}: {{ project.originalFileName }}</h2>
 
     <button mat-icon-button
             class="close-icon-btn"
@@ -11,28 +11,12 @@
     </button>
   </div>
 
-  <mat-dialog-content class="content-wrapper">
-    <div class="meta-info-header">
-      <div class="status-box">
-      <span class="status-badge" [ngClass]="project.status">
-        {{ project.status | titlecase }}
-      </span>
-      </div>
-      <div class="meta-item">
-        <mat-icon>calendar_today</mat-icon>
-        <span>Created: {{ project.createdAt | date:'mediumDate' }}</span>
-      </div>
-      <div class="meta-item">
-        <mat-icon>translate</mat-icon>
-        <span>{{ sourceLanguageTag }} → {{ targetLanguageTag }}</span>
-      </div>
-    </div>
-
+  <div slot="content">
     <section class="detail-section files-section">
-      <h3><mat-icon>folder</mat-icon> Review File</h3>
+      <h3><mat-icon>folder</mat-icon> {{ "projectReviewModal.downloadFilesHeader" | translate }}</h3>
       <div class="file-action-note">
         <mat-icon>visibility</mat-icon>
-        <span>Download and carefully review the file before proceeding with acceptance or rejection.</span>
+        <span>{{ "projectReviewModal.downloadFilesNote" | translate }}</span>
       </div>
 
       <button mat-stroked-button
@@ -44,40 +28,40 @@
         } @else {
           <mat-icon>cloud_download</mat-icon>
         }
-        <span>Download Translated File</span>
+
+        <span>{{ "projectReviewModal.downloadTranslatedFileButton" | translate }} </span>
       </button>
     </section>
 
     <form [formGroup]="feedbackForm" class="detail-section feedback-area" *ngIf="isRejecting">
-      <h3><mat-icon>edit_note</mat-icon> Provide Rejection Feedback</h3>
+      <h3><mat-icon>edit_note</mat-icon> {{ "projectReviewModal.rejectionReasonHeader" | translate }}</h3>
       <mat-form-field appearance="outline" class="full-width-input">
-        <mat-label>Reason for Rejection</mat-label>
+        <mat-label>{{ "projectReviewModal.rejectionReasonLabel" | translate }}</mat-label>
         <textarea matInput
                   formControlName="feedback"
                   rows="4"
-                  placeholder="Explain what needs to be fixed or why the translation is unsatisfactory."></textarea>
+                  placeholder='{{ "projectReviewModal.rejectionReasonPlaceholder" | translate }}'></textarea>
       </mat-form-field>
     </form>
-  </mat-dialog-content>
+  </div>
 
-  <mat-dialog-actions align="end">
-    <div class="actions-container">
-      <button mat-button
-              class="action-btn reject-btn"
-              [class.reject-active]="isRejecting"
-              [disabled]="isLoading"
-              (click)="isRejecting ? onReject() : toggleRejectMode()">
-        <mat-icon>{{ isRejecting ? 'cancel' : 'thumb_down' }}</mat-icon>
-        <span>{{ isRejecting ? 'Reject' : 'Reject' }}</span>
-      </button>
+  <div class="actions-container" slot="actions">
+    <button mat-button
+            class="action-btn reject-btn"
+            [class.reject-active]="isRejecting"
+            [disabled]="isLoading"
+            (click)="isRejecting ? onReject() : toggleRejectMode()">
+      <mat-icon>{{ isRejecting ? 'cancel' : 'thumb_down' }}</mat-icon>
+      <span>{{"projectReviewModal.rejectButton" | translate}}</span>
+    </button>
 
-      <button mat-button
-              class="action-btn accept-btn"
-              [disabled]="isLoading || isRejecting"
-              (click)="onApprove()">
-        <mat-icon>check_circle</mat-icon>
-        <span>Accept</span>
-      </button>
-    </div>
-  </mat-dialog-actions>
-</div>
+    <button mat-button
+            class="action-btn accept-btn"
+            [disabled]="isLoading || isRejecting"
+            (click)="onApprove()">
+      <mat-icon>check_circle</mat-icon>
+      <span>{{"projectReviewModal.approveButton" | translate}}</span>
+    </button>
+  </div>
+
+</app-project-modal-layout>

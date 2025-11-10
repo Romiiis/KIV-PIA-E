@@ -10,14 +10,14 @@ import {NgOptimizedImage} from '@angular/common';
 
 
 import {routes} from './app.routes';
-import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+import {HttpClient, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {provideAngularQuery} from '@tanstack/angular-query-experimental';
 import {QueryClient} from '@tanstack/query-core';
 import {AuthManager} from '@core/auth/auth.manager';
 import {ToastrModule} from 'ngx-toastr';
 import {provideAnimations} from '@angular/platform-browser/animations';
-
-
+import {provideTranslateService} from '@ngx-translate/core';
+import {provideTranslateHttpLoader} from '@ngx-translate/http-loader';
 export const appConfig: ApplicationConfig = {
 
   providers: [
@@ -44,6 +44,14 @@ export const appConfig: ApplicationConfig = {
         closeButton: true,
       })
     ),
+    provideTranslateService({
+      loader: provideTranslateHttpLoader({
+        prefix: '/i18n/',
+        suffix: '.json'
+      }),
+      fallbackLang: 'en',
+      lang: 'cs'
+    })
 
 
   ]

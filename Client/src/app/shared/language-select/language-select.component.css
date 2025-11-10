@@ -16,6 +16,13 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+.color-swatch.state-rework { background-color: var(--color-orange-text); }
+.color-swatch.state-assigned { background-color: var(--color-yellow-text); }
+.color-swatch.state-completed { background-color: var(--color-blue-bg); }
+.color-swatch.state-approved { background-color: var(--color-green-text); }
+.color-swatch.state-canceled { background-color: var(--color-red-text); }
+.color-swatch.state-closed { background-color: var(--neutral-color); }
+
 .custom-language-select .language-input::placeholder {
   color: #9ca3af;
 }

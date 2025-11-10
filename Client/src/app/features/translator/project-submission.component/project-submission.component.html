@@ -1,0 +1,119 @@
+<app-project-modal-layout [project]="project">
+
+  <div class="dialog-header" slot="header">
+    <h2 mat-dialog-title>
+      @if (project.feedback) {
+        Resubmit Translation (Rework)
+      } @else {
+        Submit Translation
+      }
+    </h2>
+    <button mat-icon-button class="close-icon-btn" aria-label="Close dialog" (click)="onClose()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div slot="content">
+    @if (project.feedback) {
+      <p class="subtitle">The customer has requested revisions. Please review the feedback, download the original file, and upload the corrected version.</p>
+    } @else {
+      <p class="subtitle">Download the source file, complete your translation, and upload the final document.</p>
+    }
+
+    <section class="detail-section">
+      <h3>
+        <mat-icon>{{ project.feedback ? 'rate_review' : 'cloud_download' }}</mat-icon>
+        @if (project.feedback) {
+          Step 1: Review Feedback & Download
+        } @else {
+          Step 1: Download Source File
+        }
+      </h3>
+
+      @if (project.feedback) {
+        <div class="feedback-note rework-note">
+          <h4>
+            <mat-icon>warning_amber</mat-icon>
+            Customer Feedback
+          </h4>
+          <div class="feedback-content">
+            <p class="feedback-text">
+              {{ project.feedback.text }}
+            </p>
+            <span class="feedback-date">
+              Received: {{ project.feedback.createdAt | date:'short' }}
+            </span>
+          </div>
+
+          <button mat-stroked-button
+                  (click)="onDownloadOriginal()"
+                  [disabled]="isDownloading"
+                  class="download-link-btn">
+            @if (isDownloading) {
+              <mat-spinner [diameter]="20"></mat-spinner>
+            } @else {
+              <mat-icon>file_download</mat-icon>
+            }
+            <span>Download: {{ project.originalFileName }}</span>
+          </button>
+        </div>
+      } @else {
+        <button mat-stroked-button
+                (click)="onDownloadOriginal()"
+                [disabled]="isDownloading"
+                class="download-link-btn">
+          @if (isDownloading) {
+            <mat-spinner [diameter]="20"></mat-spinner>
+          } @else {
+            <mat-icon>file_download</mat-icon>
+          }
+          <span>Download: {{ project.originalFileName }}</span>
+        </button>
+      }
+    </section>
+    <section class="detail-section">
+      <h3>
+        <mat-icon>cloud_upload</mat-icon>
+        @if (project.feedback) {
+          Step 2: Upload Corrected File
+        } @else {
+          Step 2: Upload Translated File
+        }
+      </h3>
+      <form [formGroup]="uploadForm">
+        <div class="form-group file-group">
+
+          <button type="button" class="file-upload-button" (click)="fileInput.click()" mat-stroked-button>
+            <span class="icon">{{ uploadForm.get('file')?.value ? '✅' : '⬆️' }}</span>
+            <span class="label">{{ uploadForm.get('file')?.value?.name || (project.feedback ? 'Drag & Drop Corrected File' : 'Drag & Drop Translated File') }}</span>
+          </button>
+
+          <input hidden #fileInput type="file" (change)="onFileSelected($event)">
+
+          @if (uploadForm.get('file')?.hasError('required') && uploadForm.get('file')?.touched) {
+            <div class="error-message">Corrected file is required.</div>
+          }
+        </div>
+      </form>
+    </section>
+
+  </div>
+
+  <div class="actions-container" slot="actions">
+    <button mat-button (click)="onClose()">Cancel</button>
+    <button
+      mat-flat-button
+      class="submit-button"
+      [disabled]="uploadForm.invalid || isLoading"
+      (click)="submitTranslation()">
+      @if (!isLoading) {
+        <span>
+          {{ project.feedback ? 'Submit Correction' : 'Submit Translation' }}
+        </span>
+      } @else {
+        <mat-spinner [diameter]="24" color="accent"></mat-spinner>
+      }
+    </button>
+  </div>
+
+</app-project-modal-layout>

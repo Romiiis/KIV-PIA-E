@@ -27,7 +27,6 @@ export const routes: Routes = [
       { path: 'admin', component: AdminPageComponent },
     ],
   },
-  // INIT user page for setting role
   {
     path: 'init',
     component: InitUserComponent,

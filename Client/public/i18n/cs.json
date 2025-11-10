@@ -1,0 +1,171 @@
+{
+  "global": {
+    "customer": "Zákazník",
+    "translator": "Překladatel",
+    "sourceLanguage": "Zdrojový jazyk",
+    "targetLanguage": "Cílový jazyk",
+    "admin": "Administrátor",
+    "success": "Úspěch",
+    "error": "Chyba",
+    "required": "Povinné",
+    "rejected": "Odmítnuto"
+  },
+  "projectStatus": {
+    "assigned": "Přiřazeno",
+    "completed": "Dokončeno",
+    "approved": "Schváleno",
+    "canceled": "Zrušeno",
+    "closed": "Uzavřeno",
+    "rework": "K přepracování"
+  },
+  "initPage": {
+    "title": "Vítejte v LinguaFlow",
+    "subtitle": "Pro nastavení vašeho účtu prosím potvrďte svou hlavní roli.",
+    "role": {
+      "label": "1. Vyberte svou hlavní roli:",
+      "customer": {
+        "description": "Potřebuji zajistit překlady."
+      },
+      "translator": {
+        "description": "Poskytuji překladatelské služby."
+      }
+    },
+    "language": {
+      "label": "2. Vyberte jazyky, které překládáte:",
+      "note": "Musíte vybrat alespoň jeden jazyk."
+    },
+    "button": {
+      "finish": "Dokončit nastavení"
+    },
+    "notifications": {
+      "initSuccess_title": "Úspěch",
+      "initSuccess_text": "Inicializace uživatele byla úspěšná"
+    }
+  },
+  "authPage": {
+    "subtitle": "Přeložte své dokumenty snadno",
+    "tabLogin": "Přihlásit se",
+    "tabRegister": "Registrovat se",
+    "login": {
+      "title": "Přihlásit se",
+      "oauth": "Pokračovat přes Google",
+      "divider": "nebo použijte svůj e-mail",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "Zadejte svůj e-mail",
+      "passwordLabel": "Heslo",
+      "passwordPlaceholder": "Zadejte své heslo",
+      "button": "Přihlásit se"
+    },
+    "register": {
+      "title": "Vytvořit účet",
+      "oauth": "Registrovat se přes Google",
+      "divider": "nebo vyplňte formulář",
+      "nameLabel": "Celé jméno",
+      "namePlaceholder": "Zadejte své celé jméno",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "Zadejte svůj e-mail",
+      "passwordLabel": "Heslo",
+      "passwordPlaceholder": "Vytvořte si heslo",
+      "confirmPasswordLabel": "Potvrdit heslo",
+      "confirmPasswordPlaceholder": "Zopakujte své heslo",
+      "button": "Registrovat se"
+    }
+  },
+  "customerPage": {
+    "myProjects": "Moje projekty",
+    "legend": {
+      "assigned": "Přiřazeno",
+      "rework": "K přepracování",
+      "completed": "Ke schválení",
+      "approved": "Schváleno",
+      "canceled": "Zrušeno",
+      "closed_created": "Uzavřeno/Vytvořeno"
+    },
+    "createProjectButton": "Vytvořit nový projekt",
+    "view": {
+      "actionRequired": "Vyžadována akce",
+      "inProgress": "Probíhá překlad",
+      "history": "Historie projektů"
+    },
+    "loadingProjects": "Načítání projektů...",
+    "created": "Vytvořeno",
+    "reviewButton": "Zkontrolovat překlad",
+    "viewDetailsButton": "Zobrazit detaily projektu",
+    "downloadButton": "Zobrazit a stáhnout překlad",
+    "viewArchiveButton": "Zobrazit archivovaný projekt",
+    "noAction": "Všechno hotovo! Žádná akce není momentálně vyžadována.",
+    "noInProgress": "Momentálně nejsou žádné probíhající projekty.",
+    "noHistory": "Zatím nemáte žádnou historii projektů."
+  },
+  "createProjectModal": {
+    "notifications": {
+      "projectCreatedSuccess": "Projekt úspěšně vytvořen!",
+      "projectCreatedError": "Chyba při vytváření projektu. Zkuste to prosím znovu."
+    },
+    "title": "Vytvořit nový překladatelský projekt",
+    "subtitle": "Nahrajte dokument v anglickém jazyce a vyberte cílový jazyk pro překlad. O zbytek se postaráme my!",
+    "uploadLabel": "1. Nahrajte svůj dokument",
+    "dragDrop": "Přetáhněte soubor sem nebo klikněte pro výběr (Max 5MB)",
+    "sourceRequired": "Dokument je povinný.",
+    "targetLanguageLabel": "2. Vyberte cílový jazyk",
+    "languagePlaceholder": "Vyberte jeden cílový jazyk",
+    "cancelButton": "Zrušit",
+    "submitButton": "Vytvořit projekt"
+  },
+  "projectReviewModal": {
+    "notifications": {
+      "approvalSuccess": "Překlad úspěšně schválen",
+      "approvalError": "Chyba při schvalování překladu. Zkuste to prosím znovu.",
+      "feedbackRequired": "Zpětná vazba je povinná pro přepracování.",
+      "rejectionSuccess": "Překlad úspěšně odeslán k přepracování"
+    },
+    "title": "Kontrola překladu",
+    "downloadFilesHeader": "Soubor ke kontrole",
+    "downloadFilesNote": "Stáhněte si přeložený dokument a pečlivě jej zkontrolujte.",
+    "downloadTranslatedFileButton": "Stáhnout přeložený soubor",
+    "rejectionReasonHeader": "Uveďte důvod k zamítnutí",
+    "rejectionReasonLabel": "Důvod zamítnutí",
+    "rejectionReasonPlaceholder": "Napište zpětnou vazbu pro překladatele...",
+    "rejectButton": "Zamítnout",
+    "approveButton": "Schválit"
+
+  },
+  "languageSelect": {
+    "placeholder": "Vyberte jazyk...",
+    "noResults": "Nenalezeny žádné odpovídající jazyky",
+    "typeToSearch": "Začněte psát pro vyhledávání..."
+  },
+  "projectDetailTemplate": {
+    "created": "Vytvořeno"
+  },
+  "projectDetailModal": {
+    "notifications": {
+      "translatedFileNotAvailable": "Přeložený soubor není momentálně k dispozici.",
+      "downloadSuccess": "Soubor {{fileName}} byl úspěšně stažen!",
+      "downloadError": "Chyba při stahování souboru. Zkuste to prosím znovu."
+    },
+    "projectDetails": "Detaily projektu",
+    "targetLanguageLabel": "Cílový jazyk",
+    "noTranslatorAssigned": "Překladatel nebyl přiřazen.",
+    "downloadFilesHeader": "Soubory ke stažení",
+    "originalFile": "Originální soubor (anglicky)",
+    "translatedFile": "Přeložený soubor",
+    "translationNotAvailable": "Překlad není momentálně k dispozici.",
+    "rejectionTitle": "Důvod zamítnutí",
+    "received": "Obdrženo",
+    "approvedTitle": "Čeká se na uzavření",
+    "approvedMessage": "Tento překlad byl schválen a nyní čeká na finální uzavření administrátorem.",
+    "canceledTitle": "Projekt zrušen",
+    "canceledMessage": "Projekt byl zrušen, protože se pro něj nepodařilo najít vhodného překladatele.",
+    "closedTitle": "Projekt uzavřen",
+    "closedMessage": "Tento projekt byl úspěšně dokončen a finálně uzavřen. Děkujeme, že jste využili LinguaFlow!"
+  },
+  "layout": {
+    "notifications": {
+      "logoutSuccess_text": "Byli jste úspěšně odhlášeni"
+    },
+    "logoutButton": "Odhlásit se",
+    "welcome": "Vítejte",
+    "translatorSettings": "Nastavení překladatele"
+  }
+}

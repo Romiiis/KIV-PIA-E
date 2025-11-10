@@ -1,14 +1,14 @@
 <div *ngIf="this.user as user">
 
   <nav class="navbar">
-    <div class="brand">
+    <div class="brand" routerLink="/">
       <mat-icon>translate</mat-icon>
       <span class="logo-text">LinguaFlow</span>
     </div>
 
     <div class="status-panel">
       <span class="panel-icon"><mat-icon>waving_hand</mat-icon></span>
-      <span class="panel-text">Welcome, {{ user.role | titlecase }}</span>
+      <span class="panel-text">{{ "layout.welcome" | translate }} {{ user.name | titlecase }}</span>
     </div>
     <div class="user-controls-group">
 
@@ -17,21 +17,21 @@
            (mouseleave)="closeLangDropdown()"
            (click)="toggleLangDropdown()">
         <mat-icon>language</mat-icon>
-        <span class="active-lang-label">{{ activeLanguage() | uppercase }}</span>
+        <span class="active-lang-label">{{ languageService.activeLanguage() | uppercase }}</span>
         <mat-icon class="caret">expand_more</mat-icon>
 
         <div class="dropdown lang-dropdown" *ngIf="showLangDropdown">
           <button
             class="lang-item"
-            [class.active]="activeLanguage() === 'en'"
-            (click)="switchLanguage('en'); $event.stopPropagation()">
-            English (EN)
+          [class.active]="languageService.activeLanguage() === SupportedLanguage.EN"
+          (click)="languageService.switchLanguage(SupportedLanguage.EN); $event.stopPropagation()">
+          English (EN)
           </button>
           <button
             class="lang-item"
-            [class.active]="activeLanguage() === 'cs'"
-            (click)="switchLanguage('cs'); $event.stopPropagation()">
-            Čeština (CZ)
+          [class.active]="languageService.activeLanguage() === SupportedLanguage.CS"
+          (click)="languageService.switchLanguage(SupportedLanguage.CS); $event.stopPropagation()">
+          Čeština (CZ)
           </button>
         </div>
       </div>
@@ -50,20 +50,20 @@
 
           <div class="menu-header">
             <p class="header-name">{{ user.name | titlecase }}</p>
-            <p class="header-role">{{ user.role | titlecase }}</p>
+            <p class="header-role">{{ 'global.' + user.role | lowercase | translate }}</p>
           </div>
 
           <div class="menu-items">
             @if (user.role === 'TRANSLATOR') {
-              <button class="menu-item translator-settings-btn" (click)="toastr.info('Opening Language Settings... (MOCK)')">
+              <button class="menu-item translator-settings-btn"
+                      (click)="openSettingsModal()">
                 <mat-icon>settings</mat-icon>
-                <span>My Translation Settings</span>
+                <span>{{ "layout.translatorSettings" | translate }}</span>
               </button>
             }
-
             <button class="menu-item logout-btn" (click)="logout()">
               <mat-icon>logout</mat-icon>
-              <span>Log Out</span>
+              <span>{{ "layout.logoutButton" | translate }}</span>
             </button>
           </div>
         </div>

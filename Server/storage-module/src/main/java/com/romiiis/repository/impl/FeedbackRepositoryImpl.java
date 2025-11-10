@@ -7,6 +7,7 @@ import com.romiiis.repository.mongo.MongoFeedbackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -58,4 +59,15 @@ public class FeedbackRepositoryImpl implements IFeedbackRepository {
     public void deleteAll() {
         mongoFeedbackRepository.deleteAll();
     }
+
+    @Override
+    public List<Feedback> getAllFeedbackForProjectIds(List<UUID> projectIds) {
+        if (projectIds == null || projectIds.isEmpty()) {
+            return List.of();
+        }
+
+        return mongoFeedbackRepository.findByProjectIdIn(projectIds)
+                .stream()
+                .map(mapper::mapDBToDomain)
+                .toList();    }
 }

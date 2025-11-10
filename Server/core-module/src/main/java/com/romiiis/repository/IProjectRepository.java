@@ -1,9 +1,11 @@
 package com.romiiis.repository;
 
 
+import com.romiiis.domain.WrapperProjectFeedback;
 import com.romiiis.filter.ProjectsFilter;
 import com.romiiis.domain.Project;
 
+import java.sql.Wrapper;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +34,6 @@ public interface IProjectRepository {
      * @return project with the given ID, or null if not found
      */
     Project findById(UUID id);
-
 
     /**
      * Retrieves all project IDs as strings.

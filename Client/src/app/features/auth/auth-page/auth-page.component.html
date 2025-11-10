@@ -1,71 +1,85 @@
 <div class="auth-container">
-  <h1 class="title">🌍 LinguaFlow</h1>
-  <p class="subtitle">Translate your documents with ease</p>
 
-  <div class="tabs">
-    <button (click)="switchMode('login')" [class.active]="mode === 'login'">
-      Login
+  <div class="language-switcher">
+    <button class="lang-btn"
+            [class.active]="languageService.activeLanguage() === SupportedLanguage.EN"
+            (click)="languageService.switchLanguage(SupportedLanguage.EN)">EN
     </button>
-    <button (click)="switchMode('register')" [class.active]="mode === 'register'">
-      Register
+    <button class="lang-btn"
+            [class.active]="languageService.activeLanguage() === SupportedLanguage.CS"
+            (click)="languageService.switchLanguage(SupportedLanguage.CS)">CS
     </button>
   </div>
 
-  <!-- Login form -->
+  <h1 class="title">
+    <mat-icon>translate</mat-icon>
+    LinguaFlow
+  </h1>
+  <p class="subtitle">{{ "authPage.subtitle" | translate }}</p>
+
+  <div class="tabs">
+    <button (click)="switchMode('login')" [class.active]="mode === 'login'">
+      {{ 'authPage.tabLogin' | translate }}
+    </button>
+    <button (click)="switchMode('register')" [class.active]="mode === 'register'">
+      {{ 'authPage.tabRegister' | translate }}
+    </button>
+  </div>
+
   <form *ngIf="mode === 'login'" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
-    <h2>Login</h2>
+    <h2>{{ "authPage.login.title" | translate }}</h2>
 
     <div class="oauth">
       <button type="button" class="oauth-btn google">
         <img ngSrc="/google.svg" alt="Google" height="48" width="48"/>
-        Continue with Google
+        {{ "authPage.login.oauth" | translate }}
       </button>
-      <p class="divider">or use your email</p>
+      <p class="divider">{{ "authPage.login.divider" | translate }}</p>
     </div>
 
     <label>
-      Email
-      <input type="email" formControlName="email" placeholder="Enter your email" />
+      {{ "authPage.login.emailLabel" | translate }}
+      <input type="email" formControlName="email" placeholder='{{ "authPage.login.emailPlaceholder" | translate }}'/>
     </label>
 
     <label>
-      Password
-      <input type="password" formControlName="password" placeholder="Enter your password" />
+      {{ "authPage.login.passwordLabel" | translate }}
+      <input type="password" formControlName="password" placeholder='{{ "authPage.login.passwordPlaceholder" | translate }}'/>
     </label>
 
-    <button type="submit" [disabled]="loginForm.invalid">Login</button>
+    <button type="submit" [disabled]="loginForm.invalid">{{"authPage.login.button" | translate}}</button>
   </form>
 
-  <!-- Register form -->
   <form *ngIf="mode === 'register'" [formGroup]="registerForm" (ngSubmit)="submitRegister()">
-    <h2>Create Account</h2>
+    <h2>{{ "authPage.register.title" | translate }}</h2>
 
     <div class="oauth">
       <button type="button" class="oauth-btn google">
-        <img src="/google.svg" alt="Google" /> Sign up with Google
+        <img src="/google.svg" alt="Google"/>
+        {{ "authPage.register.oauth" | translate }}
       </button>
-      <p class="divider">or fill the form</p>
+      <p class="divider">{{ "authPage.register.divider" | translate }}</p>
     </div>
 
     <label>
-      Full Name
-      <input type="text" formControlName="fullname" placeholder="Enter your full name" />
+      {{ "authPage.register.nameLabel" | translate }}
+      <input type="text" formControlName="fullname" placeholder='{{ "authPage.register.namePlaceholder" | translate }}'/>
     </label>
 
     <label>
-      Email
-      <input type="email" formControlName="email" placeholder="Enter your email" />
+      {{ "authPage.register.emailLabel" | translate }}
+      <input type="email" formControlName="email" placeholder='{{ "authPage.register.emailPlaceholder" | translate }}'/>
     </label>
 
     <label>
-      Password
-      <input type="password" formControlName="password" placeholder="Create a password" />
+      {{ "authPage.register.passwordLabel" | translate }}
+      <input type="password" formControlName="password" placeholder='{{ "authPage.register.passwordPlaceholder" | translate }}'/>
     </label>
 
     <label>
-      Confirm Password
-      <input type="password" formControlName="confirmPassword" placeholder="Repeat your password" />
+      {{ "authPage.register.confirmPasswordLabel" | translate }}
+      <input type="password" formControlName="confirmPassword" placeholder='{{ "authPage.register.confirmPasswordPlaceholder" | translate }}'/>
     </label>
-    <button type="submit" [disabled]="registerForm.invalid">Register</button>
+    <button type="submit" [disabled]="registerForm.invalid">{{"authPage.register.button" | translate}}</button>
   </form>
 </div>

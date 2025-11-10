@@ -5,6 +5,9 @@ import {AuthManager} from '@core/auth/auth.manager';
 import {NgIf, NgOptimizedImage} from '@angular/common';
 import {ToastrService} from 'ngx-toastr';
 import {AuthRoutingHelper} from '@core/auth/auth-routing.helper';
+import {MatIcon} from '@angular/material/icon';
+import {LanguageService, SupportedLanguage} from '@core/services/language.service';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-auth-page',
@@ -12,7 +15,9 @@ import {AuthRoutingHelper} from '@core/auth/auth-routing.helper';
   imports: [
     ReactiveFormsModule,
     NgIf,
-    NgOptimizedImage
+    NgOptimizedImage,
+    MatIcon,
+    TranslatePipe
   ],
   styleUrls: ['./auth-page.component.css']
 })
@@ -23,15 +28,14 @@ import {AuthRoutingHelper} from '@core/auth/auth-routing.helper';
  */
 export class AuthPageComponent implements OnInit {
 
-  // Current mode: 'login' or 'register'.
   mode: 'login' | 'register' = 'login';
 
-  // Login form group.
   loginForm!: FormGroup;
 
-  // Registration form group.
+  //
   registerForm!: FormGroup;
 
+  protected readonly SupportedLanguage = SupportedLanguage;
 
   /**
    * Initialize component and forms.
@@ -61,12 +65,16 @@ export class AuthPageComponent implements OnInit {
    * @param auth AuthManager for handling authentication logic.
    * @param router Router for navigation.
    * @param toastr ToastrService for displaying notifications.
+   * @param languageService Náš centralizovaný servis pro jazyky
+   * @param translateService
    */
   constructor(
     private fb: FormBuilder,
     private auth: AuthManager,
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    public languageService: LanguageService,
+    private translateService: TranslateService
   ) {
   }
 
@@ -97,15 +105,18 @@ export class AuthPageComponent implements OnInit {
         // Handle successful login.
         .then(() => {
 
+          let loginSuccessText = this.translateService.instant('authPage.notifications.loginSuccess_text');
           // Display success notification.
-          this.toastr.success('Login successful!');
+          this.toastr.success(loginSuccessText);
 
           // Get the current user.
           let currentUser = this.auth.user()
 
           // Check if user information is available.
           if (!currentUser) {
-            this.toastr.error('Unable to retrieve user information.');
+            let loginNoUserText = this.translateService.instant('authPage.notifications.loginNoUser_text');
+            this.toastr.error(loginNoUserText);
+            return;
           }
 
           // Redirect based on user role.
@@ -114,7 +125,8 @@ export class AuthPageComponent implements OnInit {
 
         // Handle login failure.
         .catch(() => {
-          this.toastr.error('Login failed. Please check your credentials.');
+          let loginErrorText = this.translateService.instant('authPage.notifications.loginError_text');
+          this.toastr.error(loginErrorText);
         });
 
     }
@@ -139,22 +151,25 @@ export class AuthPageComponent implements OnInit {
       )
         // Handle successful registration.
         .then(() => {
+          let registerSuccessText = this.translateService.instant('authPage.notifications.registerSuccess_text');
           // Display success notification.
-          this.toastr.success('Registration successful!');
+          this.toastr.success(registerSuccessText);
 
           // Get the current user.
           let currentUser = this.auth.user()
 
           // Redirect based on user role.
           if (!currentUser) {
-            this.toastr.error('Unable to retrieve user information.');
+            let registerNoUserText = this.translateService.instant('authPage.notifications.registerNoUser_text');
+            this.toastr.error(registerNoUserText);
           }
           // Redirect based on user role.
           AuthRoutingHelper.navigateToRole(this.router, currentUser!.role).then();
-        });
-
+        }).catch(() => {
+        // Handle registration failure.
+        let registerErrorText = this.translateService.instant('authPage.notifications.registerError_text');
+        this.toastr.error(registerErrorText);
+      });
     }
   }
-
-
 }

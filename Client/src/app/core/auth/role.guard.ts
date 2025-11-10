@@ -40,6 +40,10 @@ export class RoleRedirectGuard implements CanActivate {
       return true;
     }
 
+    if (state.url === AuthRoutingHelper.INIT_PATH) {
+      return AuthRoutingHelper.redirectToRole(this.router, role);
+    }
+
     // redirect to role's default path
     if (state.url === '/' || route.routeConfig?.path === '**') {
       return AuthRoutingHelper.redirectToRole(this.router, role);

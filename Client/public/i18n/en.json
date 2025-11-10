@@ -1,0 +1,177 @@
+{
+  "global": {
+    "customer": "Customer",
+    "translator": "Translator",
+    "sourceLanguage": "Source Language",
+    "targetLanguage": "Target Language",
+    "admin": "Administrator",
+    "success": "Success",
+    "error": "Error",
+    "required": "Required",
+    "rejected": "Rejected"
+  },
+  "projectStatus": {
+    "assigned": "Assigned",
+    "completed": "Completed",
+    "approved": "Approved",
+    "canceled": "Canceled",
+    "closed": "Closed",
+    "rework": "Rework"
+  },
+  "initPage": {
+    "title": "Welcome to LinguaFlow",
+    "subtitle": "Please confirm your primary role to set up your dashboard.",
+    "role": {
+      "label": "1. Select your primary role:",
+      "customer": {
+        "description": "Need translations done."
+      },
+      "translator": {
+        "description": "Provide translation services."
+      }
+    },
+    "language": {
+      "label": "2. Select languages you translate:",
+      "note": "You must select at least one language pair."
+    },
+    "button": {
+      "finish": "Finish Setup"
+    },
+    "notifications": {
+      "initSuccess_title": "Success",
+      "initSuccess_text": "User role and preferences updated successfully!"
+    }
+  },
+  "authPage": {
+    "subtitle": "Translate your documents with ease",
+    "tabLogin": "Login",
+    "tabRegister": "Register",
+    "login": {
+      "title": "Login",
+      "oauth": "Continue with Google",
+      "divider": "or use your email",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter your email",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "button": "Login"
+    },
+    "register": {
+      "title": "Create Account",
+      "oauth": "Sign up with Google",
+      "divider": "or fill the form",
+      "nameLabel": "Full Name",
+      "namePlaceholder": "Enter your full name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter your email",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Create a password",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Repeat your password",
+      "button": "Register"
+    },
+    "notifications": {
+      "loginSuccess_text": "Login Successful",
+      "loginNoUser_text": "Unable to retrieve user information.",
+      "loginError_text": "Login failed. Please check your credentials.",
+      "registerSuccess_text": "Registration Successful",
+      "registerError_text": "Registration failed. Please try again."
+    }
+  },
+  "languageSelect": {
+    "placeholder": "Select language...",
+    "noResults": "No matching languages",
+    "typeToSearch": "Type to search..."
+  },
+  "customerPage": {
+    "myProjects": "My Projects",
+    "legend": {
+      "assigned": "Assigned",
+      "rework": "Assigned for Rework",
+      "completed": "Needs review",
+      "approved": "Approved",
+      "canceled": "Canceled",
+      "closed_created": "Closed/Created"
+    },
+    "createProjectButton": "Create New Project",
+    "view": {
+      "actionRequired": "Action Required",
+      "inProgress": "In Progress",
+      "history": "Project History"
+    },
+    "loadingProjects": "Loading projects...",
+    "created": "Created",
+    "reviewButton": "Review Translation",
+    "viewDetailsButton": "View Project Details",
+    "downloadButton": "View & Download Translation",
+    "viewArchiveButton": "View Archived Project",
+    "noAction": "All caught up! Nothing needs your action.",
+    "noInProgress": "No projects are currently in progress.",
+    "noHistory": "You have no project history yet."
+  },
+  "createProjectModal": {
+    "notifications": {
+      "projectCreatedSuccess": "Project created successfully!",
+      "projectCreatedError": "Error creating project. Please try again."
+    },
+    "title": "Create New Translation Project",
+    "subtitle": "Upload your source document in English and specify the required target language. We'll handle the assignment.",
+    "uploadLabel": "1. Upload Your Document",
+    "dragDrop": "Drag and drop your file here or click to select (Max 5MB)",
+    "sourceRequired": "Document is required.",
+    "targetLanguageLabel": "2. Select Target Language",
+    "languagePlaceholder": "Select one target language",
+    "cancelButton": "Cancel",
+    "submitButton": "Create Project"
+  },
+  "projectReviewModal": {
+    "notifications": {
+      "approvalSuccess": "Translation approved successfully",
+      "approvalError": "Error approving translation. Please try again.",
+      "feedbackRequired": "Feedback is required for rework.",
+      "rejectionSuccess": "Translation successfully sent for rework"
+    },
+    "title": "Translation Review",
+    "downloadFilesHeader": "File for Review",
+    "downloadFilesNote": "Download the translated document and review it carefully.",
+    "downloadTranslatedFileButton": "Download Translated File",
+    "rejectionReasonHeader": "Provide Reason for Rejection",
+    "rejectionReasonLabel": "Reason for Rejection",
+    "rejectionReasonPlaceholder": "Write feedback for the translator...",
+    "rejectButton": "Reject",
+    "approveButton": "Approve"
+  },
+  "projectDetailTemplate": {
+    "created": "Created"
+  },
+  "projectDetailModal": {
+    "notifications": {
+      "translatedFileNotAvailable": "The translated file is not available at this time.",
+      "downloadSuccess": "File {{fileName}} was downloaded successfully!",
+      "downloadError": "Error downloading file. Please try again."
+    },
+    "projectDetails": "Project Details",
+    "targetLanguageLabel": "Target Language",
+    "noTranslatorAssigned": "No translator has been assigned.",
+    "downloadFilesHeader": "Download Files",
+    "originalFile": "Original File (English)",
+    "translatedFile": "Translated File",
+    "translationNotAvailable": "Translation is not available at this time.",
+    "rejectionTitle": "Reason for Rejection",
+    "received": "Received",
+    "approvedTitle": "Awaiting Closure",
+    "approvedMessage": "This translation has been approved and is now awaiting final closure by the administrator.",
+    "canceledTitle": "Project Canceled",
+    "canceledMessage": "The project was canceled because a suitable translator could not be found.",
+    "closedTitle": "Project Closed",
+    "closedMessage": "This project has been successfully completed and finalized. Thank you for using LinguaFlow!"
+  },
+  "layout": {
+    "notifications": {
+      "logoutSuccess_text": "You have been logged out successfully"
+    },
+    "logoutButton": "Logout",
+    "welcome": "Welcome",
+    "translatorSettings": "Translator Settings"
+  }
+}

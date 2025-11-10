@@ -1,20 +1,20 @@
-/* Globální pozadí pro celou stránku */
+
 .page-background {
   background-color: var(--background-light, #f9fafb);
   min-height: 100vh;
-  padding-top: 4rem; /* Posun formuláře dolů */
+  padding-top: 4rem;
 }
 
 .init-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 480px; /* Větší šířka pro lepší layout */
-  margin: 0 auto 4rem auto; /* Vycentrování */
+  max-width: 480px;
+  margin: 0 auto 4rem auto;
   padding: 2.5rem 2.5rem;
-  border-radius: 24px; /* Větší radius */
+  border-radius: 24px;
   background: var(--background-white, #fff);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1); /* Výraznější stín */
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
   text-align: center;
   font-family: 'Roboto', sans-serif;
 }
@@ -47,7 +47,7 @@
   color: var(--text-title);
 }
 
-/* --- Role Selection Tabs (Cards) --- */
+
 .role-tabs {
   display: flex;
   gap: 1rem;
@@ -67,7 +67,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-height: 140px; /* Pevná výška pro vizuální balanc */
+  min-height: 140px;
 }
 
 .role-card .icon {
@@ -93,7 +93,7 @@
 .role-card.active {
   border-color: var(--brand-primary);
   background: var(--background-white);
-  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.15); /* Jemný stín pro aktivní stav */
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.15);
 }
 
 .role-card:hover:not(.active) {
@@ -101,7 +101,7 @@
   background: var(--background-hover);
 }
 
-/* --- Language Note --- */
+
 .lang-note {
   font-size: 0.8rem;
   color: var(--text-muted);
@@ -109,7 +109,7 @@
   padding-left: 0.5rem;
 }
 
-/* --- Save Button (CTA) --- */
+
 .save-btn {
   width: 100%;
   display: flex;
@@ -133,4 +133,38 @@
   background: var(--brand-primary-hover);
   box-shadow: 0 8px 25px rgba(79, 70, 229, 0.5);
   transform: translateY(-2px);
+}
+
+
+
+@media (max-width: 500px) {
+  .page-background {
+    padding: 1rem;
+  }
+
+  .init-container {
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+
+  .role-tabs {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .role-card {
+    min-height: unset;
+    padding: 1.25rem 1rem;
+  }
 }

@@ -1,109 +1,159 @@
-<div class="dialog-wrapper">
+<app-project-modal-layout [project]="project">
 
-  <h2 mat-dialog-title [matTooltip]="project.originalFileName">
-    {{ project.originalFileName }}
-  </h2>
+  <div class="dialog-header" slot="header">
+    <h2 mat-dialog-title [matTooltip]="project.originalFileName">
+      {{ project.originalFileName }}
+    </h2>
 
-  <div class="meta-info-header">
-    <div class="status-box">
-      <span class="status-badge" [ngClass]="project.status">
-        {{ project.status | titlecase }}
-      </span>
-    </div>
-    <div class="meta-item">
-      <mat-icon>calendar_today</mat-icon>
-      <span>Created: {{ project.createdAt | date:'mediumDate' }}</span>
-    </div>
-    <div class="meta-item">
-      <mat-icon>translate</mat-icon>
-      <span>{{ sourceLanguageTag }} → {{ targetLanguageTag }}</span>
-    </div>
+    <button mat-icon-button
+            class="close-icon-btn"
+            aria-label="Close dialog"
+            (click)="onClose()">
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
 
-  <mat-dialog-content>
+  <div slot="content">
 
-    <section class="detail-section">
-      <h3><mat-icon>info</mat-icon> Project Details</h3>
-      <div class="info-list compact-list">
+    <div class="content-grid">
+      <section class="detail-section">
+        <h3>
+          <mat-icon>info</mat-icon>
+          {{ "projectDetailModal.projectDetails" | translate }}
+        </h3>
+        <div class="info-list compact-list">
 
-        <div class="info-item">
-          <label>Target Language</label>
-          <span class="info-value primary-text">{{ targetLanguageName }} ({{ targetLanguageTag }})</span>
-        </div>
-
-        <div class="info-item">
-          <label>Customer</label>
-          <div class="user-info info-value">
-            <strong>{{ project.customer.name }}</strong>
-            <span>{{ project.customer.emailAddress }}</span>
+          <div class="info-item">
+            <label>{{ "projectDetailModal.targetLanguageLabel" | translate }}</label>
+            <span class="info-value primary-text">{{this.languageService.getLanguageName(project.targetLanguage)}} ({{ project.targetLanguage }})</span>
           </div>
-        </div>
 
-        <div class="info-item">
-          <label>Translator</label>
-          @if (project.translator) {
+          <div class="info-item">
+            <label>{{ "global.customer" | translate }}</label>
             <div class="user-info info-value">
-              <strong>{{ project.translator.name }}</strong>
-              <span>{{ project.translator.emailAddress }}</span>
-            </div>
-          } @else {
-            <span class="muted-text info-value">Not assigned yet</span>
-          }
-        </div>
-
-      </div>
-    </section>
-
-    <section class="detail-section files-section">
-      <h3><mat-icon>folder</mat-icon> Download Files</h3>
-      <div class="file-download-container">
-
-        <div class="file-item file-original" (click)="onDownload('original')" [class.disabled]="!!downloadingType">
-          <div class="file-description">
-            <mat-icon class="file-icon">description</mat-icon>
-            <div class="file-text-group">
-              <span class="file-title">Original File (Source)</span>
-              <span class="file-name" [matTooltip]="project.originalFileName">{{ project.originalFileName }}</span>
+              <strong>{{ project.customer.name }}</strong>
+              <span>{{ project.customer.emailAddress }}</span>
             </div>
           </div>
-          <div class="download-zone primary-download">
-            @if (downloadingType === 'original') {
-              <mat-spinner [diameter]="20"></mat-spinner>
+
+          <div class="info-item">
+            <label>{{ "global.translator" | translate }}</label>
+            @if (project.translator) {
+              <div class="user-info info-value">
+                <strong>{{ project.translator.name }}</strong>
+                <span>{{ project.translator.emailAddress }}</span>
+              </div>
             } @else {
-              <mat-icon>file_download</mat-icon>
+              <span class="muted-text info-value">{{ "projectDetailModal.noTranslatorAssigned" | translate }}</span>
             }
-          </div>
-        </div>
 
-        <div class="file-item file-translated" (click)="onDownload('translated')" [class.disabled]="!!downloadingType || !project.translatedFileName">
-          <div class="file-description">
-            <mat-icon class="file-icon translated-icon">check_circle</mat-icon>
-            <div class="file-text-group">
-              <span class="file-title">Translated File ({{ targetLanguageTag }})</span>
-              @if (project.translatedFileName) {
-                <span class="file-name" [matTooltip]="project.translatedFileName">{{ project.translatedFileName }}</span>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="detail-section files-section">
+        <h3>
+          <mat-icon>folder</mat-icon>
+          {{ "projectDetailModal.downloadFilesHeader" | translate }}
+        </h3>
+        <div class="file-download-container">
+          <div class="file-item file-original" (click)="onDownload('original')" [class.disabled]="!!downloadingType">
+            <div class="file-description">
+              <mat-icon class="file-icon">description</mat-icon>
+              <div class="file-text-group">
+                <span class="file-title">{{ "projectDetailModal.originalFile" | translate }}</span>
+                <span class="file-name" [matTooltip]="project.originalFileName">{{ project.originalFileName }}</span>
+              </div>
+            </div>
+            <div class="download-zone primary-download">
+              @if (downloadingType === 'original') {
+                <mat-spinner [diameter]="20"></mat-spinner>
               } @else {
-                <span class="file-name muted-text">File not yet available</span>
+                <mat-icon>file_download</mat-icon>
+              }
+
+            </div>
+          </div>
+
+          <div class="file-item file-translated" (click)="onDownload('translated')"
+               [class.disabled]="!!downloadingType || !project.translatedFileName">
+            <div class="file-description">
+              <mat-icon class="file-icon translated-icon">check_circle</mat-icon>
+              <div class="file-text-group">
+                <span class="file-title">{{ "projectDetailModal.translatedFile" | translate }}
+                  ({{ project.targetLanguage }})</span>
+                @if (project.translatedFileName) {
+                  <span class="file-name"
+                        [matTooltip]="project.translatedFileName">{{ project.translatedFileName }}</span>
+                } @else {
+                  <span
+                    class="file-name muted-text">{{ "projectDetailModal.translationNotAvailable" | translate }}</span>
+                }
+
+              </div>
+            </div>
+            <div class="download-zone success-download">
+              @if (downloadingType === 'translated') {
+                <mat-spinner [diameter]="20"></mat-spinner>
+              } @else {
+                <mat-icon>file_download</mat-icon>
               }
             </div>
           </div>
-          <div class="download-zone success-download">
-            @if (downloadingType === 'translated') {
-              <mat-spinner [diameter]="20"></mat-spinner>
-            } @else {
-              <mat-icon>file_download</mat-icon>
-            }
-          </div>
+
         </div>
+      </section>
 
-      </div>
-    </section>
 
-  </mat-dialog-content>
+      @if (project.getStatusClass() === 'REWORK' && project.feedback) {
+        <section class="detail-section feedback-note rework-note">
+          <h4>
+            <mat-icon>warning_amber</mat-icon>
+            {{ "projectDetailModal.rejectionTitle" | translate }}
+          </h4>
+          <div class="feedback-content">
+            <p class="feedback-text">
+              {{ project.feedback.text }}
+            </p>
+            <span class="feedback-date">
+              {{ "projectDetailModal.received" | translate }}: {{ project.feedback.createdAt | date:'short' }}
+            </span>
+          </div>
+        </section>
+      }
 
-  <mat-dialog-actions>
-    <button mat-flat-button class="close-full-width-btn" (click)="onClose()">
-      <span>CLOSE PROJECT DETAILS</span>
-    </button>
-  </mat-dialog-actions>
-</div>
+      @if (project.status === 'APPROVED') {
+        <section class="detail-section feedback-note approved-note">
+          <h4>
+            <mat-icon>hourglass_top</mat-icon>
+            {{ "projectDetailModal.approvedTitle" | translate }}
+          </h4>
+          <p>{{ "projectDetailModal.approvedMessage" | translate }}</p>
+        </section>
+      }
+
+      @if (project.getStatusClass() === 'CANCELED') {
+        <section class="detail-section feedback-note canceled-note">
+          <h4>
+            <mat-icon>cancel</mat-icon>
+            {{ "projectDetailModal.canceledTitle" | translate }}
+          </h4>
+          <p>{{ "projectDetailModal.canceledMessage" | translate }}</p>
+        </section>
+      }
+
+      @if (project.getStatusClass() === 'CLOSED') {
+        <section class="detail-section feedback-note closed-note">
+          <h4>
+            <mat-icon>check_circle_outline</mat-icon>
+            {{ "projectDetailModal.closedTitle" | translate }}
+          </h4>
+          <p>{{ "projectDetailModal.closedMessage" | translate }}</p>
+        </section>
+      }
+
+    </div>
+  </div>
+
+</app-project-modal-layout>

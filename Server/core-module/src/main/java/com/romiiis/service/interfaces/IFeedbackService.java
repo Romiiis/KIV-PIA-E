@@ -5,6 +5,7 @@ import com.romiiis.exception.FeedbackNotFoundException;
 import com.romiiis.exception.ProjectNotFoundException;
 import com.romiiis.exception.UserNotFoundException;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -35,4 +36,13 @@ public interface IFeedbackService {
      * @param projectId ID of the project whose feedback is to be deleted
      */
     void deleteProjectFeedbackByProjectId(UUID projectId) throws UserNotFoundException, ProjectNotFoundException ;
+
+
+    /**
+     * Retrieves all feedbacks for the given list of project IDs.
+     *
+     * @param projectIds list of project IDs
+     * @return list of Feedbacks associated with the given project IDs
+     */
+    List<Feedback> getAllFeedbacksByProjectIds(List<UUID> projectIds) throws UserNotFoundException, ProjectNotFoundException;
 }

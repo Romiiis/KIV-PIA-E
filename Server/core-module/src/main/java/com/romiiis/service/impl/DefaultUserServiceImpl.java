@@ -3,6 +3,7 @@ package com.romiiis.service.impl;
 
 import com.romiiis.domain.User;
 import com.romiiis.domain.UserRole;
+import com.romiiis.exception.MyIllegalParametersException;
 import com.romiiis.exception.NoAccessToOperateException;
 import com.romiiis.exception.UserNotFoundException;
 import com.romiiis.filter.UsersFilter;
@@ -37,9 +38,6 @@ public class DefaultUserServiceImpl implements IUserService {
      */
     @Override
     public User getUserByEmail(String email) throws UserNotFoundException, NoAccessToOperateException {
-
-        // TODO - add authorization checks here
-        // TODO - admin can access all users, customers and translators can access their own data only.
         if (!callerContextProvider.isSystem()) {
 
             User caller = fetchUserFromContext();
@@ -119,8 +117,6 @@ public class DefaultUserServiceImpl implements IUserService {
      */
     @Override
     public User getUserById(UUID userId) {
-        // TODO - add authorization checks here
-        // TODO - admin can access all users, customers can access their own data only and translators can access their own data only.
         if (!callerContextProvider.isSystem()) {
 
             User caller = fetchUserFromContext();
@@ -154,8 +150,6 @@ public class DefaultUserServiceImpl implements IUserService {
      */
     @Override
     public List<User> getAllUsers(UsersFilter filter) {
-        // TODO - add authorization checks here
-        // TODO - only admin can fetch all users
         if (!callerContextProvider.isSystem()) {
             User caller = fetchUserFromContext();
 
@@ -176,7 +170,6 @@ public class DefaultUserServiceImpl implements IUserService {
     @Override
     public List<Locale> getUsersLanguages(UUID userId) throws UserNotFoundException {
 
-        // TODO - only admin and the user themselves can access this data
         if (!callerContextProvider.isSystem()) {
             User caller = fetchUserFromContext();
 
@@ -214,6 +207,12 @@ public class DefaultUserServiceImpl implements IUserService {
                 throw new NoAccessToOperateException("User is not authorized to update languages of user ID " + userId);
             }
         }
+
+        if (languages == null || languages.isEmpty()) {
+            log.error("Languages set cannot be null or empty for user ID {}", userId);
+            throw new MyIllegalParametersException("Languages set cannot be null or empty");
+        }
+
         User user = getUserById(userId);
 
         user.setLanguages(languages);

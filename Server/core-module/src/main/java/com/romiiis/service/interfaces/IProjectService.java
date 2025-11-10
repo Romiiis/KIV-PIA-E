@@ -3,6 +3,7 @@ package com.romiiis.service.interfaces;
 
 import com.romiiis.configuration.ResourceHeader;
 import com.romiiis.domain.Project;
+import com.romiiis.domain.WrapperProjectFeedback;
 import com.romiiis.exception.*;
 import com.romiiis.filter.ProjectsFilter;
 
@@ -75,4 +76,21 @@ public interface IProjectService {
      * @return A list of all project IDs in string format.
      */
     List<String> getAllProjectIdsAsString();
+
+
+    /**
+     * Retrieves all projects along with their feedback based on the provided filter.
+     *
+     * @param filter the filter criteria for retrieving projects
+     * @return a list of WrapperProjectFeedback containing projects and their feedback
+     */
+    List<WrapperProjectFeedback> getAllProjectsWithFeedback(ProjectsFilter filter);
+
+    /**
+     * Retrieves a project along with its feedback by project ID.
+     *
+     * @param projectId the project ID
+     * @return project with feedback wrapped in WrapperProjectFeedback
+     */
+    WrapperProjectFeedback getProjectFeedback(UUID projectId) throws ProjectNotFoundException;
 }

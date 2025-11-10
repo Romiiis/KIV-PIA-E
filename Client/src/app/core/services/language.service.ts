@@ -1,60 +1,48 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
+import { Injectable, signal, WritableSignal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
-/**
- * Interface for language objects.
- */
-interface Language {
-  code: string;
-  name: string;
+export enum SupportedLanguage {
+  EN = 'en',
+  CS = 'cs'
 }
 
-/**
- * This service loads and provides language data.
- * It uses Angular signals for reactive state management.
- * - Loads languages from '/languages.json' on startup.
- * - Provides a readonly signal for language selection components.
- * - Provides a fast lookup method for language names by code.
- */
+
 @Injectable({
   providedIn: 'root'
 })
 export class LanguageService {
-  private http = inject(HttpClient);
 
-  private languagesSignal = signal<Language[]>([]);
+  protected readonly localStorageLangKey = 'lang';
 
-  private languageMap = computed(() => {
-    const map = new Map<string, string>();
-    for (const lang of this.languagesSignal()) {
-      map.set(lang.code, lang.name);
-    }
-    return map;
-  });
+  public activeLanguage: WritableSignal<string>;
 
-  constructor() {
-    this.http.get<Language[]>('/languages.json').pipe(
-      tap(data => this.languagesSignal.set(data))
-    ).subscribe();
+  constructor(private translateService: TranslateService) {
+
+    const langs = Object.values(SupportedLanguage);
+
+    this.translateService.addLangs(langs);
+    this.translateService.setDefaultLang(langs[0]);
+
+    const savedLang = localStorage.getItem(this.localStorageLangKey);
+    const langToUse = (savedLang && this.translateService.getLangs().includes(savedLang)) ? savedLang : langs[0];
+
+    this.activeLanguage = signal(langToUse);
+
+    // Automatizace: Při změně jazyka...
+    this.translateService.onLangChange.subscribe(event => {
+      // 1. Uložíme do localStorage
+      localStorage.setItem(this.localStorageLangKey, event.lang);
+      // 2. Aktualizujeme signál (všechny komponenty to hned uvidí)
+      this.activeLanguage.set(event.lang);
+    });
+
+    // Použijeme jazyk (tím se spustí onLangChange a vše se synchronizuje)
+    this.translateService.use(langToUse);
   }
 
-  /**
-   * Returns a readonly signal of the languages array.
-   * Used by 'language-select' component.
-   * @returns Readonly signal of languages.
-   */
-  getLanguagesSignal() {
-    return this.languagesSignal.asReadonly();
+
+  switchLanguage(lang: SupportedLanguage): void {
+    this.translateService.use(lang);
   }
 
-  /**
-   * Get the language name for a given code.
-   * If the code is not found, returns the code itself.
-   * @param code Language code.
-   * @returns Language name or the code if not found.
-   */
-  getLanguageName(code: string): string {
-    return this.languageMap().get(code) || code;
-  }
 }

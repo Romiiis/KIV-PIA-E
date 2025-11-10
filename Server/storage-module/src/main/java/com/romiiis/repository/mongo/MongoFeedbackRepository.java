@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -32,6 +33,15 @@ public interface MongoFeedbackRepository extends MongoRepository<FeedbackDB, UUI
      * @param projectId the UUID of the project whose feedback is to be deleted
      */
     void deleteByProjectId(UUID projectId);
+
+    /**
+     * Finds all FeedbackDB entities associated with the given list of project IDs.
+     *
+     * @param projectIds a list of UUIDs representing project IDs
+     * @return a list of FeedbackDB entities associated with the specified project IDs
+     */
+    @Query("{ 'projectId': { $in: ?0 } }")
+    List<FeedbackDB> findByProjectIdIn(List<UUID> projectIds);
 
 }
 

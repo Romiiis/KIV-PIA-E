@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @Builder
+@NoArgsConstructor
 public class User {
 
     private UUID id;

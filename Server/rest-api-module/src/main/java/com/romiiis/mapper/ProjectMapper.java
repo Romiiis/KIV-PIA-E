@@ -2,10 +2,10 @@ package com.romiiis.mapper;
 
 import com.romiiis.configuration.ResourceHeader;
 import com.romiiis.domain.Project;
+import com.romiiis.domain.WrapperProjectFeedback;
 import com.romiiis.model.ProjectDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @author Roman Pejs
  */
-@Mapper(componentModel = "spring", uses = {CommonMapper.class, UserMapper.class})
+@Mapper(componentModel = "spring", uses = {CommonMapper.class, UserMapper.class, FeedbackMapper.class})
 public interface ProjectMapper {
 
 
@@ -39,6 +39,30 @@ public interface ProjectMapper {
      */
     ProjectDTO mapDomainToDTO(Project project);
 
+
+    /**
+     * Converts a WrapperProjectFeedback to a ProjectDTO.
+     *
+     * @param wrapper the WrapperProjectFeedback to be converted
+     * @return the corresponding ProjectDTO
+     */
+    @Mapping(target = "id", source = "project.id")
+    @Mapping(target = "targetLanguage", source = "project.targetLanguage")
+    @Mapping(target = "originalFileName", source = "project.originalFileName")
+    @Mapping(target = "translatedFileName", source = "project.translatedFileName")
+    @Mapping(target = "customer", source = "project.customer")
+    @Mapping(target = "translator", source = "project.translator")
+    @Mapping(target = "state", source = "project.state")
+    @Mapping(target = "createdAt", source = "project.createdAt")
+    ProjectDTO mapWrapperProjectWithFeedbackToDTO(WrapperProjectFeedback wrapper);
+
+    /**
+     * Converts a list of WrapperProjectFeedback to a list of ProjectDTOs.
+     *
+     * @param aggregatedResults the list of WrapperProjectFeedback to be converted
+     * @return the corresponding list of ProjectDTOs
+     */
+    List<ProjectDTO> mapListWrapperProjectFeedbackToDTO(List<WrapperProjectFeedback> aggregatedResults);
 
     /**
      * Converts a ProjectDTO to a Project entity.
@@ -70,4 +94,6 @@ public interface ProjectMapper {
             throw new RuntimeException("Failed to read resource bytes for " + resource.getFilename(), e);
         }
     }
+
+
 }

@@ -2,37 +2,39 @@
 
   <h2 mat-dialog-title>
     <span class="title-icon">✨</span>
-    Create New Translation Project
+    {{ "createProjectModal.title" | translate }}
   </h2>
 
   <mat-dialog-content>
-    <p class="subtitle">Upload your source document in English and specify the required target language(s). We'll handle the assignment.</p>
-
+    <p class="subtitle">
+      {{ "createProjectModal.subtitle" | translate }}
+    </p>
     <form [formGroup]="projectForm">
 
       <div class="form-section">
-        <label class="section-label">1. Upload Source File</label>
+        <label class="section-label">{{ "createProjectModal.uploadLabel" | translate }}</label>
         <div class="form-group file-group">
 
           <button type="button" class="file-upload-button" (click)="fileInput.click()" mat-stroked-button>
             <span class="icon">{{ projectForm.get('file')?.value ? '✅' : '⬆️' }}</span>
-            <span class="label">{{ projectForm.get('file')?.value?.name || 'Drag & Drop or Click to Select File (Max 5MB)' }}</span>
+            <span
+              class="label">{{ projectForm.get('file')?.value?.name || ('createProjectModal.dragDrop' | translate) }}</span>
           </button>
 
           <input hidden #fileInput type="file" (change)="onFileSelected($event)">
 
           @if (projectForm.get('file')?.hasError('required') && projectForm.get('file')?.touched) {
-            <div class="error-message">Source file is required.</div>
+            <div class="error-message">{{ "createProjectModal.sourceRequired" | translate }}</div>
           }
         </div>
       </div>
 
       <div class="form-section">
-        <label class="section-label">2. Select Target Language(s)</label>
+        <label class="section-label">{{ "createProjectModal.targetLanguageLabel" | translate }}</label>
         <div class="form-group lang-group">
           <app-language-select
             formControlName="targetLang"
-            [isMulti]="true" [placeholder]="'Select one or more target languages'"
+            [isMulti]="false" [placeholder]="'createProjectModal.languagePlaceholder' | translate"
           ></app-language-select>
         </div>
       </div>
@@ -41,17 +43,20 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button (click)="onCancel()">Cancel</button>
+    <button mat-button (click)="onCancel()">
+      {{ "createProjectModal.cancelButton" | translate }}
+    </button>
     <button
       mat-flat-button
       class="submit-button"
       [disabled]="projectForm.invalid || isLoading"
       (click)="submitProject()">
       @if (!isLoading) {
-        <span>Submit {{ (projectForm.get('targetLang')?.value?.length || 0) > 1 ? 'Projects' : 'Project' }}</span>
+        <span> {{ "createProjectModal.submitButton" | translate }}</span>
       } @else {
         <mat-spinner [diameter]="24" color="accent"></mat-spinner>
       }
+
     </button>
   </mat-dialog-actions>
 </div>

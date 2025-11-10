@@ -1,12 +1,16 @@
 import {Component, OnInit} from '@angular/core';
-import {CommonModule, DatePipe} from '@angular/common';
+
+import {CommonModule, DatePipe, TitleCasePipe} from '@angular/common';
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import {ProjectDomain} from '@core/models/project.model';
 import {ProjectStatusDomain} from '@core/models/projectStatus.model';
-// Zde předpokládáme, že tyto pipes jsou dostupné
-import {FilterByStatusPipe} from '@shared/pipes/filter-by-status-pipe';
-import {LengthPipe} from '@shared/pipes/length-pipe';
-import {MatIconModule} from '@angular/material/icon'; // Přidáno pro použití ikon
+import {MatIconModule} from '@angular/material/icon';
+import {ToastrService} from 'ngx-toastr';
+import {ProjectDetailModalComponent} from '@shared/project-detail-modal/project-detail-modal.component';
+import {useListProjectsMutation} from '@api/queries/project.query';
+import {
+  ProjectSubmissionComponent
+} from '@features/translator/project-submission.component/project-submission.component';
 
 @Component({
   selector: 'app-translator-page',
@@ -15,57 +19,73 @@ import {MatIconModule} from '@angular/material/icon'; // Přidáno pro použití
     CommonModule,
     MatDialogModule,
     DatePipe,
-    MatIconModule // Přidáno
+    MatIconModule,
+    TitleCasePipe
   ],
   templateUrl: './translator-page.component.html',
   styleUrls: ['./translator-page.component.css']
 })
 export class TranslatorPageComponent implements OnInit {
+
+  projects: ProjectDomain[] = [];
+  isLoading = false;
+  readonly listTranslatorProjectsMutation = useListProjectsMutation();
+  currentView: 'action' | 'waiting' | 'history' = 'action';
   protected readonly ProjectStatusDomain = ProjectStatusDomain;
 
-  // MOCK DATA:
-  projects: ProjectDomain[] = [
-    // Mock ASSIGNED
-    { id: '1', status: ProjectStatusDomain.ASSIGNED, originalFileName: 'Article_001.pdf', targetLanguage: 'cs', createdAt: new Date().toISOString() } as ProjectDomain,
-    // Mock COMPLETED (Waiting)
-    { id: '2', status: ProjectStatusDomain.COMPLETED, originalFileName: 'Brochure_002.docx', targetLanguage: 'de', createdAt: new Date().toISOString() } as ProjectDomain,
-    // Mock CLOSED
-    { id: '3', status: ProjectStatusDomain.CLOSED, originalFileName: 'Manual_003.txt', targetLanguage: 'fr', createdAt: new Date().toISOString() } as ProjectDomain,
-    // Mock APPROVED
-    { id: '4', status: ProjectStatusDomain.APPROVED, originalFileName: 'Report_004.pdf', targetLanguage: 'de', createdAt: new Date().toISOString() } as ProjectDomain,
-  ];
-
-  isLoading = false;
-
-  // Pohledy pro překladatele
-  currentView: 'action' | 'waiting' | 'history' = 'action';
-
-  constructor(public dialog: MatDialog) {}
-
-  ngOnInit(): void {
-    // V realné aplikaci by zde proběhlo načítání dat
+  constructor(
+    public dialog: MatDialog,
+    private toastr: ToastrService
+  ) {
   }
 
-  /**
-   * Vrací počet projektů, které jsou přiřazeny a vyžadují akci (upload).
-   */
   get actionRequiredCount(): number {
-    return this.projects.filter(p => p.status === ProjectStatusDomain.ASSIGNED).length;
+    return this.projects.filter(p => {
+      const statusClass = p.getStatusClass();
+      return statusClass === 'ASSIGNED' || statusClass === 'REWORK';
+    }).length;
   }
 
-  /**
-   * Filtruje projekty na základě aktuálního pohledu.
-   */
   get projectsForCurrentView(): ProjectDomain[] {
     switch (this.currentView) {
       case 'action':
-        return this.projects.filter(p => p.status === ProjectStatusDomain.ASSIGNED);
+        return this.projects.filter(p => {
+          const statusClass = p.getStatusClass();
+          return statusClass === 'ASSIGNED' || statusClass === 'REWORK';
+        });
+
       case 'waiting':
-        return this.projects.filter(p => p.status === ProjectStatusDomain.COMPLETED);
+        return this.projects.filter(p => p.getStatusClass() === 'COMPLETED');
+
       case 'history':
-        return this.projects.filter(p => p.status === ProjectStatusDomain.APPROVED || p.status === ProjectStatusDomain.CLOSED);
+        return this.projects.filter(p => {
+          const statusClass = p.getStatusClass();
+          return statusClass === 'APPROVED' || statusClass === 'CLOSED' || statusClass === 'CANCELED';
+        });
+
       default:
         return [];
+    }
+  }
+
+  ngOnInit(): void {
+    this.fetchTranslatorProjects().then();
+  }
+
+  async fetchTranslatorProjects() {
+    this.isLoading = true;
+    try {
+      this.projects = await this.listTranslatorProjectsMutation.mutateAsync();
+      console.log('Fetched translator projects:', this.projects);
+
+      if (this.projectsForCurrentView.length === 0) {
+        this.autoSwitchView();
+      }
+    } catch (error) {
+      console.error('Failed to fetch translator projects:', error);
+      this.toastr.error('Failed to load projects.');
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -73,10 +93,41 @@ export class TranslatorPageComponent implements OnInit {
     this.currentView = view;
   }
 
-  /**
-   * Otevře modální okno detailu (předpokládá se logika uploadu pro translatora).
-   */
-  openProjectDetails(project: ProjectDomain): void {
-    // Implementujte vaši dialog opening logic zde
+  openProjectSubmission(project: ProjectDomain): void {
+    const dialogRef = this.dialog.open(ProjectSubmissionComponent, {
+      data: {project: project},
+      width: '600px',
+      maxWidth: '95vw',
+      panelClass: 'clean-dialog-panel',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'submitted') {
+        this.fetchTranslatorProjects();
+      }
+    });
   }
+
+  openProjectDetails(project: ProjectDomain): void {
+    this.dialog.open(ProjectDetailModalComponent, {
+      data: {project: project},
+      width: '800px',
+      maxWidth: '95vw',
+      panelClass: 'clean-dialog-panel',
+      disableClose: false
+    });
+  }
+
+  private autoSwitchView(): void {
+    if (this.actionRequiredCount > 0) {
+      this.currentView = 'action';
+    } else if (this.projects.filter(p => p.getStatusClass() === 'COMPLETED').length > 0) {
+      this.currentView = 'waiting';
+    } else {
+      this.currentView = 'history';
+    }
+  }
+
+
 }

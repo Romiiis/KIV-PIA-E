@@ -1,20 +1,21 @@
-import { Component, Inject } from '@angular/core';
-import { CommonModule, TitleCasePipe } from '@angular/common';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { ProjectDomain } from '@core/models/project.model';
-import { ToastrService } from 'ngx-toastr';
-import { LanguageService } from '@core/services/language.service';
+import {Component, Inject} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {MatIconModule} from '@angular/material/icon';
+import {MatButtonModule} from '@angular/material/button';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {ProjectDomain} from '@core/models/project.model';
+import {ToastrService} from 'ngx-toastr';
 
-// API mutace
-import { useApproveTranslatedMutation, useRejectTranslatedMutation } from '@api/queries/workflow.query';
-import { useDownloadOriginalMutation, useDownloadTranslatedMutation } from '@api/queries/project.query';
+import {useApproveTranslatedMutation, useRejectTranslatedMutation} from '@api/queries/workflow.query';
+import {useDownloadTranslatedMutation} from '@api/queries/project.query';
+import {ProjectModalLayoutComponent} from '@shared/project-modal-layout/project-modal-layout.component';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+
 
 export interface ProjectReviewData {
   project: ProjectDomain;
@@ -32,8 +33,9 @@ export interface ProjectReviewData {
     MatProgressSpinnerModule,
     MatFormFieldModule,
     MatInputModule,
-    TitleCasePipe,
-    MatTooltipModule
+    MatTooltipModule,
+    ProjectModalLayoutComponent,
+    TranslatePipe,
   ],
   templateUrl: './project-review.component.html',
   styleUrls: ['./project-review.component.css']
@@ -42,37 +44,31 @@ export class ProjectReviewComponent {
 
   public project: ProjectDomain;
   public feedbackForm: FormGroup;
-  public targetLanguageName: string;
-  public targetLanguageTag: string;
-  public sourceLanguageTag: string = 'en';
+
 
   isRejecting = false;
   isLoading = false;
   isDownloading = false;
 
-  // Mutace pro schválení/zamítnutí
+
   readonly approveMutation = useApproveTranslatedMutation();
   readonly rejectMutation = useRejectTranslatedMutation();
-
-  // Mutace pro stahování
-  readonly downloadOriginalMutation = useDownloadOriginalMutation();
   readonly downloadTranslatedMutation = useDownloadTranslatedMutation();
+
 
   constructor(
     public dialogRef: MatDialogRef<ProjectReviewComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ProjectReviewData,
     private fb: FormBuilder,
     private toastr: ToastrService,
-    private languageService: LanguageService
+    private translationService: TranslateService
   ) {
     this.project = data.project;
     this.feedbackForm = this.fb.group({
       feedback: ['', [Validators.maxLength(500)]],
     });
-
-    this.targetLanguageName = this.languageService.getLanguageName(this.project.targetLanguage);
-    this.targetLanguageTag = this.project.targetLanguage.toLowerCase();
   }
+
 
   toggleRejectMode(): void {
     this.isRejecting = !this.isRejecting;
@@ -85,10 +81,17 @@ export class ProjectReviewComponent {
     this.isLoading = true;
     try {
       await this.approveMutation.mutateAsync(this.project.id);
-      this.toastr.success('Project approved and closed successfully.', 'Success');
+
+      let approvedText = this.translationService.instant("projectReviewModal.notifications.approvalSuccess");
+      let successTitle = this.translationService.instant("global.success");
+
+      this.toastr.success(approvedText, successTitle);
       this.dialogRef.close('approved');
     } catch (error) {
-      this.toastr.error('Failed to approve project. Try again.', 'Error');
+      let approvalErrorText = this.translationService.instant("projectReviewModal.notifications.approvalError");
+      let errorTitle = this.translationService.instant("global.error");
+
+      this.toastr.error(approvalErrorText, errorTitle);
     } finally {
       this.isLoading = false;
     }
@@ -100,7 +103,10 @@ export class ProjectReviewComponent {
       const feedbackText = this.feedbackForm.get('feedback')?.value || '';
 
       if (feedbackText.trim() === '') {
-        this.toastr.warning('Please provide feedback when rejecting the translation.', 'Required');
+        let requiredTitle = this.translationService.instant("global.required");
+        let requiredText = this.translationService.instant("projectReviewModal.notifications.feedbackRequired");
+
+        this.toastr.warning(requiredText, requiredTitle);
         this.isLoading = false;
         return;
       }
@@ -110,10 +116,14 @@ export class ProjectReviewComponent {
           id: this.project.id,
           feedback: feedbackText
         });
-        this.toastr.info('Translation rejected. Feedback sent to administrator.', 'Rejected');
+        let rejectedTitle = this.translationService.instant("global.rejected");
+        let rejectedText = this.translationService.instant("projectReviewModal.notifications.rejectionSuccess");
+
+        this.toastr.info(rejectedText, rejectedTitle);
         this.dialogRef.close('rejected');
       } catch (error) {
-        this.toastr.error('Failed to reject project. Try again.', 'Error');
+        let errorTitle = this.translationService.instant("global.error");
+        this.toastr.error('Failed to reject project. Try again.', errorTitle);
       } finally {
         this.isLoading = false;
       }
@@ -123,8 +133,6 @@ export class ProjectReviewComponent {
   onClose(): void {
     this.dialogRef.close();
   }
-
-  // --- LOGIKA STAHOVÁNÍ ---
 
   async onDownload(): Promise<void> {
     if (this.isDownloading) return;

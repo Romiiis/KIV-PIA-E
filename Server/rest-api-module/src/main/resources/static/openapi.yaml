@@ -887,6 +887,9 @@ components:
         translator:
           $ref:
             '#/components/schemas/User'
+        feedback:
+          $ref:
+            '#/components/schemas/ProjectFeedback'
         state:
           $ref: '#/components/schemas/ProjectState'
         createdAt:
@@ -941,7 +944,7 @@ components:
         createdAt:
           type: string
           format: date-time
-      required: [ projectId, text, createdAt]
+      required: [ projectId, text, createdAt ]
 
     ### PROJECT FEEDBACK REQUESTS ###
     ProjectFeedbackRequest:

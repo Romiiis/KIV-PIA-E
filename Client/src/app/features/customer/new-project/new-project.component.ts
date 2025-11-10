@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {HttpClient} from '@angular/common/http';
 import {ToastrService} from 'ngx-toastr';
 import {MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatButtonModule} from '@angular/material/button';
@@ -9,6 +8,7 @@ import {CommonModule} from '@angular/common';
 
 import {LanguageSelectComponent} from '@shared/language-select/language-select.component';
 import {useCreateProjectMutation} from '@api/queries/project.query';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-customer-new-project',
@@ -19,7 +19,8 @@ import {useCreateProjectMutation} from '@api/queries/project.query';
     LanguageSelectComponent,
     MatDialogModule,
     MatButtonModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslatePipe
   ],
   templateUrl: './new-project.component.html',
   styleUrls: ['./new-project.component.css']
@@ -30,11 +31,12 @@ export class NewProjectComponent implements OnInit {
 
   private createMutation = useCreateProjectMutation();
 
+
   constructor(
     public dialogRef: MatDialogRef<NewProjectComponent>,
     private fb: FormBuilder,
-    private http: HttpClient,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private translationService: TranslateService
   ) {
     this.projectForm = this.fb.group({
       file: [null, Validators.required],
@@ -56,7 +58,7 @@ export class NewProjectComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  async submitProject(): Promise<void> { // <-- Měníme na async
+  async submitProject(): Promise<void> {
     if (!this.projectForm.valid) {
       return;
     }
@@ -65,7 +67,7 @@ export class NewProjectComponent implements OnInit {
     const {file, targetLang} = this.projectForm.value;
 
     try {
-      // Vytvoříme pole všech mutačních Promise
+
       const mutationPromises = targetLang.map((langCode: string) =>
         this.createMutation.mutateAsync({
           languageCode: langCode,
@@ -75,11 +77,13 @@ export class NewProjectComponent implements OnInit {
 
       await Promise.all(mutationPromises);
 
-      this.toastr.success(`Successfully created ${targetLang.length} projects!`);
+      let projectCreatedSuccessText = this.translationService.instant('createProjectModal.notifications.projectCreatedSuccess')
+      this.toastr.success(projectCreatedSuccessText);
       this.dialogRef.close('created');
 
     } catch (error) {
-      this.toastr.error('Failed to create one or more projects. Please try again.');
+      let projectCreatedErrorText = this.translationService.instant('createProjectModal.notifications.projectCreatedError')
+      this.toastr.error(projectCreatedErrorText);
     } finally {
       this.isLoading = false;
     }

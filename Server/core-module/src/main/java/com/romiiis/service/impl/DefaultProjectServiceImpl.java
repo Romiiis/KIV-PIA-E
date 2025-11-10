@@ -2,19 +2,20 @@ package com.romiiis.service.impl;
 
 
 import com.romiiis.configuration.ResourceHeader;
-import com.romiiis.domain.Project;
-import com.romiiis.domain.User;
-import com.romiiis.domain.UserRole;
+import com.romiiis.domain.*;
 import com.romiiis.exception.*;
 import com.romiiis.filter.ProjectsFilter;
+import com.romiiis.repository.IFeedbackRepository;
 import com.romiiis.repository.IProjectRepository;
 import com.romiiis.security.CallerContextProvider;
+import com.romiiis.service.interfaces.IFeedbackService;
 import com.romiiis.service.interfaces.IFileSystemService;
 import com.romiiis.service.interfaces.IProjectService;
 import com.romiiis.service.interfaces.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -34,6 +35,7 @@ public class DefaultProjectServiceImpl implements IProjectService {
      */
     private final IUserService userService;
     private final IProjectRepository projectRepository;
+    private final IFeedbackRepository feedbackRepository;
     private final IFileSystemService fsService;
     private final CallerContextProvider callerContextProvider;
 
@@ -90,7 +92,6 @@ public class DefaultProjectServiceImpl implements IProjectService {
     @Override
     public List<Project> getAllProjects(ProjectsFilter filter) {
         User caller = fetchUserFromContext();
-        // If caller is not system, restrict to their own projects
         if (!callerContextProvider.isSystem()) {
             if (caller.getRole() == UserRole.CUSTOMER) {
                 filter.setCustomerId(caller.getId());
@@ -276,5 +277,57 @@ public class DefaultProjectServiceImpl implements IProjectService {
             throw new ProjectNotFoundException("Project not found");
         }
         return project;
+    }
+
+
+    @Override
+    public List<WrapperProjectFeedback> getAllProjectsWithFeedback(ProjectsFilter filter) {
+        User caller = fetchUserFromContext();
+        if (!callerContextProvider.isSystem()) {
+            if (caller.getRole() == UserRole.CUSTOMER) {
+                filter.setCustomerId(caller.getId());
+            } else if (caller.getRole() == UserRole.TRANSLATOR) {
+                filter.setTranslatorId(caller.getId());
+            }
+        }
+
+
+        // Get all projects based on the filter
+        List<Project> projects = projectRepository.getAll(filter);
+
+        // For each project, get its feedback wrapper
+        List<Feedback> feedbacks = callerContextProvider.runAsSystem(() -> feedbackRepository.getAllFeedbackForProjectIds(
+                projects.stream().map(Project::getId).toList()
+        ));
+
+
+        List<WrapperProjectFeedback> wrapperProjectFeedbacks = new ArrayList<>();
+        for (Project project : projects) {
+            Feedback feedbackForProject = feedbacks.stream()
+                    .filter(fb -> fb.getProjectId().equals(project.getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            WrapperProjectFeedback wrapper = new WrapperProjectFeedback(project, feedbackForProject);
+            wrapperProjectFeedbacks.add(wrapper);
+        }
+
+        // Check filter for projects with feedback only
+        if (filter.isHasFeedback()) {
+            wrapperProjectFeedbacks.removeIf(wpf -> wpf.getFeedback() == null);
+        }
+
+        return wrapperProjectFeedbacks;
+
+
+    }
+
+    @Override
+    public WrapperProjectFeedback getProjectFeedback(UUID projectId) throws ProjectNotFoundException {
+        Project project = fetchProject(projectId);
+        Feedback feedback = feedbackRepository.getFeedbackByProjectId(projectId);
+        return new WrapperProjectFeedback(project, feedback);
+
+
     }
 }

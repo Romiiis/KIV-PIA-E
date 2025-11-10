@@ -1,6 +1,7 @@
 import {Expose, Type} from 'class-transformer';
 import {ProjectStatusDomain} from '@core/models/projectStatus.model';
 import {UserDomain} from '@core/models/user.model';
+import {FeedbackDomain} from '@core/models/feedback.model';
 
 /**
  * Domain model for a translation project.
@@ -31,4 +32,27 @@ export class ProjectDomain {
 
   @Expose()
   createdAt!: string;
+
+  @Expose()
+  feedback!: FeedbackDomain;
+
+  /**
+   * Returns a modified status class for UI representation.
+   * @param project The project whose status class is to be determined.
+   * @returns A string representing the status class.
+   */
+  public getStatusClass(): string {
+
+    if (this.status === 'ASSIGNED' && (this.feedback !== null)) {
+      return 'REWORK';
+    }
+
+    if (this.status === 'CLOSED' && !this.translator) {
+      return 'CANCELED';
+    }
+
+    return this.status;
+  }
+
+
 }

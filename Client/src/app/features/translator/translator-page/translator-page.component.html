@@ -4,29 +4,58 @@
     <header class="dashboard-header">
       <div class="header-left">
         <h1>My Translation Tasks</h1>
-        <nav class="project-view-toggle">
-          <button
-            [class.active]="currentView === 'action'"
-            (click)="setView('action')">
-            <span>New Assignments</span>
-            @if (actionRequiredCount > 0) {
-              <span class="action-badge">{{ actionRequiredCount }}</span>
-            }
-          </button>
-          <button
-            [class.active]="currentView === 'waiting'"
-            (click)="setView('waiting')">
-            <span>Waiting Customer Review</span>
-          </button>
-          <button
-            [class.active]="currentView === 'history'"
-            (click)="setView('history')">
-            <span>Closed History</span>
-          </button>
-        </nav>
       </div>
-      <div class="header-right"></div>
+      <div class="project-status-legend">
+        <div class="legend-item">
+          <span class="color-swatch state-assigned"></span>
+          <span>Assigned</span>
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-rework"></span>
+          <span>Assigned for Rework</span>
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-completed"></span>
+          <span>Needs Review</span>
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-approved"></span>
+          <span>Approved</span>
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-canceled"></span>
+          <span>Canceled</span>
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-closed"></span>
+          <span>Closed / Created</span>
+        </div>
+      </div>
+      <div class="header-right">
+      </div>
     </header>
+
+    <nav class="project-view-toggle">
+      <button
+        [class.active]="currentView === 'action'"
+        (click)="setView('action')">
+        <span>New Assignments</span>
+        @if (actionRequiredCount > 0) {
+          <span class="action-badge">{{ actionRequiredCount }}</span>
+        }
+      </button>
+      <button
+        [class.active]="currentView === 'waiting'"
+        (click)="setView('waiting')">
+        <span>Waiting Customer Review</span>
+      </button>
+      <button
+        [class.active]="currentView === 'history'"
+        (click)="setView('history')">
+        <span>Closed History</span>
+      </button>
+    </nav>
+
 
     <div class="project-grid">
       @if (isLoading) {
@@ -37,10 +66,16 @@
 
         @for (p of projectsForCurrentView; track p.id) {
 
-          <div class="project-card" [class]="'state-' + p.status.toLowerCase()" (click)="openProjectDetails(p)">
-
+          <div class="project-card" [class]="'status-badge-' + p.getStatusClass()">
             <div class="card-content">
-              <h3 class="card-title">{{ p.originalFileName }}</h3>
+
+              <div class="status-box">
+                <h3 class="card-title">{{ p.originalFileName }}</h3>
+                <span class="status-badge" [ngClass]="'status-badge-' + p.getStatusClass()">
+                  {{ p.getStatusClass() | titlecase }}
+                </span>
+
+              </div>
 
               <div class="project-meta">
                 <span class="meta-item">
@@ -49,35 +84,47 @@
                 </span>
                 <span class="meta-item">
                   <span class="icon">↔️</span>
-                  <span>EN → {{ p.targetLanguage }}</span>
+                  <span>EN → {{ p.targetLanguage | uppercase }}</span>
                 </span>
               </div>
             </div>
 
             <footer class="card-footer">
-              @switch (p.status) {
-                @case (ProjectStatusDomain.ASSIGNED) {
-                  <button class="cta-button primary" (click)="openProjectDetails(p)">
+              @switch (p.getStatusClass()) {
+                @case ('ASSIGNED') {
+                  <button class="cta-button primary" (click)="openProjectSubmission(p); $event.stopPropagation()">
                     <span class="icon">⬆️</span>
                     <span class="label">Upload Translation</span>
                   </button>
                 }
-                @case (ProjectStatusDomain.COMPLETED) {
-                  <button class="cta-button ghost" (click)="openProjectDetails(p)">
+                @case ('REWORK') {
+                  <button class="cta-button rework" (click)="openProjectSubmission(p); $event.stopPropagation()">
+                    <span class="icon">⬆️</span>
+                    <span class="label">Re-Upload Translation</span>
+                  </button>
+                }
+                @case ('COMPLETED') {
+                  <button class="cta-button ghost" (click)="openProjectDetails(p); $event.stopPropagation()">
                     <span class="icon">👀</span>
                     <span class="label">View Status (Waiting)</span>
                   </button>
                 }
-                @case (ProjectStatusDomain.APPROVED) {
-                  <button class="cta-button success" (click)="openProjectDetails(p)">
+                @case ('APPROVED') {
+                  <button class="cta-button success" (click)="openProjectDetails(p); $event.stopPropagation()">
                     <span class="icon">✅</span>
                     <span class="label">View Approved</span>
                   </button>
                 }
-                @case (ProjectStatusDomain.CLOSED) {
-                  <button class="cta-button ghost" (click)="openProjectDetails(p)">
+                @case ('CLOSED') {
+                  <button class="cta-button ghost" (click)="openProjectDetails(p); $event.stopPropagation()">
                     <span class="icon">🗄️</span>
                     <span class="label">View History</span>
+                  </button>
+                }
+                @case ('CANCELED') {
+                  <button class="cta-button ghost" (click)="openProjectDetails(p); $event.stopPropagation()">
+                    <span class="icon">🗄️</span>
+                    <span class="label">View Canceled Project</span>
                   </button>
                 }
               }

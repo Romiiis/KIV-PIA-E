@@ -15,6 +15,7 @@ import com.romiiis.service.interfaces.IProjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -114,6 +115,7 @@ public class DefaultFeedbackServiceImpl implements IFeedbackService {
 
     /**
      * Fetches the user from the caller context.
+     *
      * @return the User
      * @throws UserNotFoundException if no valid user is found in the context
      */
@@ -145,4 +147,27 @@ public class DefaultFeedbackServiceImpl implements IFeedbackService {
         return project;
     }
 
+
+    /**
+     * Retrieves all feedbacks for the given list of project IDs.
+     * ONLY SYSTEM CONTEXT CAN CALL THIS METHOD
+     *
+     * @param projectIds List of project IDs
+     * @return List of Feedbacks associated with the given project IDs
+     * @throws UserNotFoundException        if no valid user is found in the context
+     * @throws ProjectNotFoundException     if any of the projects are not found
+     */
+    @Override
+    public List<Feedback> getAllFeedbacksByProjectIds(List<UUID> projectIds) throws UserNotFoundException, ProjectNotFoundException {
+
+        if (!callerContextProvider.isSystem()) {
+            log.error("Only system context can access all feedbacks by project IDs");
+            throw new NoAccessToOperateException("Only system context can access all feedbacks by project IDs");
+        }
+
+        log.info("Fetching all feedbacks for project IDs: {}", projectIds);
+        return feedbackRepository.getAllFeedbackForProjectIds(projectIds);
+
+
+    }
 }

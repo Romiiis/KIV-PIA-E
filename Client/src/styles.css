@@ -11,6 +11,8 @@
   --background-light: #f9fafb;
   --background-hover: #f3f4f6;
   --shadow-color-subtle: rgba(0, 0, 0, 0.04);
+  --color-neutral-bg: #cecece;
+  --color-neutral-text: #6b7280;
 
   /* Barevné tokeny pro statusy (Váš kód) */
   --color-yellow-bg: #fef9c3;
@@ -21,13 +23,17 @@
   --color-green-text: #155e2b;
   --color-light-gray-bg: #bdbdbd;
   --color-gray-text: #4b4b4b;
+  --color-orange-bg: #fff7ed;    /* Světlá oranžová pro "REWORK" */
+  --color-orange-text: #f97316;   /* Tmavá oranžová pro "REWORK" */
+  --color-red-bg: #ffebee;       /* Světlá červená pro "CANCELED" */
+  --color-red-text: #d32f2f;      /* Tmavá červená pro "CANCELED" */
 
   /* SDÍLENÉ BAREVNÉ TOKENS Z CUSTOMER PAGE, Mapované na globální paletu */
   --c-primary: #3498db;
   --c-success: #2ecc71;
   --c-warning: #f39c12;
   --c-danger: #e74c3c;
-  --c-neutral: #95a5a6;
+  --c-neutral: #000000;
   --c-bg-page: #f9fafc;
   --c-bg-white: #fff;
   --c-text-dark: #2c3e50;
@@ -52,6 +58,8 @@ body { font-family: Roboto, "Helvetica Neue", sans-serif; }
   padding: 0.1rem 0.4rem;
   border-radius: 8px;
   background: var(--background-page);
+  display: flex;
+  justify-content: space-between;
 }
 .status-badge {
   padding: 4px 8px;
@@ -62,19 +70,72 @@ body { font-family: Roboto, "Helvetica Neue", sans-serif; }
   letter-spacing: 0.05em;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
-.status-badge.ASSIGNED {
+.status-badge-ASSIGNED {
   background-color: var(--color-yellow-bg);
   color: var(--color-yellow-text);
 }
-.status-badge.COMPLETED {
+.status-badge-COMPLETED {
   background-color: var(--color-blue-bg);
   color: var(--color-blue-text);
 }
-.status-badge.APPROVED {
+.status-badge-APPROVED {
   background-color: var(--color-green-bg);
   color: var(--color-green-text);
 }
-.status-badge.CLOSED, .status-badge.CREATED {
-  background-color: var(--color-light-gray-bg);
-  color: var(--color-gray-text);
+
+.status-badge-REWORK {
+  background-color: var(--color-orange-bg);
+  color: var(--color-orange-text);
+  animation: pulse-orange 2s infinite;
 }
+
+.status-badge-CANCELED {
+  background-color: var(--color-red-bg);
+  color: var(--color-red-text);
+}
+
+.status-badge-CLOSED {
+  background-color: var(--neutral-color);
+  color: var(--color-neutral-text);
+  opacity: 0.7;
+}
+
+.color-swatch.state-rework { background-color: var(--color-orange-text); }
+.color-swatch.state-assigned { background-color: var(--color-yellow-text); }
+.color-swatch.state-completed { background-color: var(--color-blue-bg); }
+.color-swatch.state-approved { background-color: var(--color-green-text); }
+.color-swatch.state-canceled { background-color: var(--color-red-text); }
+.color-swatch.state-closed { background-color: var(--neutral-color); }
+
+
+project-view-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.project-view-toggle button {
+  padding: 0.5rem 0.25rem;
+  margin: 0 0.5rem;
+  border: none;
+  background: transparent;
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.project-view-toggle button:hover {
+  color: var(--text-dark);
+}
+
+.project-view-toggle button.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+

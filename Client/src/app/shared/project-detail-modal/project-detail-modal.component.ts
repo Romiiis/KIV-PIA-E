@@ -7,8 +7,10 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {ToastrService} from 'ngx-toastr';
-import {LanguageService} from '@core/services/language.service';
+import {LanguageListService} from '@core/services/languageList.service';
 import {useDownloadOriginalMutation, useDownloadTranslatedMutation,} from '@api/queries/project.query';
+import {ProjectModalLayoutComponent} from '@shared/project-modal-layout/project-modal-layout.component';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 export interface ProjectDetailData {
   project: ProjectDomain;
@@ -19,12 +21,13 @@ export interface ProjectDetailData {
   standalone: true,
   imports: [
     CommonModule,
-    TitleCasePipe,
     MatDialogModule,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
+    ProjectModalLayoutComponent,
+    TranslatePipe,
   ],
   templateUrl: './project-detail-modal.component.html',
   styleUrls: ['./project-detail-modal.component.css']
@@ -33,9 +36,8 @@ export class ProjectDetailModalComponent {
 
   public project: ProjectDomain;
   public downloadingType: 'original' | 'translated' | null = null;
-  public targetLanguageName: string;
-  public targetLanguageTag: string;
-  public sourceLanguageTag: string = 'en';
+
+  protected targetLanguageName: string = '';
 
 
   readonly downloadOriginalMutation = useDownloadOriginalMutation();
@@ -45,11 +47,11 @@ export class ProjectDetailModalComponent {
     public dialogRef: MatDialogRef<ProjectDetailModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ProjectDetailData,
     private toastr: ToastrService,
-    private languageService: LanguageService,
+    protected languageService: LanguageListService,
+    private translationService: TranslateService
   ) {
     this.project = data.project;
     this.targetLanguageName = this.languageService.getLanguageName(this.project.targetLanguage);
-    this.targetLanguageTag = this.project.targetLanguage;
   }
 
   onClose(): void {
@@ -59,9 +61,10 @@ export class ProjectDetailModalComponent {
   async onDownload(type: 'original' | 'translated'): Promise<void> {
     if (this.downloadingType) return;
 
-    // ZÁKAZ VOLÁNÍ ENDPOINTU, POKUD SOUBOR NENÍ K DISPOZICI
+
     if (type === 'translated' && !this.project.translatedFileName) {
-      this.toastr.warning('Translated file is not yet available for download.');
+      let fileNotAvailable = this.translationService.instant('projectDetailModal.notifications.translatedFileNotAvailable');
+      this.toastr.warning(fileNotAvailable);
       return;
     }
 
@@ -84,12 +87,14 @@ export class ProjectDetailModalComponent {
       }
 
       this.triggerFileDownload(blob, filename);
-      this.toastr.success(`Downloaded ${filename} successfully!`);
+      let successMessage = this.translationService.instant('projectDetailModal.notifications.downloadSuccess', { fileName: filename });
+      this.toastr.success(successMessage);
 
     } catch (error) {
 
       console.error('Download failed', error);
-      this.toastr.error('Failed to download file. Please try again.');
+      let downloadErrorMessage = this.translationService.instant('projectDetailModal.notifications.downloadError');
+      this.toastr.error(downloadErrorMessage);
 
     } finally {
       this.downloadingType = null;

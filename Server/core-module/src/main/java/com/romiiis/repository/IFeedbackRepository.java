@@ -2,6 +2,7 @@ package com.romiiis.repository;
 
 import com.romiiis.domain.Feedback;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -34,5 +35,15 @@ public interface IFeedbackRepository {
      * Deletes all feedback entries from the repository
      */
     void deleteAll();
+
+
+    /**
+     * Retrieves all feedback entries for the given list of project IDs.
+     *
+     * @param projectIds a list of project IDs
+     * @return a list of Feedback objects associated with the provided project IDs
+     */
+    List<Feedback> getAllFeedbackForProjectIds(List<UUID> projectIds);
+
 
 }

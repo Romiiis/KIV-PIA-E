@@ -45,6 +45,7 @@ public class Project {
         this.createdAt = Instant.now();
     }
 
+
     /**
      * Assigns a translator to the project and changes the state to ASSIGNED.
      * <br><br>
@@ -166,7 +167,6 @@ public class Project {
         }
 
         this.state = ProjectState.ASSIGNED;
-
         return new Feedback(id, feedbackText);
     }
 

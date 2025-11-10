@@ -16,22 +16,21 @@
       }
     </mat-chip-listbox>
 
-    <!-- PŘIDÁNO: Zobrazí placeholder, pokud nejsou vybrány žádné jazyky a pole není aktivní -->
     @if (!selectedLanguages.length && !isFocused) {
-      <span class="selected-value is-placeholder">{{ placeholder }}</span>
+      <span class="selected-value is-placeholder">{{ placeholder | translate }}</span>
     }
 
   } @else {
     @if (!isFocused) {
       <span class="selected-value" [class.is-placeholder]="!selectedLanguages.length">
-        {{ selectedLanguages[0]?.name || placeholder }}
+        {{ selectedLanguages[0]?.name || (placeholder | translate) }}
       </span>
     }
   }
 
   <input
     #languageInput
-    [placeholder]="isFocused ? placeholder : ''"
+    [placeholder]="isFocused ? (placeholder | translate) : ''"
     class="language-input-field"
     [formControl]="searchControl"
     [matAutocomplete]="auto"
@@ -66,12 +65,12 @@
   }
   @if (!(filteredLanguages$ | async)?.length && searchControl.value) {
     <mat-option disabled class="no-results">
-      No matching languages
+      {{ 'languageSelect.noResults' | translate }}
     </mat-option>
   }
   @if (!(filteredLanguages$ | async)?.length && !searchControl.value) {
     <mat-option disabled class="no-results">
-      Type to search...
+      {{ 'languageSelect.typeToSearch' | translate }}
     </mat-option>
   }
 </mat-autocomplete>
