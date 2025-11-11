@@ -1,6 +1,4 @@
 package com.romiiis.controller;
-
-import com.romiiis.exception.BaseException;
 import com.romiiis.mapper.UserMapper;
 import com.romiiis.model.UserDTO;
 import com.romiiis.service.interfaces.IUserService;
@@ -35,8 +33,6 @@ public class MeController implements MeApi {
         UUID uuid = UUID.fromString(userIdString);
 
         return ResponseEntity.ok(userMapper.mapDomainToDTO(userService.getUserById(uuid)));
-
-
     }
 
 

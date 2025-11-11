@@ -5,6 +5,7 @@ import com.romiiis.domain.UserRole;
 import com.romiiis.model.UserDB;
 import com.romiiis.model.UserRoleDB;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 

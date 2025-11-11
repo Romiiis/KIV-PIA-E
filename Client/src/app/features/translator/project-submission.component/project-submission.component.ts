@@ -11,6 +11,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {useDownloadOriginalMutation} from '@api/queries/project.query';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {useUploadTranslatedMutation} from '@api/queries/workflow.query';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 
 export interface ProjectSubmissionData {
@@ -28,7 +29,8 @@ export interface ProjectSubmissionData {
     MatButtonModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    ProjectModalLayoutComponent
+    ProjectModalLayoutComponent,
+    TranslatePipe
   ],
   templateUrl: './project-submission.component.html',
   styleUrls: ['./project-submission.component.css']
@@ -48,7 +50,8 @@ export class ProjectSubmissionComponent implements OnInit {
     public dialogRef: MatDialogRef<ProjectSubmissionComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ProjectSubmissionData,
     private fb: FormBuilder,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private translationService: TranslateService
   ) {
     this.project = data.project;
     this.uploadForm = this.fb.group({
@@ -76,9 +79,11 @@ export class ProjectSubmissionComponent implements OnInit {
     try {
       const blob = await this.downloadOriginalMutation.mutateAsync(this.project.id);
       this.triggerFileDownload(blob, this.project.originalFileName);
-      this.toastr.success(`Downloaded ${this.project.originalFileName}`);
+      let downloadSuccessMsg = this.translationService.instant('projectSubmissionModal.notifications.downloadSuccess', {fileName: this.project.originalFileName});
+      this.toastr.success(downloadSuccessMsg);
     } catch (error) {
-      this.toastr.error('Failed to download original file.');
+      let downloadErrorMsg = this.translationService.instant('projectSubmissionModal.notifications.downloadError');
+      this.toastr.error(downloadErrorMsg);
     } finally {
       this.isDownloading = false;
     }
@@ -86,7 +91,8 @@ export class ProjectSubmissionComponent implements OnInit {
 
   async submitTranslation(): Promise<void> {
     if (!this.uploadForm.valid) {
-      this.toastr.warning('Please select a file to upload.');
+      let requiredFileMsg = this.translationService.instant('projectSubmissionModal.notifications.fileRequired');
+      this.toastr.warning(requiredFileMsg);
       return;
     }
     if (this.isLoading) return;
@@ -99,10 +105,12 @@ export class ProjectSubmissionComponent implements OnInit {
         id: this.project.id,
         file: file
       });
-      this.toastr.success('Translation submitted successfully!');
+      let successMsg = this.translationService.instant('projectSubmissionModal.notifications.submissionSuccess');
+      this.toastr.success(successMsg);
       this.dialogRef.close('submitted');
     } catch (error) {
-      this.toastr.error('Failed to submit translation. Please try again.');
+      let errorMsg = this.translationService.instant('projectSubmissionModal.notifications.submissionError');
+      this.toastr.error(errorMsg);
     } finally {
       this.isLoading = false;
     }

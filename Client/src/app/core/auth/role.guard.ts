@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree} from '@angular/router';
 import {AuthManager} from '@core/auth/auth.manager';
-import {UserRoleDomain} from '@core/models/userRole.model';
 import {AuthRoutingHelper} from '@core/auth/auth-routing.helper';
 
 

@@ -38,12 +38,11 @@ export class ProjectDomain {
 
   /**
    * Returns a modified status class for UI representation.
-   * @param project The project whose status class is to be determined.
    * @returns A string representing the status class.
    */
   public getStatusClass(): string {
 
-    if (this.status === 'ASSIGNED' && (this.feedback !== null)) {
+    if (this.status === 'ASSIGNED' && (this.feedback !== undefined && this.feedback !== null)) {
       return 'REWORK';
     }
 

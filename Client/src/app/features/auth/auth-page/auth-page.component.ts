@@ -124,11 +124,14 @@ export class AuthPageComponent implements OnInit {
         })
 
         // Handle login failure.
-        .catch(() => {
-          let loginErrorText = this.translateService.instant('authPage.notifications.loginError_text');
-          this.toastr.error(loginErrorText);
-        });
+        .catch((e) => {
+          console.log('e', e);
+          if (e?.status === 401) {
+            let loginErrorText = this.translateService.instant('authPage.notifications.loginError_text');
+            this.toastr.error(loginErrorText);
+          }
 
+        });
     }
   }
 

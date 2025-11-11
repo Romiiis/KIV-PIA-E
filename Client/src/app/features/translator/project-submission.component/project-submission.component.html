@@ -3,9 +3,9 @@
   <div class="dialog-header" slot="header">
     <h2 mat-dialog-title>
       @if (project.feedback) {
-        Resubmit Translation (Rework)
+        {{ "projectSubmissionModal.resubmitTitle" | translate }}
       } @else {
-        Submit Translation
+        {{ "projectSubmissionModal.submitTitle" | translate }}
       }
     </h2>
     <button mat-icon-button class="close-icon-btn" aria-label="Close dialog" (click)="onClose()">
@@ -15,18 +15,18 @@
 
   <div slot="content">
     @if (project.feedback) {
-      <p class="subtitle">The customer has requested revisions. Please review the feedback, download the original file, and upload the corrected version.</p>
+      <p class="subtitle">{{ "projectSubmissionModal.feedbackSubtitle" | translate }}</p>
     } @else {
-      <p class="subtitle">Download the source file, complete your translation, and upload the final document.</p>
+      <p class="subtitle">{{ "projectSubmissionModal.noFeedbackSubtitle" | translate }}</p>
     }
 
     <section class="detail-section">
       <h3>
         <mat-icon>{{ project.feedback ? 'rate_review' : 'cloud_download' }}</mat-icon>
         @if (project.feedback) {
-          Step 1: Review Feedback & Download
+          {{ "projectSubmissionModal.step1ReviewFeedback" | translate }}
         } @else {
-          Step 1: Download Source File
+          {{ "projectSubmissionModal.step1DownloadSource" | translate }}
         }
       </h3>
 
@@ -41,7 +41,8 @@
               {{ project.feedback.text }}
             </p>
             <span class="feedback-date">
-              Received: {{ project.feedback.createdAt | date:'short' }}
+              {{ "projectSubmissionModal.feedbackReceivedOn" | translate }}
+              : {{ project.feedback.createdAt | date:'short' }}
             </span>
           </div>
 
@@ -54,7 +55,9 @@
             } @else {
               <mat-icon>file_download</mat-icon>
             }
-            <span>Download: {{ project.originalFileName }}</span>
+
+            <span>
+              {{ "projectSubmissionModal.downloadTitle" | translate }}: {{ project.originalFileName }}</span>
           </button>
         </div>
       } @else {
@@ -67,7 +70,7 @@
           } @else {
             <mat-icon>file_download</mat-icon>
           }
-          <span>Download: {{ project.originalFileName }}</span>
+          <span>{{ "projectSubmissionModal.downloadTitle" | translate }}: {{ project.originalFileName }}</span>
         </button>
       }
     </section>
@@ -75,9 +78,9 @@
       <h3>
         <mat-icon>cloud_upload</mat-icon>
         @if (project.feedback) {
-          Step 2: Upload Corrected File
+          {{ "projectSubmissionModal.step2UploadCorrected" | translate }}
         } @else {
-          Step 2: Upload Translated File
+          {{ "projectSubmissionModal.step2UploadTranslated" | translate }}
         }
       </h3>
       <form [formGroup]="uploadForm">
@@ -85,13 +88,16 @@
 
           <button type="button" class="file-upload-button" (click)="fileInput.click()" mat-stroked-button>
             <span class="icon">{{ uploadForm.get('file')?.value ? '✅' : '⬆️' }}</span>
-            <span class="label">{{ uploadForm.get('file')?.value?.name || (project.feedback ? 'Drag & Drop Corrected File' : 'Drag & Drop Translated File') }}</span>
+            <span class="label">{{
+                uploadForm.get('file')?.value?.name ||
+                (project.feedback ? 'projectSubmissionModal.dragDropCorrected' : 'projectSubmissionModal.dragDropTranslated') | translate
+              }}</span>
           </button>
 
           <input hidden #fileInput type="file" (change)="onFileSelected($event)">
 
           @if (uploadForm.get('file')?.hasError('required') && uploadForm.get('file')?.touched) {
-            <div class="error-message">Corrected file is required.</div>
+            <div class="error-message">{{ "projectSubmissionModal.correctedFileError" | translate }}</div>
           }
         </div>
       </form>
@@ -107,9 +113,7 @@
       [disabled]="uploadForm.invalid || isLoading"
       (click)="submitTranslation()">
       @if (!isLoading) {
-        <span>
-          {{ project.feedback ? 'Submit Correction' : 'Submit Translation' }}
-        </span>
+        <span>{{(project.feedback ? 'projectSubmissionModal.submitCorrectionButton' : 'projectSubmissionModal.submitTranslationButton') | translate }}        </span>
       } @else {
         <mat-spinner [diameter]="24" color="accent"></mat-spinner>
       }

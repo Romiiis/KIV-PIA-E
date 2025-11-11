@@ -27,6 +27,12 @@ export function setRefreshHandler(handler: () => Promise<boolean>) {
   refreshHandler = handler;
 }
 
+const AUTH_PATHS = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/refresh'
+];
+
 /**
  * Response interceptor to handle 401 Unauthorized errors by attempting to refresh tokens.
  * If the refresh is successful, retries the original request.
@@ -37,9 +43,9 @@ instance.interceptors.response.use(
   async (error: AxiosError) => {
     const original = error.config as AxiosRequestConfig & { _retry?: boolean };
     const status = error.response?.status;
-
+    const url = original.url;
     // If not a 401 error or already retried, reject the promise
-    if (status !== 401 || original._retry) {
+    if (status !== 401 || original._retry ||(url && AUTH_PATHS.includes(url))) {
       return Promise.reject(error);
     }
 

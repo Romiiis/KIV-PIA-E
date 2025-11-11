@@ -5,7 +5,6 @@
   --waiting-color: var(--color-blue-bg, #11488f);
   --success-color: var(--color-green-text, #155e2b);
   --danger-color: var(--color-red-text, #d32f2f);
-  --neutral-color: var(--c-neutral, #95a5a6);
   --background-page: var(--c-bg-page, #f9fafc);
   --background-white: var(--c-bg-white, #fff);
   --text-dark: var(--c-text-dark, #2c3e50);
@@ -92,14 +91,6 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   transform: translateY(-4px);
 }
-
-.project-card.status-badge-ASSIGNED { border-top-color: var(--color-yellow-text, #713f12); }
-.project-card.status-badge-REWORK { border-top-color: var(--color-orange-text, #f97316); }
-.project-card.status-badge-COMPLETED { border-top-color: var(--color-blue-bg, #11488f); }
-.project-card.status-badge-APPROVED { border-top-color: var(--color-green-text, #155e2b); }
-.project-card.status-badge-CANCELED { border-top-color: var(--color-red-text, #d32f2f); }
-.project-card.status-badge-CLOSED { border-top-color: var(--color-green-text, #155e2b); }
-.project-card.status-badge-CREATED { border-top-color: var(--neutral-color, #95a5a6); }
 
 
 .card-content {

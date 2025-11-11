@@ -11,6 +11,7 @@ import {useListProjectsMutation} from '@api/queries/project.query';
 import {
   ProjectSubmissionComponent
 } from '@features/translator/project-submission.component/project-submission.component';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-translator-page',
@@ -20,7 +21,8 @@ import {
     MatDialogModule,
     DatePipe,
     MatIconModule,
-    TitleCasePipe
+    TitleCasePipe,
+    TranslatePipe
   ],
   templateUrl: './translator-page.component.html',
   styleUrls: ['./translator-page.component.css']
@@ -98,6 +100,7 @@ export class TranslatorPageComponent implements OnInit {
       data: {project: project},
       width: '600px',
       maxWidth: '95vw',
+      maxHeight: '100vh',
       panelClass: 'clean-dialog-panel',
       disableClose: true
     });

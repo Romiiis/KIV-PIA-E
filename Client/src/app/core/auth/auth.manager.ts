@@ -67,8 +67,8 @@ export class AuthManager {
    * @param password User's password.
    */
   async login(email: string, password: string) {
-    await this.loginMutation.mutateAsync({email, password});
-    await this.meQuery.refetch();
+      await this.loginMutation.mutateAsync({email, password})
+      await this.meQuery.refetch();
   }
 
   /**

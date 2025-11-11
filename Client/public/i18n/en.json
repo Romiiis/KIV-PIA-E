@@ -173,5 +173,39 @@
     "logoutButton": "Logout",
     "welcome": "Welcome",
     "translatorSettings": "Translator Settings"
+  },
+  "projectSubmissionModal": {
+    "notifications": {
+      "downloadSuccess": "File {{fileName}} was downloaded successfully!",
+      "downloadError": "Error downloading file. Please try again.",
+      "submissionSuccess": "Translation submitted successfully!",
+      "submissionError": "Error submitting translation. Please try again.",
+      "fileRequired": "Please upload the translated document."
+    },
+    "submitTitle": "Submit Translated Document",
+    "resubmitTitle": "Resubmit Translated Document",
+    "feedbackSubtitle": "The customer has requested revisions. Please review the feedback, download the original file, and upload the corrected version.",
+    "noFeedbackSubtitle": "Download the source file, complete your translation, and upload the final document.",
+    "step1ReviewFeedback": "Step 1: Review Feedback & Download",
+    "step1DownloadSource": "Step 1: Download Source File",
+    "feedbackReceivedOn": "Received",
+    "downloadTitle": "Download",
+    "step2UploadCorrected": "Step 2: Upload Corrected File",
+    "step2UploadTranslated": "Step 2: Upload Translated File",
+    "dragDropCorrected": "Drag & Drop Corrected File (Max 5MB)",
+    "dragDropTranslated": "Drag & Drop Translated File (Max 5MB)",
+    "correctedFileError": "Corrected file is required.",
+    "submitCorrectionButton": "Submit Correction",
+    "submitTranslationButton": "Submit Translation"
+  },
+  "translatorPage": {
+    "legend": {
+      "assigned": "Assigned",
+      "rework": "Assigned for Rework",
+      "completed": "Needs review",
+      "approved": "Approved",
+      "canceled": "Canceled",
+      "closed_created": "Closed/Created"
+    }
   }
 }

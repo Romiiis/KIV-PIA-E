@@ -27,6 +27,7 @@
   --color-orange-text: #f97316;   /* Tmavá oranžová pro "REWORK" */
   --color-red-bg: #ffebee;       /* Světlá červená pro "CANCELED" */
   --color-red-text: #d32f2f;      /* Tmavá červená pro "CANCELED" */
+  --neutral-color: #95a5a6;
 
   /* SDÍLENÉ BAREVNÉ TOKENS Z CUSTOMER PAGE, Mapované na globální paletu */
   --c-primary: #3498db;

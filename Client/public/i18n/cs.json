@@ -69,6 +69,13 @@
       "confirmPasswordLabel": "Potvrdit heslo",
       "confirmPasswordPlaceholder": "Zopakujte své heslo",
       "button": "Registrovat se"
+    },
+    "notifications": {
+      "loginSuccess_text": "Přihlášení bylo úspěšné",
+      "loginNoUser_text": "Nelze načíst informace o uživateli.",
+      "loginError_text": "Přihlášení se nezdařilo. Zkontrolujte prosím své údaje.",
+      "registerSuccess_text": "Registrace byla úspěšná",
+      "registerError_text": "Registrace se nezdařila. Zkuste to prosím znovu."
     }
   },
   "customerPage": {
@@ -128,7 +135,6 @@
     "rejectionReasonPlaceholder": "Napište zpětnou vazbu pro překladatele...",
     "rejectButton": "Zamítnout",
     "approveButton": "Schválit"
-
   },
   "languageSelect": {
     "placeholder": "Vyberte jazyk...",
@@ -167,5 +173,39 @@
     "logoutButton": "Odhlásit se",
     "welcome": "Vítejte",
     "translatorSettings": "Nastavení překladatele"
+  },
+  "projectSubmissionModal": {
+    "notifications": {
+      "downloadSuccess": "Soubor {{fileName}} byl úspěšně stažen!",
+      "downloadError": "Chyba při stahování souboru. Zkuste to prosím znovu.",
+      "submissionSuccess": "Překlad byl úspěšně odeslán!",
+      "submissionError": "Chyba při odesílání překladu. Zkuste to prosím znovu.",
+      "fileRequired": "Nahrajte prosím přeložený dokument."
+    },
+    "submitTitle": "Odeslat přeložený dokument",
+    "resubmitTitle": "Znovu odeslat přeložený dokument",
+    "feedbackSubtitle": "Zákazník požádal o revize. Projděte si prosím zpětnou vazbu, stáhněte si původní soubor a nahrajte opravenou verzi.",
+    "noFeedbackSubtitle": "Stáhněte si zdrojový soubor, dokončete překlad a nahrajte finální dokument.",
+    "step1ReviewFeedback": "Krok 1: Kontrola zpětné vazby a stažení",
+    "step1DownloadSource": "Krok 1: Stažení zdrojového souboru",
+    "feedbackReceivedOn": "Obdrženo",
+    "downloadTitle": "Stáhnout",
+    "step2UploadCorrected": "Krok 2: Nahrání opraveného souboru",
+    "step2UploadTranslated": "Krok 2: Nahrání přeloženého souboru",
+    "dragDropCorrected": "Přetáhněte opravený soubor (Max 5MB)",
+    "dragDropTranslated": "Přetáhněte přeložený soubor (Max 5MB)",
+    "correctedFileError": "Je vyžadován opravený soubor.",
+    "submitCorrectionButton": "Odeslat opravu",
+    "submitTranslationButton": "Odeslat překlad"
+  },
+  "translatorPage": {
+    "legend": {
+      "assigned": "Přiřazeno",
+      "rework": "K přepracování",
+      "completed": "Ke schválení",
+      "approved": "Schváleno",
+      "canceled": "Zrušeno",
+      "closed_created": "Uzavřeno/Vytvořeno"
+    }
   }
 }
