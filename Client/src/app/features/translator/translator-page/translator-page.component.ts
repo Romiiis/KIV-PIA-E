@@ -12,6 +12,7 @@ import {
   ProjectSubmissionComponent
 } from '@features/translator/project-submission.component/project-submission.component';
 import {TranslatePipe} from '@ngx-translate/core';
+import {LanguageListService} from '@core/services/languageList.service';
 
 @Component({
   selector: 'app-translator-page',
@@ -21,7 +22,6 @@ import {TranslatePipe} from '@ngx-translate/core';
     MatDialogModule,
     DatePipe,
     MatIconModule,
-    TitleCasePipe,
     TranslatePipe
   ],
   templateUrl: './translator-page.component.html',
@@ -37,7 +37,8 @@ export class TranslatorPageComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    protected langList: LanguageListService
   ) {
   }
 

@@ -1,45 +1,138 @@
+<div class="page-content">
+  <div class="project-dashboard">
 
-<div class="dashboard">
-  <div class="header">
-    <div class="stat-card">📄 {{ projects | filterByStatus:ProjectStatusDomain.CREATED | length }} with feedback</div>
-    <div class="stat-card">📝 {{ projects | filterByStatus:ProjectStatusDomain.COMPLETED | length }} completed</div>
-  </div>
+    <header class="dashboard-header">
+      <div class="header-left">
+        <h1>{{ "adminPage.title" | translate }}</h1>
+      </div>
+    </header>
 
-  <div class="timeline-board">
-    <div class="stage created">
-      <h3>Projects with feedback</h3>
-      @for (p of projects | filterByStatus:ProjectStatusDomain.CREATED; track p.id) {
-        <div class="project-card">
-          <div>
-            <div class="title">{{ p.customer.id }}</div>
-            <div class="lang">English → {{ p.targetLanguage }}</div>
+    <div class="filter-bar-wrapper">
+      @if (areLabelsReady) {
+        <div class="filter-bar">
+          <h3 class="filter-bar-title">
+            <mat-icon>filter_list</mat-icon>
+            <span>{{ "adminPage.filterTitle" | translate }}</span>
+          </h3>
+
+          <div class="filters-container">
+            <mat-form-field appearance="outline" class="filter-select">
+              <mat-label>{{ "adminPage.filter.status" | translate }}</mat-label>
+              <mat-icon matPrefix>layers</mat-icon>
+              <mat-select [(ngModel)]="filterStatus" (ngModelChange)="onFilterChange()" panelClass="admin-filter-overlay">
+                <mat-option value="all">{{ "adminPage.filter.allStatuses" | translate }}</mat-option>
+                @for (status of allStatuses; track status) {
+                  <mat-option [value]="status">
+                    {{ 'projectStatus.' + (status | lowercase) | translate }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="filter-select">
+              <mat-label>{{ "adminPage.filter.feedback" | translate }}</mat-label>
+              <mat-icon matPrefix>feedback</mat-icon>
+              <mat-select [(ngModel)]="filterFeedback" (ngModelChange)="onFilterChange()"
+                          panelClass="admin-filter-overlay">
+                <mat-option value="all">{{ "adminPage.filter.allFeedback" | translate }}</mat-option>
+                <mat-option value="yes">{{ "adminPage.filter.hasFeedback" | translate }}</mat-option>
+                <mat-option value="no">{{ "adminPage.filter.noFeedback" | translate }}</mat-option>
+              </mat-select>
+            </mat-form-field>
           </div>
-          <div>
-            <button class="btn btn-secondary">
-              <span class="material-icons">more_vert</span>
-            </button>
-          </div>
-
-
         </div>
-      } @empty { <p class="empty">No projects</p> }
+      } @else {
+        <div class="filter-bar-wrapper" style="height: 100px; visibility: hidden;"></div>
+      }
     </div>
 
-    <div class="stage completed">
-      <h3>Waiting for closing</h3>
-      @for (p of projects | filterByStatus:ProjectStatusDomain.COMPLETED; track p.id) {
-        <div class="project-card">
-          <div>
-            <div class="title">{{ p.customer.id }}</div>
-            <div class="lang">English → {{ p.targetLanguage }}</div>
+    <div class="project-status-legend">
+      <div class="legend-item">
+        <span class="color-swatch state-created"></span>
+        <span>{{ "customerPage.legend.created" | translate }}
+        </span>
+      </div>
+
+      <div class="legend-item">
+        <span class="color-swatch state-assigned"></span>
+        <span>{{ "customerPage.legend.assigned" | translate }}</span>
+      </div>
+      <div class="legend-item">
+        <span class="color-swatch state-rework"></span>
+        {{ "customerPage.legend.rework" | translate }}
+      </div>
+      <div class="legend-item">
+        <span class="color-swatch state-completed"></span>
+        {{ "customerPage.legend.completed" | translate }}
+      </div>
+      <div class="legend-item">
+        <span class="color-swatch state-approved"></span>
+        {{ "customerPage.legend.approved" | translate }}
+      </div>
+      <div class="legend-item">
+        <span class="color-swatch state-canceled"></span>
+        {{ "customerPage.legend.canceled" | translate }}
+      </div>
+      <div class="legend-item">
+        <span class="color-swatch state-closed"></span>
+        {{ "customerPage.legend.closed" | translate }}
+      </div>
+    </div>
+
+    <div class="project-grid">
+      @if (isLoading) {
+        <div class="loading-indicator">...</div>
+      } @else {
+        @for (p of filteredProjects; track p.id) {
+          <div class="project-card" [class]="'status-badge-' + p.getStatusClass()">
+            <div class="card-content">
+
+              <div class="status-box">
+                <h3 class="card-title">{{ p.originalFileName }}</h3>
+                <span class="status-badge" [ngClass]="'status-badge-' + p.getStatusClass()">
+                  {{ 'projectStatus.' + (p.getStatusClass() | lowercase) | translate }}
+                </span>
+              </div>
+              <div class="project-meta">
+                <span class="meta-item">
+                  <span class="icon">📅</span>
+                  <span><strong>{{ "adminPage.created" | translate }}:</strong> {{ p.createdAt | date: 'mediumDate' }}</span>
+                </span>
+                <span class="meta-item">
+                  <span class="icon">↔️</span>
+                  <span><strong>{{ (this.langList.getLanguageName("en")) }} →</strong> {{ this.langList.getLanguageName(p.targetLanguage) }}</span>
+                </span>
+                <span class="meta-item">
+                  <span class="icon">👤</span>
+                  <span><strong>{{ ("adminPage.customerLabel" | translate) | slice: 0 : 3 }}:</strong> {{ p.customer.name}}</span>
+                </span>
+                <span class="meta-item">
+                  <span class="icon">✍️</span>
+                  <span><strong>{{ "adminPage.translatorLabel" | translate | slice: 0 : 3  }}:</strong> {{ p.translator?.name ?? 'Not Assigned' }}</span>
+                </span>
+              </div>
+              @if (p.feedback && p.feedback.text.length > 0) {
+                <div class="card-alert-footer">
+                  <span class="meta-item feedback-warning">
+                    <span class="icon">⚠️</span>
+                    <span>{{ "adminPage.feedbackSubmitted" | translate }}</span>
+                  </span>
+                </div>
+              }
+
+            </div> <footer class="card-footer">
+            <button class="cta-button primary" (click)="openProjectManagement(p)">
+              <span class="icon">🔧</span>
+              <span class="label">{{ "adminPage.manageButton" | translate }}</span>
+            </button>
+          </footer>
           </div>
-          <div>
-            <button class="btn btn-danger">Close project</button>
+        } @empty {
+          <div class="empty-state">
+            <p>{{ "adminPage.noProjectsFound" | translate }}</p>
           </div>
-        </div>
-      } @empty { <p class="empty">No projects</p> }
+        }
+      }
     </div>
   </div>
 </div>
-
-

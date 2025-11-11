@@ -90,6 +90,10 @@
                   <span class="icon">📅</span>
                   <span>{{ "customerPage.created" | translate }}: {{ p.createdAt | date: 'mediumDate'  : this.languageService.activeLanguage()}}</span>
                 </span>
+                <span class="meta-item">
+                  <span class="icon">↔️</span>
+                  <span>{{ (this.langList.getLanguageName("en")) +  " → " + this.langList.getLanguageName( p.targetLanguage) }}</span>
+                </span>
               </div>
             </div>
 

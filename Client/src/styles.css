@@ -12,11 +12,11 @@
   --background-hover: #f3f4f6;
   --shadow-color-subtle: rgba(0, 0, 0, 0.04);
   --color-neutral-bg: #cecece;
-  --color-neutral-text: #6b7280;
+  --color-neutral-text: #000000;
 
   /* Barevné tokeny pro statusy (Váš kód) */
   --color-yellow-bg: #fef9c3;
-  --color-yellow-text: #713f12;
+  --color-yellow-text: #c99633;
   --color-blue-bg: #11488f;
   --color-blue-text: #ffffff;
   --color-green-bg: #dcfce7;
@@ -27,7 +27,9 @@
   --color-orange-text: #f97316;   /* Tmavá oranžová pro "REWORK" */
   --color-red-bg: #ffebee;       /* Světlá červená pro "CANCELED" */
   --color-red-text: #d32f2f;      /* Tmavá červená pro "CANCELED" */
-  --neutral-color: #95a5a6;
+  --neutral-color: #e5eaea;
+  --color-light-green-bg: #cbcbcb;
+  --color-purple-text: #6c014c;
 
   /* SDÍLENÉ BAREVNÉ TOKENS Z CUSTOMER PAGE, Mapované na globální paletu */
   --c-primary: #3498db;
@@ -101,12 +103,19 @@ body { font-family: Roboto, "Helvetica Neue", sans-serif; }
   opacity: 0.7;
 }
 
+.status-badge-CREATED {
+  background-color: var(--color-light-green-bg);
+  color: var(--color-purple-text);
+  animation: pulse-green 2s infinite;
+}
+
+.color-swatch.state-created { background-color: var(--color-purple-text); }
 .color-swatch.state-rework { background-color: var(--color-orange-text); }
 .color-swatch.state-assigned { background-color: var(--color-yellow-text); }
 .color-swatch.state-completed { background-color: var(--color-blue-bg); }
 .color-swatch.state-approved { background-color: var(--color-green-text); }
 .color-swatch.state-canceled { background-color: var(--color-red-text); }
-.color-swatch.state-closed { background-color: var(--neutral-color); }
+.color-swatch.state-closed { background-color: var(--color-neutral-text); }
 
 
 project-view-toggle {
@@ -138,5 +147,17 @@ project-view-toggle {
 .project-view-toggle button.active {
   color: var(--primary-color);
   border-bottom-color: var(--primary-color);
+}
+
+.admin-filter-overlay {
+  /*
+   * Nastavte zde číslo, které je zaručeně vyšší
+   * než z-index vašeho hlavního navbaru.
+   */
+  z-index: 9999 !important;
+}
+
+.cdk-overlay-container {
+  z-index: 1001 !important;
 }
 

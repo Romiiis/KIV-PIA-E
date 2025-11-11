@@ -3,7 +3,7 @@
 
     <header class="dashboard-header">
       <div class="header-left">
-        <h1>My Translation Tasks</h1>
+        <h1> {{ "translatorPage.title" | translate }}</h1>
       </div>
       <div class="project-status-legend">
         <div class="legend-item">
@@ -39,7 +39,7 @@
       <button
         [class.active]="currentView === 'action'"
         (click)="setView('action')">
-        <span>New Assignments</span>
+        <span>{{ 'translatorPage.newAssignments' | translate }}</span>
         @if (actionRequiredCount > 0) {
           <span class="action-badge">{{ actionRequiredCount }}</span>
         }
@@ -47,12 +47,12 @@
       <button
         [class.active]="currentView === 'waiting'"
         (click)="setView('waiting')">
-        <span>Waiting Customer Review</span>
+        <span>{{ 'translatorPage.waitingForReview' | translate }}</span>
       </button>
       <button
         [class.active]="currentView === 'history'"
         (click)="setView('history')">
-        <span>Closed History</span>
+        <span>{{ 'translatorPage.closedHistory' | translate }}</span>
       </button>
     </nav>
 
@@ -60,10 +60,10 @@
     <div class="project-grid">
       @if (isLoading) {
         <div class="loading-indicator">
-          <p>Loading tasks...</p>
+          <p>{{ "translatorPage.loadingProjects" | translate }}</p>
         </div>
-      } @else {
 
+      } @else {
         @for (p of projectsForCurrentView; track p.id) {
 
           <div class="project-card" [class]="'status-badge-' + p.getStatusClass()">
@@ -72,7 +72,7 @@
               <div class="status-box">
                 <h3 class="card-title">{{ p.originalFileName }}</h3>
                 <span class="status-badge" [ngClass]="'status-badge-' + p.getStatusClass()">
-                  {{ p.getStatusClass() | titlecase }}
+                      {{ 'projectStatus.' + (p.getStatusClass() | lowercase) | translate }}
                 </span>
 
               </div>
@@ -84,7 +84,7 @@
                 </span>
                 <span class="meta-item">
                   <span class="icon">↔️</span>
-                  <span>EN → {{ p.targetLanguage | uppercase }}</span>
+                  <span>{{ (this.langList.getLanguageName("en")) + " → " + this.langList.getLanguageName(p.targetLanguage) }}</span>
                 </span>
               </div>
             </div>
@@ -94,37 +94,37 @@
                 @case ('ASSIGNED') {
                   <button class="cta-button primary" (click)="openProjectSubmission(p); $event.stopPropagation()">
                     <span class="icon">⬆️</span>
-                    <span class="label">Upload Translation</span>
+                    <span class="label">{{ "translatorPage.uploadTranslationButton" | translate }}</span>
                   </button>
                 }
                 @case ('REWORK') {
                   <button class="cta-button rework" (click)="openProjectSubmission(p); $event.stopPropagation()">
                     <span class="icon">⬆️</span>
-                    <span class="label">Re-Upload Translation</span>
+                    <span class="label">{{ "translatorPage.resubmitTranslationButton" | translate }}</span>
                   </button>
                 }
                 @case ('COMPLETED') {
                   <button class="cta-button ghost" (click)="openProjectDetails(p); $event.stopPropagation()">
                     <span class="icon">👀</span>
-                    <span class="label">View Status (Waiting)</span>
+                    <span class="label">{{ "translatorPage.viewStatusButton" | translate }}</span>
                   </button>
                 }
                 @case ('APPROVED') {
                   <button class="cta-button success" (click)="openProjectDetails(p); $event.stopPropagation()">
                     <span class="icon">✅</span>
-                    <span class="label">View Approved</span>
+                    <span class="label">{{ "translatorPage.viewApprovedButton" | translate }}</span>
                   </button>
                 }
                 @case ('CLOSED') {
                   <button class="cta-button ghost" (click)="openProjectDetails(p); $event.stopPropagation()">
                     <span class="icon">🗄️</span>
-                    <span class="label">View History</span>
+                    <span class="label">{{ "translatorPage.viewClosedButton" | translate }}</span>
                   </button>
                 }
                 @case ('CANCELED') {
                   <button class="cta-button ghost" (click)="openProjectDetails(p); $event.stopPropagation()">
                     <span class="icon">🗄️</span>
-                    <span class="label">View Canceled Project</span>
+                    <span class="label">{{ "translatorPage.viewCanceledButton" | translate }}</span>
                   </button>
                 }
               }
@@ -135,13 +135,13 @@
           <div class="empty-state">
             @switch (currentView) {
               @case ('action') {
-                <p>All clear! You have no current translation tasks.</p>
+                <p>{{ "translatorPage.noNewAssignments" | translate }}</p>
               }
               @case ('waiting') {
-                <p>No tasks waiting for customer review.</p>
+                <p>{{ "translatorPage.noWaitingForReview" | translate }}</p>
               }
               @case ('history') {
-                <p>No closed projects found.</p>
+                <p>{{ "translatorPage.noClosedHistory" | translate }}</p>
               }
             }
           </div>

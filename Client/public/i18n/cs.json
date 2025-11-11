@@ -4,13 +4,14 @@
     "translator": "Překladatel",
     "sourceLanguage": "Zdrojový jazyk",
     "targetLanguage": "Cílový jazyk",
-    "admin": "Administrátor",
+    "administrator": "Administrátor",
     "success": "Úspěch",
     "error": "Chyba",
     "required": "Povinné",
     "rejected": "Odmítnuto"
   },
   "projectStatus": {
+    "created": "Vytvořeno",
     "assigned": "Přiřazeno",
     "completed": "Dokončeno",
     "approved": "Schváleno",
@@ -81,12 +82,13 @@
   "customerPage": {
     "myProjects": "Moje projekty",
     "legend": {
+      "created": "Vytvořeno",
       "assigned": "Přiřazeno",
       "rework": "K přepracování",
       "completed": "Ke schválení",
       "approved": "Schváleno",
       "canceled": "Zrušeno",
-      "closed_created": "Uzavřeno/Vytvořeno"
+      "closed": "Uzavřeno"
     },
     "createProjectButton": "Vytvořit nový projekt",
     "view": {
@@ -200,12 +202,60 @@
   },
   "translatorPage": {
     "legend": {
+      "created": "Vytvořeno",
       "assigned": "Přiřazeno",
       "rework": "K přepracování",
       "completed": "Ke schválení",
       "approved": "Schváleno",
       "canceled": "Zrušeno",
-      "closed_created": "Uzavřeno/Vytvořeno"
-    }
+      "closed": "Uzavřeno"
+    },
+    "title": "Moje překladatelské projekty",
+    "newAssignments": "Otevřené úkoly",
+    "waitingForReview": "Čeká na kontrolu",
+    "closedHistory": "Uzavřená historie",
+    "loadingProjects": "Načítání projektů...",
+    "uploadTranslationButton": "Nahrát překlad",
+    "resubmitTranslationButton": "Znovu odeslat překlad",
+    "viewStatusButton": "Zobrazit stav projektu",
+    "viewApprovedButton": "Zobrazit detail projektu",
+    "viewClosedButton": "Zobrazit archivovaný projekt",
+    "viewCanceledButton": "Zobrazit zrušený projekt",
+    "noNewAssignments": "Momentálně nemáte žádné otevřené úlohy.",
+    "noWaitingForReview": "Momentálně nemáte žádné projekty čekající na kontrolu.",
+    "noClosedHistory": "Zatím nemáte žádnou uzavřenou historii projektů."
+  },
+  "translatorSettingsModal": {
+    "notifications": {
+      "settingsSavedSuccess": "Nastavení překladatele bylo úspěšně uloženo!",
+      "settingsSavedError": "Chyba při ukládání nastavení překladatele. Zkuste to prosím znovu.",
+      "userInfoLoadError": "Chyba při načítání informací o uživateli. Zkuste to prosím znovu.",
+      "selectAtLeastOneLanguage": "Vyberte prosím alespoň jeden jazyk."
+    },
+    "title": "Nastavení překladatele",
+    "languageLabel": "Jazyky, které překládáte",
+    "languageDescription": "Vyberte všechny jazyky, do kterých jste schopni překládat. Toto nastavení vám pomůže při přiřazování vhodných překladatelských projektů.",
+    "languagePlaceholder": "Vyberte jazyky...",
+    "saveButton": "Uložit nastavení",
+    "cancelButton": "Zrušit"
+  },
+  "adminPage": {
+    "title": "Správa projektů",
+    "loadingProjects": "Načítám všechny projekty...",
+    "created": "Vytvořeno",
+    "feedbackSubmitted": "S feedbackem",
+    "manageButton": "Spravovat projekt",
+    "noProjectsFound": "Nebyly nalezeny žádné projekty odpovídající filtrům.",
+    "customerLabel": "Zákazník",
+    "translatorLabel": "Překladatel",
+    "filter": {
+      "status": "Filtrovat podle stavu",
+      "allStatuses": "Všechny stavy",
+      "feedback": "Filtrovat podle feedbacku",
+      "allFeedback": "Veškerý feedback",
+      "hasFeedback": "S feedbackem",
+      "noFeedback": "Bez feedbacku"
+    },
+    "filterTitle": "Filtrovat projekty"
   }
 }

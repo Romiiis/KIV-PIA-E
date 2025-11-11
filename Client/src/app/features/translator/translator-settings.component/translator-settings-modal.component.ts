@@ -9,6 +9,7 @@ import { AuthManager } from '@core/auth/auth.manager';
 import { MatDialogModule, MatDialogRef, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { LanguageSelectComponent } from '@shared/language-select/language-select.component';
 import {useReplaceTranslatorLanguagesMutation} from '@api/queries/translators.query';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-translator-settings-modal',
@@ -22,7 +23,8 @@ import {useReplaceTranslatorLanguagesMutation} from '@api/queries/translators.qu
     MatDialogActions,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslatePipe
   ],
   templateUrl: './translator-settings-modal.component.html',
   styleUrls: ['./translator-settings-modal.component.css']
@@ -38,7 +40,8 @@ export class TranslatorSettingsModalComponent implements OnInit {
     public dialogRef: MatDialogRef<TranslatorSettingsModalComponent>,
     private fb: FormBuilder,
     private auth: AuthManager,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private translationService: TranslateService
   ) {
     this.form = this.fb.group({
       languages: [[] as string[]]
@@ -64,7 +67,8 @@ export class TranslatorSettingsModalComponent implements OnInit {
 
     const currentUser = this.auth.user();
     if (!currentUser) {
-      this.toastr.error('User not found. Please log in again.');
+      let errorMsg = this.translationService.instant('translatorSettingsModal.notifications.userInfoLoadError');
+      this.toastr.error(errorMsg);
       return;
     }
 
@@ -72,7 +76,8 @@ export class TranslatorSettingsModalComponent implements OnInit {
     const { languages } = this.form.value;
 
     if (languages.length === 0) {
-      this.toastr.error('Please select at least one language.');
+      let errorMsg = this.translationService.instant('translatorSettingsModal.notifications.selectAtLeastOneLanguage');
+      this.toastr.error(errorMsg);
       this.isLoading = false;
       return;
     }
@@ -85,13 +90,16 @@ export class TranslatorSettingsModalComponent implements OnInit {
       {
         onSuccess: async () => {
           await this.auth.refreshUserData();
-          this.toastr.success('Your language settings have been updated!');
+          let successMsg = this.translationService.instant('translatorSettingsModal.notifications.settingsSavedSuccess');
+          this.toastr.success(successMsg);
           this.form.markAsPristine();
           this.dialogRef.close('saved');
         },
         onError: (err) => {
           console.error('Failed to update settings:', err);
-          this.toastr.error('Failed to update settings. Please try again.');
+
+          let errorMsg = this.translationService.instant('translatorSettingsModal.notifications.settingsSavedError');
+          this.toastr.error(errorMsg);
         },
         onSettled: () => {
           this.isLoading = false;

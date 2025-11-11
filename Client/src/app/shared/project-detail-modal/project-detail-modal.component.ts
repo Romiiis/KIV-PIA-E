@@ -11,9 +11,13 @@ import {LanguageListService} from '@core/services/languageList.service';
 import {useDownloadOriginalMutation, useDownloadTranslatedMutation,} from '@api/queries/project.query';
 import {ProjectModalLayoutComponent} from '@shared/project-modal-layout/project-modal-layout.component';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {FormsModule} from '@angular/forms';
+import {MatFormField, MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
 
 export interface ProjectDetailData {
   project: ProjectDomain;
+  isAdminView?: boolean;
 }
 
 @Component({
@@ -28,6 +32,9 @@ export interface ProjectDetailData {
     MatProgressSpinnerModule,
     ProjectModalLayoutComponent,
     TranslatePipe,
+    MatFormFieldModule, // Zde musí být MODUL
+    MatInputModule,
+    FormsModule,
   ],
   templateUrl: './project-detail-modal.component.html',
   styleUrls: ['./project-detail-modal.component.css']
@@ -38,6 +45,11 @@ export class ProjectDetailModalComponent {
   public downloadingType: 'original' | 'translated' | null = null;
 
   protected targetLanguageName: string = '';
+
+  public isAdminView: boolean = false;
+  public adminMessage: string = '';
+  public isSending: boolean = false;
+  public isClosing: boolean = false;
 
 
   readonly downloadOriginalMutation = useDownloadOriginalMutation();
@@ -51,7 +63,11 @@ export class ProjectDetailModalComponent {
     private translationService: TranslateService
   ) {
     this.project = data.project;
+    this.isAdminView = data.isAdminView ?? false;
     this.targetLanguageName = this.languageService.getLanguageName(this.project.targetLanguage);
+    if (this.project.feedback) {
+      this.adminMessage = `Odpověď na feedback:\n"${this.project.feedback.text}"\n\n------------------\n`;
+    }
   }
 
   onClose(): void {
@@ -111,4 +127,61 @@ export class ProjectDetailModalComponent {
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   }
+
+
+  // TODO - nove funkce pro admina - odeslani zpravy a uzavreni projektu
+
+  /**
+   * (Simulace) Odešle zprávu zákazníkovi/překladateli
+   */
+  async onAdminSendMessage(): Promise<void> {
+    if (this.isSending || !this.adminMessage.trim()) return;
+    this.isSending = true;
+
+    try {
+      // Zde byste volali reálnou mutaci:
+      // await this.sendMessageMutation.mutateAsync({
+      //   projectId: this.project.id,
+      //   message: this.adminMessage
+      // });
+
+      // Simulace
+      await new Promise(resolve => setTimeout(resolve, 750));
+      this.toastr.success('Zpráva byla odeslána (simulace).');
+      this.adminMessage = ''; // Vyčistit zprávu
+
+    } catch (error) {
+      this.toastr.error('Odeslání zprávy selhalo.');
+      console.error('Send message failed', error);
+    } finally {
+      this.isSending = false;
+    }
+  }
+
+  /**
+   * (Simulace) Uzavře projekt z pohledu admina
+   */
+  async onAdminCloseProject(): Promise<void> {
+    if (this.isClosing) return;
+    this.isClosing = true;
+
+    try {
+      // Zde byste volali reálnou mutaci:
+      // await this.closeProjectMutation.mutateAsync(this.project.id);
+
+      // Simulace
+      await new Promise(resolve => setTimeout(resolve, 750));
+      this.toastr.success('Projekt byl úspěšně uzavřen (simulace).');
+
+      // Zavřeme modál a vrátíme 'projectUpdated', aby se seznam na stránce admina obnovil
+      this.dialogRef.close('projectUpdated');
+
+    } catch (error) {
+      this.toastr.error('Uzavření projektu selhalo.');
+      console.error('Close project failed', error);
+    } finally {
+      this.isClosing = false;
+    }
+  }
+
 }

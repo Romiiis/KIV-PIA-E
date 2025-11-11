@@ -6,10 +6,11 @@ import { NewProjectComponent } from '@features/customer/new-project/new-project.
 import { useListProjectsMutation } from '@api/queries/project.query';
 import { ProjectDetailModalComponent } from '@shared/project-detail-modal/project-detail-modal.component';
 
-import {DatePipe, LowerCasePipe, NgClass, TitleCasePipe} from '@angular/common';
+import {DatePipe, LowerCasePipe, NgClass, TitleCasePipe, UpperCasePipe} from '@angular/common';
 import {ProjectReviewComponent} from '@features/customer/project-review/project-review.component';
 import {TranslatePipe} from '@ngx-translate/core';
 import {LanguageService} from '@core/services/language.service';
+import {LanguageListService} from '@core/services/languageList.service';
 
 @Component({
   selector: 'app-customer-page',
@@ -33,7 +34,8 @@ export class CustomerPageComponent implements OnInit {
 
   currentView: 'action' | 'progress' | 'history' = 'action';
 
-  constructor(public dialog: MatDialog, public languageService: LanguageService) {}
+  constructor(public dialog: MatDialog, public languageService: LanguageService,
+              protected langList: LanguageListService) {}
 
   ngOnInit(): void {
     this.fetchCustomerProjects().then();

@@ -1,7 +1,7 @@
 <div class="dialog-wrapper">
 
   <div class="dialog-header">
-    <h2 mat-dialog-title>My Language Settings</h2>
+    <h2 mat-dialog-title>{{ 'translatorSettingsModal.title' | translate }}</h2>
     <button mat-icon-button class="close-icon-btn" aria-label="Close dialog" (click)="onClose()">
       <mat-icon>close</mat-icon>
     </button>
@@ -12,17 +12,17 @@
       <section class="detail-section">
         <h3>
           <mat-icon>translate</mat-icon>
-          My Languages
+          {{ 'translatorSettingsModal.languageLabel' | translate }}
         </h3>
 
         <p class="form-description">
-          Select the languages you want to translate. These will be used to assign you new projects.
+          {{ 'translatorSettingsModal.languageDescription' | translate }}
         </p>
 
         <app-language-select
           [isMulti]="true"
           formControlName="languages"
-          [placeholder]="'Select languages...'"
+          [placeholder]="'translatorSettingsModal.languagePlaceholder' | translate"
         ></app-language-select>
 
       </section>
@@ -31,7 +31,7 @@
 
   <mat-dialog-actions class="actions-container">
     <button mat-button (click)="onClose()">
-      Cancel
+      {{ 'translatorSettingsModal.cancelButton' | translate }}
     </button>
     <button
       mat-flat-button
@@ -39,10 +39,11 @@
       (click)="saveSettings()"
       [disabled]="isLoading || form.pristine || form.invalid">
       @if (!isLoading) {
-        <span>Save Changes</span>
+        <span>{{ 'translatorSettingsModal.saveButton' | translate }}</span>
       } @else {
         <mat-spinner [diameter]="24" color="accent"></mat-spinner>
       }
+
     </button>
   </mat-dialog-actions>
 

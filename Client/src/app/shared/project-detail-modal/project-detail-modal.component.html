@@ -4,7 +4,6 @@
     <h2 mat-dialog-title [matTooltip]="project.originalFileName">
       {{ project.originalFileName }}
     </h2>
-
     <button mat-icon-button
             class="close-icon-btn"
             aria-label="Close dialog"
@@ -14,7 +13,6 @@
   </div>
 
   <div slot="content">
-
     <div class="content-grid">
       <section class="detail-section">
         <h3>
@@ -152,8 +150,58 @@
           <p>{{ "projectDetailModal.closedMessage" | translate }}</p>
         </section>
       }
-
     </div>
+  </div>
+
+  <div slot="actions">
+    @if (isAdminView) {
+      <section class="detail-section admin-actions">
+        <h4>
+          <mat-icon>admin_panel_settings</mat-icon>
+          Admin Actions
+        </h4>
+
+        @if (project.feedback || project.status !== 'CLOSED') {
+          <div class="admin-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Zpráva pro zákazníka / překladatele</mat-label>
+              <textarea matInput
+                        [(ngModel)]="adminMessage"
+                        rows="3"
+                        placeholder="Napište zprávu..."></textarea>
+            </mat-form-field>
+
+            <div class="admin-buttons-grid">
+              <button class="admin-cta-button send"
+                      [disabled]="isSending || !adminMessage.trim()"
+                      (click)="onAdminSendMessage()">
+                @if (isSending) {
+                  <mat-spinner [diameter]="20"></mat-spinner>
+                } @else {
+                  <mat-icon>send</mat-icon>
+                  <span>Odeslat zprávu</span>
+                }
+              </button>
+
+              @if (project.status !== 'CLOSED') {
+                <button class="admin-cta-button close"
+                        [disabled]="isClosing"
+                        (click)="onAdminCloseProject()">
+                  @if (isClosing) {
+                    <mat-spinner [diameter]="20"></mat-spinner>
+                  } @else {
+                    <mat-icon>gpp_good</mat-icon>
+                    <span>Uzavřít projekt</span>
+                  }
+                </button>
+              }
+            </div>
+          </div>
+        } @else {
+          <p class="muted-text">Tento projekt je již uzavřen a nevyžaduje žádnou akci.</p>
+        }
+      </section>
+    }
   </div>
 
 </app-project-modal-layout>

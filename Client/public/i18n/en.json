@@ -4,13 +4,14 @@
     "translator": "Translator",
     "sourceLanguage": "Source Language",
     "targetLanguage": "Target Language",
-    "admin": "Administrator",
+    "administrator": "Administrator",
     "success": "Success",
     "error": "Error",
     "required": "Required",
     "rejected": "Rejected"
   },
   "projectStatus": {
+    "created": "Created",
     "assigned": "Assigned",
     "completed": "Completed",
     "approved": "Approved",
@@ -86,12 +87,13 @@
   "customerPage": {
     "myProjects": "My Projects",
     "legend": {
+      "created" : "Created",
       "assigned": "Assigned",
       "rework": "Assigned for Rework",
       "completed": "Needs review",
       "approved": "Approved",
       "canceled": "Canceled",
-      "closed_created": "Closed/Created"
+      "closed": "Closed"
     },
     "createProjectButton": "Create New Project",
     "view": {
@@ -200,12 +202,61 @@
   },
   "translatorPage": {
     "legend": {
+      "created" : "Created",
       "assigned": "Assigned",
       "rework": "Assigned for Rework",
       "completed": "Needs review",
       "approved": "Approved",
       "canceled": "Canceled",
-      "closed_created": "Closed/Created"
-    }
+      "closed": "Closed"
+    },
+    "title": "My Translation Projects",
+    "newAssignments": "Open Assignments",
+    "waitingForReview": "Waiting for Review",
+    "closedHistory": "Closed History",
+    "loadingProjects": "Loading projects...",
+    "uploadTranslationButton": "Upload Translation",
+    "resubmitTranslationButton": "Resubmit Translation",
+    "viewStatusButton": "View Status",
+    "viewApprovedButton": "View project Details",
+    "viewClosedButton": "View Archived Project",
+    "viewCanceledButton": "View Canceled Project",
+    "noNewAssignments": "No new assignments available at the moment.",
+    "noWaitingForReview": "No projects are currently awaiting your review.",
+    "noClosedHistory": "You have no closed project history yet."
+  },
+  "translatorSettingsModal": {
+    "notifications": {
+      "settingsSavedSuccess": "Translator settings saved successfully!",
+      "settingsSavedError": "Error saving translator settings. Please try again.",
+      "userInfoLoadError": "Error loading user information. Please try again.",
+      "selectAtLeastOneLanguage": "Please select at least one language."
+    },
+    "title": "Translator Settings",
+    "languageLabel": "Languages You Translate",
+    "languageDescription": "Select the languages you want to translate. These will be used to assign you new projects.",
+    "languagePlaceholder": "Select languages...",
+    "saveButton": "Save Settings",
+    "cancelButton": "Cancel"
+  },
+  "adminPage": {
+    "title": "Project Management",
+    "loadingProjects": "Loading all projects...",
+    "created": "Created",
+    "feedbackSubmitted": "Feedback Submitted",
+    "manageButton": "Manage Project",
+    "noProjectsFound": "No projects found matching the current filters.",
+    "customerLabel": "Cust",
+    "translatorLabel": "Trans",
+    "filter": {
+      "status": "Filter by Status",
+      "allStatuses": "All Statuses",
+      "feedback": "Filter by Feedback",
+      "allFeedback": "All Feedback",
+      "hasFeedback": "With Feedback",
+      "noFeedback": "No Feedback"
+    },
+    "filterTitle": "Filter Projects"
   }
+
 }
