@@ -1,0 +1,60 @@
+<div class="dialog-header">
+  <h2 mat-dialog-title>
+    <mat-icon>send</mat-icon> {{ 'adminActionModal.tabSend' | translate }} </h2>
+  <button mat-icon-button class="close-icon-btn" (click)="onClose()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content>
+  <p class="dialog-subtitle">
+    {{ 'adminActionModal.subtitle' | translate }} <strong>{{ project.originalFileName }}</strong>
+  </p>
+
+  <div class="recipient-options">
+    <h3>{{ 'adminActionModal.recipientTitle' | translate }}</h3>
+    <mat-radio-group [(ngModel)]="messageRecipient" class="recipient-radio-group">
+      <mat-radio-button value="customer">
+        {{ 'adminActionModal.recipientCustomer' | translate }} ({{ project.customer.name }})
+      </mat-radio-button>
+
+      @if (hasTranslator) {
+        <mat-radio-button value="translator">
+          {{ 'adminActionModal.recipientTranslator' | translate }} ({{ project.translator?.name }})
+        </mat-radio-button>
+        <mat-radio-button value="both">
+          {{ 'adminActionModal.recipientBoth' | translate }}
+        </mat-radio-button>
+      }
+    </mat-radio-group>
+  </div>
+
+  <div class="admin-form">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'adminActionModal.messageLabel' | translate }}</mat-label>
+      <textarea matInput
+                [(ngModel)]="adminMessage"
+                rows="5"
+                [placeholder]="'adminActionModal.messagePlaceholder' | translate"></textarea>
+    </mat-form-field>
+
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions class="action-footer">
+  <button mat-button class="cancel-button" (click)="onClose()">
+    {{ 'global.cancel' | translate }}
+  </button>
+
+  <button class="admin-cta-button send"
+          [disabled]="isSending || !adminMessage.trim()"
+          (click)="onAdminSendMessage()">
+    @if (isSending) {
+      <mat-spinner [diameter]="20"></mat-spinner>
+    } @else {
+      <mat-icon>send</mat-icon>
+      <span>{{ 'adminActionModal.buttonSend' | translate }}</span>
+    }
+  </button>
+</mat-dialog-actions>

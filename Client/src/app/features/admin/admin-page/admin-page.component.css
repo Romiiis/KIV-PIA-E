@@ -1,10 +1,9 @@
 :host {
-  /* ... (proměnné beze změny) ... */
   --admin-primary-color: #11488f; /* Definice barvy pro admina */
   --admin-primary-hover: #0d3a70;
+  --color-reject: #e74c3c; /* Přidáno pro Close tlačítko */
 }
 
-/* ... (page-content, project-dashboard, dashboard-header, atd. beze změny) ... */
 .page-content {
   background-color: var(--background-page);
   min-height: 100vh;
@@ -39,7 +38,7 @@
   color: var(--text-dark);
 }
 
-/* --- NOVÉ STYLY PRO FILTR BAR --- */
+/* --- STYLY PRO FILTR BAR --- */
 
 .filter-bar {
   background: var(--background-white);
@@ -76,15 +75,12 @@
   min-width: 250px;
 }
 
-/* Posunutí ikony, aby byla hezky zarovnaná */
 .filter-select mat-icon[matPrefix] {
   margin-right: 0.5rem;
   color: var(--text-light);
 }
-/* --- KONEC NOVÝCH STYLŮ PRO FILTR BAR --- */
+/* --- KONEC STYLŮ PRO FILTR BAR --- */
 
-
-/* ... (project-grid, loading-indicator, project-card, ... beze změny) ... */
 .project-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -115,15 +111,13 @@
   transform: translateY(-4px);
 }
 
-
 .card-content {
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem; /* Lehce zvětšená mezera pro lepší oddělení */
+  gap: 1.25rem;
   flex-grow: 1;
 }
-
 
 .card-content .status-box {
   display: flex;
@@ -146,16 +140,14 @@
   white-space: normal;
 }
 
-
 .card-content .status-box .status-badge {
   flex-shrink: 0;
 }
 
-
 .project-meta {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem 1rem; /* Větší mezera mezi sloupci */
+  gap: 0.75rem 1rem;
 }
 
 .meta-item {
@@ -166,7 +158,6 @@
   color: var(--text-light);
 }
 
-/* Zvýraznění popisků (Cust:, Trans:, atd.) */
 .meta-item strong {
   color: var(--text-dark);
   font-weight: 600;
@@ -181,30 +172,26 @@
   text-align: center;
 }
 
-
-/* Kontejner pro upozornění na feedback */
 .card-alert-footer {
-  margin-top: 0.25rem; /* Menší mezera */
+  margin-top: 0.25rem;
   padding-top: 0.75rem;
   border-top: 1px dashed var(--border-color);
 }
 
-/* Vylepšení stávajícího stylu pro feedback */
 .meta-item.feedback-warning {
   color: var(--danger-color, #d32f2f);
   font-weight: 600;
-  background-color: rgba(211, 47, 47, 0.05); /* Lehké pozadí */
-  padding: 0.5rem; /* Odsazení */
-  border-radius: 6px; /* Oblé rohy */
-  width: 100%; /* Natáhnout přes celý kontejner */
+  background-color: rgba(211, 47, 47, 0.05);
+  padding: 0.5rem;
+  border-radius: 6px;
+  width: 100%;
 }
 
 .meta-item.feedback-warning .icon {
   color: var(--danger-color, #d32f2f);
   opacity: 1;
-  flex-shrink: 0; /* Aby se ikona nezmenšila */
+  flex-shrink: 0;
 }
-
 
 .card-footer {
   padding: 1rem;
@@ -213,22 +200,45 @@
   border-radius: 0 0 11px 11px;
 }
 
+/* Mřížka pro 2 nebo 3 tlačítka */
+.card-footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Výchozí jsou 2 sloupce */
+  gap: 0.75rem;
+}
+
+/* Dynamická třída pro 3 sloupce */
+.card-footer-grid.three-buttons {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
 .cta-button {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem 0.5rem; /* Zmenšen padding pro 3 tlačítka */
   border-radius: 50px;
   border: none;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem; /* Zmenšen font */
   font-weight: 600;
-  width: 100%;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-/* Oprava barvy, aby nebyla šedá */
+.cta-button .icon {
+  display: flex;
+  align-items: center;
+}
+.cta-button .icon mat-icon {
+  font-size: 1rem; /* Zmenšena ikona */
+  height: 1rem;
+  width: 1rem;
+  line-height: 1;
+}
+
+/* Tlačítko "Mail" nyní používá styl .secondary, stejně jako "Detail" */
 .cta-button.primary {
   background: var(--admin-primary-color, #11488f);
   color: #fff;
@@ -237,7 +247,31 @@
   background: var(--admin-primary-hover, #0d3a70);
 }
 
-/* ... (project-status-legend, legend-item, ... beze změny) ... */
+.cta-button.secondary {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-dark);
+}
+.cta-button.secondary:hover {
+  background: var(--background-page);
+  border-color: #ccc;
+}
+.cta-button.secondary .icon {
+  color: var(--admin-primary-color);
+}
+
+/* Nové styly pro tlačítko "Close" */
+.cta-button.close {
+  background: var(--color-reject);
+  color: #fff;
+}
+.cta-button.close:hover {
+  background: #c0392b; /* Tmavší červená */
+}
+.cta-button.close .icon {
+  color: #fff;
+}
+
 .project-status-legend {
   display: flex;
   gap: 1.5rem;
@@ -267,8 +301,8 @@
 }
 
 
+/* --- ZDE ZAČÍNÁ RESPONZIVNÍ LOGIKA --- */
 @media (max-width: 768px) {
-  /* ... (jiné mobilní styly) ... */
   .project-dashboard {
     padding: 1rem;
     gap: 1rem;
@@ -290,7 +324,6 @@
     font-size: 1.5rem;
   }
 
-  /* Úprava pro mobilní filtry */
   .filter-bar {
     padding: 1rem;
   }
@@ -311,13 +344,11 @@
     gap: 0.75rem;
   }
 
-  /* Na mobilu vrátíme mřížku na jeden sloupec */
   .project-meta {
     grid-template-columns: 1fr;
-    gap: 0.6rem; /* Zmenšení mezery pro mobil */
+    gap: 0.6rem;
   }
 
-  /* ... (zbytek mobilních stylů) ... */
   .project-card:hover {
     transform: none;
   }
@@ -351,9 +382,16 @@
     padding: 0.75rem 1rem;
   }
 
+  /* TOTO JE TO KLÍČOVÉ PRAVIDLO:
+    Mřížka se na mobilu roztáhne na plnou šířku (1 sloupec)
+  */
+  .card-footer-grid {
+    grid-template-columns: 1fr;
+  }
+
   .cta-button {
     font-size: 0.85rem;
-    padding: 0.6rem 1rem;
+    padding: 0.75rem 1rem; /* Vrácení většího paddingu na mobilu */
   }
 
   .project-status-legend {

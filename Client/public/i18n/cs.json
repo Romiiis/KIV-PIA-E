@@ -240,6 +240,11 @@
     "cancelButton": "Zrušit"
   },
   "adminPage": {
+    "detailButton": "Detaily projektu",
+    "mailButton": "Mail",
+    "closeButton": "Uzavřít",
+    "confirmCloseMessage": "Opravdu chcete trvale uzavřít projekt '{{projectName}}'?",
+    "actionsButton": "Administrátorské akce",
     "title": "Správa projektů",
     "loadingProjects": "Načítám všechny projekty...",
     "created": "Vytvořeno",
@@ -257,5 +262,26 @@
       "noFeedback": "Bez feedbacku"
     },
     "filterTitle": "Filtrovat projekty"
+  },
+  "adminActionModal": {
+    "title": "Administrátorské akce",
+    "subtitle": "Akce pro projekt:",
+    "recipientTitle": "Příjemce zprávy",
+    "recipientCustomer": "Pouze zákazník",
+    "recipientTranslator": "Pouze překladatel",
+    "recipientBoth": "Odeslat oběma",
+    "messageLabel": "Zpráva pro zákazníka / překladatele",
+    "messagePlaceholder": "Napište zprávu...",
+    "buttonSend": "Odeslat zprávu",
+    "buttonCloseProject": "Uzavřít projekt",
+    "feedbackReplyTemplate": "Odpověď na feedback (ID projektu: {{projectId}}):\n\"{{feedbackText}}\"\n\n------------------\n",
+    "messageTemplate": "Zpráva k projektu ID: {{projectId}}\n\n",
+    "toastSendSuccess": "Zpráva byla odeslána {{target}} (simulace).",
+    "toastSendError": "Odeslání zprávy selhalo.",
+    "toastCloseSuccess": "Projekt byl úspěšně uzavřen (simulace).",
+    "toastCloseError": "Uzavření projektu selhalo.",
+    "targetBoth": "oběma stranám",
+    "targetCustomer": "zákazníkovi",
+    "targetTranslator": "překladateli"
   }
 }

@@ -240,6 +240,11 @@
     "cancelButton": "Cancel"
   },
   "adminPage": {
+    "detailButton": "View Details",
+    "mailButton": "Mail",
+    "closeButton": "Close",
+    "confirmCloseMessage": "Are you sure you want to permanently close project '{{projectName}}'?",
+    "actionsButton": "Admin Actions",
     "title": "Project Management",
     "loadingProjects": "Loading all projects...",
     "created": "Created",
@@ -257,6 +262,27 @@
       "noFeedback": "No Feedback"
     },
     "filterTitle": "Filter Projects"
+  },
+  "adminActionModal": {
+    "title": "Administrator Actions",
+    "subtitle": "Actions for project:",
+    "recipientTitle": "Message Recipient",
+    "recipientCustomer": "Customer only",
+    "recipientTranslator": "Translator only",
+    "recipientBoth": "Send to Both",
+    "messageLabel": "Message for Customer / Translator",
+    "messagePlaceholder": "Write your message...",
+    "buttonSend": "Send Message",
+    "buttonCloseProject": "Close Project",
+    "feedbackReplyTemplate": "Response to feedback (Project ID: {{projectId}}):\n\"{{feedbackText}}\"\n\n------------------\n",
+    "messageTemplate": "Message regarding Project ID: {{projectId}}\n\n",
+    "toastSendSuccess": "Message sent to {{target}} (simulation).",
+    "toastSendError": "Failed to send message.",
+    "toastCloseSuccess": "Project closed successfully (simulation).",
+    "toastCloseError": "Failed to close project.",
+    "targetBoth": "both parties",
+    "targetCustomer": "the customer",
+    "targetTranslator": "the translator"
   }
 
 }

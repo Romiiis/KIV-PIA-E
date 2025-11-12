@@ -39,6 +39,7 @@
                 <mat-option value="no">{{ "adminPage.filter.noFeedback" | translate }}</mat-option>
               </mat-select>
             </mat-form-field>
+
           </div>
         </div>
       } @else {
@@ -47,41 +48,13 @@
     </div>
 
     <div class="project-status-legend">
-      <div class="legend-item">
-        <span class="color-swatch state-created"></span>
-        <span>{{ "customerPage.legend.created" | translate }}
-        </span>
-      </div>
-
-      <div class="legend-item">
-        <span class="color-swatch state-assigned"></span>
-        <span>{{ "customerPage.legend.assigned" | translate }}</span>
-      </div>
-      <div class="legend-item">
-        <span class="color-swatch state-rework"></span>
-        {{ "customerPage.legend.rework" | translate }}
-      </div>
-      <div class="legend-item">
-        <span class="color-swatch state-completed"></span>
-        {{ "customerPage.legend.completed" | translate }}
-      </div>
-      <div class="legend-item">
-        <span class="color-swatch state-approved"></span>
-        {{ "customerPage.legend.approved" | translate }}
-      </div>
-      <div class="legend-item">
-        <span class="color-swatch state-canceled"></span>
-        {{ "customerPage.legend.canceled" | translate }}
-      </div>
-      <div class="legend-item">
-        <span class="color-swatch state-closed"></span>
-        {{ "customerPage.legend.closed" | translate }}
-      </div>
     </div>
 
     <div class="project-grid">
       @if (isLoading) {
-        <div class="loading-indicator">...</div>
+        <div class="loading-indicator">
+          <p>{{ "adminPage.loadingProjects" | translate }}</p>
+        </div>
       } @else {
         @for (p of filteredProjects; track p.id) {
           <div class="project-card" [class]="'status-badge-' + p.getStatusClass()">
@@ -120,12 +93,36 @@
                 </div>
               }
 
-            </div> <footer class="card-footer">
-            <button class="cta-button primary" (click)="openProjectManagement(p)">
-              <span class="icon">🔧</span>
-              <span class="label">{{ "adminPage.manageButton" | translate }}</span>
-            </button>
-          </footer>
+            </div>
+
+            <footer class="card-footer">
+              <div class="card-footer-grid"
+                   [class.three-buttons]="p.status === 'CREATED' || p.status === 'APPROVED'">
+
+                <button class="cta-button secondary" (click)="openProjectDetails(p)">
+                  <span class="icon">
+                    <mat-icon>visibility</mat-icon>
+                  </span>
+                  <span class="label">{{ "adminPage.detailButton" | translate }}</span>
+                </button>
+
+                <button class="cta-button secondary" (click)="openAdminActions(p)">
+                  <span class="icon">
+                    <mat-icon>mail</mat-icon>
+                  </span>
+                  <span class="label">{{ "adminPage.mailButton" | translate }}</span>
+                </button>
+
+                @if (p.status === 'CREATED' || p.status === 'APPROVED') {
+                  <button class="cta-button close" (click)="onCloseProject(p)">
+                    <span class="icon">
+                      <mat-icon>gpp_good</mat-icon>
+                    </span>
+                    <span class="label">{{ "adminPage.closeButton" | translate }}</span>
+                  </button>
+                }
+              </div>
+            </footer>
           </div>
         } @empty {
           <div class="empty-state">

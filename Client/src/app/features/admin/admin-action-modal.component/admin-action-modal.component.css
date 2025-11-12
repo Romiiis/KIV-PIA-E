@@ -1,0 +1,179 @@
+:host {
+  --admin-primary-color: #11488f;
+  --admin-primary-hover: #0d3a70;
+  --color-reject: #e74c3c;
+  --text-title: #2c3e50;
+  --text-body: #34495e;
+  --text-light: #7f8c8d;
+  --border-color: #eef2f7;
+  --background-white: #fff;
+  --background-page: #f9fafc;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dialog-header h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dialog-header h2 mat-icon {
+  color: var(--admin-primary-color);
+}
+
+.close-icon-btn {
+  color: var(--text-light);
+}
+.close-icon-btn:hover {
+  color: var(--color-reject);
+}
+
+.dialog-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-body);
+  margin: 0 0 1.5rem 0; /* Větší mezera pod podtitulkem */
+  padding: 0;
+}
+
+[mat-dialog-content] {
+  padding: 1.5rem;
+  min-width: 500px; /* Zmenšeno z 550px */
+}
+
+
+/* --- VYLEPŠENÝ VZHLED FORMULÁŘE --- */
+
+.recipient-options {
+  /* Odstraněno pozadí, padding a ohraničení */
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.recipient-options h3 {
+  font-size: 1rem; /* Mírně větší */
+  font-weight: 600;
+  color: var(--text-body); /* Tmavší */
+  margin: 0 0 0.75rem 0;
+}
+.recipient-radio-group {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem; /* Zmenšeny mezery */
+}
+:host ::ng-deep .recipient-radio-group .mdc-radio {
+  padding: 0.25rem;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  /* Gap odebrán, protože tlačítko je pryč */
+}
+
+.admin-form mat-form-field {
+  width: 100%;
+}
+
+/* --- NOVÝ STYL PRO FOOTER --- */
+
+.action-footer {
+  display: flex;
+  justify-content: space-between; /* "Zrušit" vlevo, "Odeslat" vpravo */
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  margin-top: 1.5rem;
+}
+
+.cancel-button {
+  font-weight: 600;
+  color: var(--text-light);
+}
+.cancel-button:hover {
+  color: var(--text-body);
+}
+
+/* --- TLAČÍTKO "ODESLAT" UPRAVENO --- */
+.admin-cta-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  min-width: 180px;
+  flex-grow: 0;
+  /* width: 100%; <- ODSTRANĚNO */
+}
+
+.admin-cta-button mat-spinner {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.admin-cta-button.send {
+  background: var(--admin-primary-color);
+  color: #fff;
+}
+.admin-cta-button.send:hover:not(:disabled) {
+  background: var(--admin-primary-hover);
+}
+
+.admin-cta-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- RESPONZIVNÍ ÚPRAVY --- */
+@media (max-width: 600px) {
+  [mat-dialog-content] {
+    min-width: unset;
+    padding: 1rem; /* Menší padding */
+  }
+
+  .dialog-header {
+    padding: 1rem 1rem 0.75rem 1rem; /* Menší padding */
+  }
+
+  .dialog-header h2 {
+    font-size: 1.2rem; /* Menší písmo */
+  }
+
+  /* Tlačítka ve footeru pod sebou */
+  .action-footer {
+    flex-direction: column-reverse; /* "Odeslat" bude nahoře */
+    align-items: stretch; /* Tlačítka budou na plnou šířku */
+    gap: 0.75rem;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  .admin-cta-button {
+    width: 100%; /* Plná šířka */
+    min-width: unset;
+  }
+
+  .cancel-button {
+    /* Aby vypadalo konzistentně */
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--background-page);
+    border-radius: 50px;
+  }
+}
