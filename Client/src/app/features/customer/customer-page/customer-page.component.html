@@ -77,7 +77,7 @@
 
         @for (p of projectsForCurrentView; track p.id) {
 
-          <div class="project-card" [class]="'status-badge-' + p.getStatusClass()">
+          <div class="project-card" [id]="'project-card-' + p.id" [class]="'status-badge-' + p.getStatusClass()">
 
             <div class="card-content">
               <div class="status-box">
@@ -105,11 +105,13 @@
               @switch (currentView) {
                 @case ('action') {
                   <button class="cta-button primary" (click)="openProjectReview(p)">
+                    <span class="icon">📝</span>
                     <span class="label"> {{ "customerPage.reviewButton" | translate }} </span>
                   </button>
                 }
                 @case ('progress') {
                   <button class="cta-button" (click)="openProjectDetails(p)">
+                    <span class="icon">👁️</span>
                     <span class="label"> {{ "customerPage.viewDetailsButton" | translate }} </span>
                   </button>
                 }
@@ -117,11 +119,13 @@
                   @switch (p.status) {
                     @case (ProjectStatusDomain.APPROVED) {
                       <button class="cta-button success" (click)="openProjectDetails(p)">
+                        <span class="icon">⬇️</span>
                         <span class="label">{{ "customerPage.downloadButton" | translate }} </span>
                       </button>
                     }
                     @case (ProjectStatusDomain.CLOSED) {
                       <button class="cta-button ghost" (click)="openProjectDetails(p)">
+                        <span class="icon">📂</span>
                         <span class="label">{{ "customerPage.viewArchiveButton" | translate }} </span>
                       </button>
                     }

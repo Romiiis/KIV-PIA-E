@@ -25,10 +25,8 @@ export class ProjectsWorkflowApiService extends BaseApiService {
    * Returns updated ProjectDomain.
    */
   uploadTranslated(id: string, file: File): Observable<ProjectDomain> {
-    const form = new FormData();
-    form.append('file', file);
 
-    return this.wrapPromise(uploadTranslatedContent(id, form as unknown as UploadTranslatedContentBody)).pipe(
+    return this.wrapPromise(uploadTranslatedContent(id, {file: file})).pipe(
       map((p: ProjectDto) =>
         plainToInstance(ProjectDomain, p, {
           excludeExtraneousValues: true,

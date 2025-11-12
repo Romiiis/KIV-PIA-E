@@ -3,6 +3,22 @@
   <div class="dialog-header" slot="header">
     <h2 mat-dialog-title [matTooltip]="project.originalFileName">
       {{ project.originalFileName }}
+
+      <span *ngIf="project.id" class="project-id-wrapper">
+
+      <span class="project-id-text">
+        ({{ project.id }})
+      </span>
+
+      <button mat-icon-button
+              class="copy-id-btn"
+              [cdkCopyToClipboard]="project.id"
+              (click)="onIdCopied()"
+              matTooltip="Kopírovat ID"
+              aria-label="Kopírovat ID projektu">
+        <mat-icon>content_copy</mat-icon>
+      </button>
+    </span>
     </h2>
     <button mat-icon-button
             class="close-icon-btn"
@@ -104,7 +120,7 @@
       </section>
 
 
-      @if (project.getStatusClass() === 'REWORK' && project.feedback) {
+      @if (project.getStatusClass() === 'REWORK' && project.feedback && !isAdminView) {
         <section class="detail-section feedback-note rework-note">
           <h4>
             <mat-icon>warning_amber</mat-icon>
@@ -120,7 +136,22 @@
           </div>
         </section>
       }
-
+      @if (isAdminView && project.feedback && project.feedback.text.length > 0) {
+        <section class="detail-section feedback-note admin-note">
+          <h4>
+            <mat-icon>chat</mat-icon>
+            {{ "projectDetailModal.adminFeedbackTitle" | translate }}
+          </h4>
+          <div class="feedback-content">
+            <p class="feedback-text">
+              {{ project.feedback.text }}
+            </p>
+            <span class="feedback-date">
+              {{ "projectDetailModal.received" | translate }}: {{ project.feedback.createdAt | date:'short' }}
+            </span>
+          </div>
+        </section>
+      }
       @if (project.status === 'APPROVED') {
         <section class="detail-section feedback-note approved-note">
           <h4>

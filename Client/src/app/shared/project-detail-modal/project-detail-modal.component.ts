@@ -16,6 +16,7 @@ import {FormsModule} from '@angular/forms';
 import {MatFormField, MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {AdminActionModalComponent} from '@features/admin/admin-action-modal.component/admin-action-modal.component';
+import {CdkCopyToClipboard} from '@angular/cdk/clipboard';
 
 
 export interface ProjectDetailData {
@@ -38,6 +39,7 @@ export interface ProjectDetailData {
     MatFormFieldModule, // Zde musí být MODUL
     MatInputModule,
     FormsModule,
+    CdkCopyToClipboard,
   ],
   templateUrl: './project-detail-modal.component.html',
   styleUrls: ['./project-detail-modal.component.css']
@@ -116,26 +118,9 @@ export class ProjectDetailModalComponent {
     document.body.removeChild(a);
   }
 
-  // Metody onAdminSendMessage a onAdminCloseProject byly ODSTRANĚNY
 
-  // NOVÁ METODA pro otevření akčního modálu
-  openAdminActionModal(): void {
-    const actionDialogRef = this.dialog.open(AdminActionModalComponent, {
-      data: { project: this.project }, // Předáme projekt
-      width: '600px',
-      maxWidth: '95vw',
-      panelClass: 'clean-dialog-panel',
-      disableClose: true // Uživatel musí provést akci nebo zavřít křížkem
-    });
-
-    // Nasloucháme, co se stane po zavření akčního modálu
-    actionDialogRef.afterClosed().subscribe(result => {
-      // Pokud akční modál vrátil 'projectUpdated' (např. po uzavření projektu)
-      if (result === 'projectUpdated') {
-        // Zavřeme i tento detailní modál a pošleme signál 'projectUpdated'
-        // zpět na admin-page, aby se obnovil seznam
-        this.dialogRef.close('projectUpdated');
-      }
-    });
+  onIdCopied() {
+    let copySuccessMsg = this.translationService.instant('projectDetailModal.notifications.idCopySuccess');
+    this.toastr.success(copySuccessMsg);
   }
 }

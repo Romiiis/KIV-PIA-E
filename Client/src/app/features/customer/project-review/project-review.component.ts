@@ -121,6 +121,8 @@ export class ProjectReviewComponent {
 
         this.toastr.info(rejectedText, rejectedTitle);
         this.dialogRef.close('rejected');
+
+
       } catch (error) {
         let errorTitle = this.translationService.instant("global.error");
         this.toastr.error('Failed to reject project. Try again.', errorTitle);

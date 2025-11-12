@@ -1,36 +1,44 @@
 version: '3.8'
 
 services:
-  mongo:
-    image: mongo:7.0
-    container_name: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-    command: >
-      bash -c "
-        # Start standard Mongo entrypoint on background
-        /usr/local/bin/docker-entrypoint.sh mongod &
+    mongo:
+        image: mongo:7.0
+        container_name: mongo
+        restart: always
+        environment:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: admin
+        command: >
+          bash -c "
+            # Start standard Mongo entrypoint on background
+            /usr/local/bin/docker-entrypoint.sh mongod &
 
-        # Wait until MongoDB is up
-        until mongosh --quiet --eval 'db.adminCommand(\"ping\")' > /dev/null 2>&1; do
-          echo '⏳ Waiting for Mongo to be ready...';
-          sleep 2;
-        done;
+            # Wait until MongoDB is up
+            until mongosh --quiet --eval 'db.adminCommand(\"ping\")' > /dev/null 2>&1; do
+              echo '⏳ Waiting for Mongo to be ready...';
+              sleep 2;
+            done;
 
-        echo '📦 Restoring dump from /mongo-dump/piadb ...';
-        mongorestore --drop --db piadb /mongo-dump/piadb;
-        echo '✅ Restore finished.';
+            echo '📦 Restoring dump from /mongo-dump/piadb ...';
+            mongorestore --drop --db piadb /mongo-dump/piadb;
+            echo '✅ Restore finished.';
 
-        # Keep container alive
-        wait
-      "
-    volumes:
-      - mongo-data:/data/db
-      - ./mongo-dump:/mongo-dump
-    ports:
-      - "27017:27017"
+            # Keep container alive
+            wait
+          "
+        volumes:
+          - mongo-data:/data/db
+          - ./mongo-dump:/mongo-dump
+        ports:
+          - "27017:27017"
+          
+    mailhog:
+        image: mailhog/mailhog
+        container_name: mailhog
+        restart: always
+        ports:
+          - "1025:1025"
+          - "8025:8025"
 volumes:
   mongo-data:
     driver: local

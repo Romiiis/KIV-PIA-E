@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ProjectDomain } from '@core/models/project.model';
-import { ProjectStatusDomain } from '@core/models/projectStatus.model';
-import { NewProjectComponent } from '@features/customer/new-project/new-project.component';
-import { useListProjectsMutation } from '@api/queries/project.query';
-import { ProjectDetailModalComponent } from '@shared/project-detail-modal/project-detail-modal.component';
+import {Component, OnInit} from '@angular/core';
+import {MatDialog, MatDialogModule} from '@angular/material/dialog';
+import {ProjectDomain} from '@core/models/project.model';
+import {ProjectStatusDomain} from '@core/models/projectStatus.model';
+import {NewProjectComponent} from '@features/customer/new-project/new-project.component';
+import {useListProjectsMutation} from '@api/queries/project.query';
+import {ProjectDetailModalComponent} from '@shared/project-detail-modal/project-detail-modal.component';
 
-import {DatePipe, LowerCasePipe, NgClass, TitleCasePipe, UpperCasePipe} from '@angular/common';
+import {DatePipe, LowerCasePipe, NgClass} from '@angular/common';
 import {ProjectReviewComponent} from '@features/customer/project-review/project-review.component';
 import {TranslatePipe} from '@ngx-translate/core';
 import {LanguageService} from '@core/services/language.service';
@@ -35,7 +35,8 @@ export class CustomerPageComponent implements OnInit {
   currentView: 'action' | 'progress' | 'history' = 'action';
 
   constructor(public dialog: MatDialog, public languageService: LanguageService,
-              protected langList: LanguageListService) {}
+              protected langList: LanguageListService) {
+  }
 
   ngOnInit(): void {
     this.fetchCustomerProjects().then();
@@ -105,15 +106,18 @@ export class CustomerPageComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result === 'created') {
+      if (!result) return;
+      console.log('result from new project modal:', result);
+      if (result.result === 'created') {
         this.fetchCustomerProjects();
+
       }
     });
   }
 
   openProjectDetails(project: ProjectDomain): void {
     this.dialog.open(ProjectDetailModalComponent, {
-      data: { project: project },
+      data: {project: project},
       width: '800px',
       maxWidth: '95vw',
       panelClass: 'clean-dialog-panel',
@@ -127,12 +131,27 @@ export class CustomerPageComponent implements OnInit {
       this.openProjectDetails(project);
       return;
     }
-    this.dialog.open(ProjectReviewComponent, {
-      data: { project: project },
+    const dialogRef = this.dialog.open(ProjectReviewComponent, {
+      data: {project: project},
       width: '600px',
       maxWidth: '95vw',
       panelClass: 'clean-dialog-panel',
       disableClose: false
     });
+
+    if (!dialogRef) return;
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'rejected') {
+        this.fetchCustomerProjects();
+        this.currentView = 'progress';
+      }
+      if (result === 'approved') {
+        this.fetchCustomerProjects();
+        this.currentView = 'history';
+      }
+    });
   }
+
+
 }

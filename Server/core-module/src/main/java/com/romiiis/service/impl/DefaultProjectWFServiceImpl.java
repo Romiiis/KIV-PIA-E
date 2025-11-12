@@ -8,10 +8,7 @@ import com.romiiis.domain.UserRole;
 import com.romiiis.exception.NoAccessToOperateException;
 import com.romiiis.exception.ProjectNotFoundException;
 import com.romiiis.security.CallerContextProvider;
-import com.romiiis.service.interfaces.IFeedbackService;
-import com.romiiis.service.interfaces.IFileSystemService;
-import com.romiiis.service.interfaces.IProjectService;
-import com.romiiis.service.interfaces.IProjectWFService;
+import com.romiiis.service.interfaces.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +22,7 @@ public class DefaultProjectWFServiceImpl implements IProjectWFService {
     private final IProjectService projectService;
     private final IFeedbackService feedbackService;
     private final CallerContextProvider callerContextProvider;
+    private final IDomainEventPublisher eventPublisher;
 
 
     /**
@@ -58,6 +56,8 @@ public class DefaultProjectWFServiceImpl implements IProjectWFService {
 
         log.info("Project ID: {} marked as completed", projectId);
 
+        // TODO - send notification to customer about completed translation
+
         // Return updated project
         return fetchProject(projectId);
 
@@ -88,6 +88,8 @@ public class DefaultProjectWFServiceImpl implements IProjectWFService {
         projectService.updateProject(project);
         log.info("Project ID: {} marked as closed", projectId);
 
+        // TODO - send notification to customer and translator about project closure
+
         // Return updated project
         return fetchProject(projectId);
 
@@ -115,6 +117,8 @@ public class DefaultProjectWFServiceImpl implements IProjectWFService {
 
         projectService.updateProject(project);
         log.info("Project ID: {} marked as approved", projectId);
+
+        // TODO - send notification to translator about project approval
 
         // Return updated project
         return fetchProject(projectId);
@@ -149,6 +153,8 @@ public class DefaultProjectWFServiceImpl implements IProjectWFService {
 
         projectService.updateProject(project);
         log.info("Project ID: {} marked as rejected", projectId);
+
+        // TODO - send notification to translator about project rejection
 
         // Store feedback
         feedbackService.saveFeedback(feedbackObject);

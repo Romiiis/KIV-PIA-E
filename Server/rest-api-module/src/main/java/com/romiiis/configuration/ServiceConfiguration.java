@@ -8,11 +8,13 @@ import com.romiiis.security.CallerContextProvider;
 import com.romiiis.security.ExecutionContext;
 import com.romiiis.service.DefaultJwtServiceImpl;
 import com.romiiis.service.DefaultPasswordHasherImpl;
+import com.romiiis.service.MailHogEmailService;
 import com.romiiis.service.impl.*;
 import com.romiiis.service.interfaces.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -50,8 +52,8 @@ public class ServiceConfiguration {
     }
 
     @Bean
-    public IProjectWFService projectWorkflowService(IFileSystemService fsService, IProjectService projectService, IFeedbackService feedbackService, CallerContextProvider callerContextProvider) {
-        return new DefaultProjectWFServiceImpl(fsService, projectService, feedbackService, callerContextProvider);
+    public IProjectWFService projectWorkflowService(IFileSystemService fsService, IProjectService projectService, IFeedbackService feedbackService, CallerContextProvider callerContextProvider, IDomainEventPublisher domainEventPublisher) {
+        return new DefaultProjectWFServiceImpl(fsService, projectService, feedbackService, callerContextProvider, domainEventPublisher);
     }
 
     @Bean
@@ -68,6 +70,11 @@ public class ServiceConfiguration {
     @Bean
     public IJwtService jwtService(JwtProperties props, IUserService userService, CallerContextProvider callerContextProvider) {
         return new DefaultJwtServiceImpl(props, userService, callerContextProvider);
+    }
+
+    @Bean
+    public IMailService mailService(JavaMailSender mailSender) {
+        return new MailHogEmailService(mailSender);
     }
 
 

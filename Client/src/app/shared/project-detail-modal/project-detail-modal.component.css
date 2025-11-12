@@ -2,8 +2,8 @@
 
   --color-reject: var(--c-danger, #e74c3c);
   --color-secondary-text: var(--text-body);
-  --admin-primary-color: #11488f; /* Barva z admin-page.css */
-  --admin-primary-hover: #0d3a70; /* Barva z admin-page.css */
+  --admin-primary-color: #11488f;
+  --admin-primary-hover: #0d3a70;
 }
 :host ::ng-deep .dialog-wrapper {
   min-width: 650px;
@@ -27,7 +27,44 @@
   word-break: break-word;
   white-space: normal;
   line-height: 1.4;
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
+
+.project-id-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+  gap: 0;
+
+}
+
+.project-id-text {
+  font-size: 0.5em;
+  font-weight: 400;
+  color: #666;
+}
+
+
+.copy-id-btn {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  margin-left: 4px;
+}
+
+.copy-id-btn .mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  translate:  -10% -40%;
+}
+
 
 .close-icon-btn {
   position: absolute;
@@ -189,7 +226,7 @@
   background-color: var(--brand-primary);
 }
 .success-download {
-  background-color: var(--success-color);
+  background-color: var(--color-reject);
 }
 .file-item.disabled .download-zone {
   background-color: var(--border-color);
@@ -362,21 +399,21 @@
 
 
 .admin-actions {
-  /* Použijeme stejné stylování jako ostatní sekce */
-  margin-bottom: 0; /* V actions slotu nechceme margin */
+
+  margin-bottom: 0;
   padding: 1.2rem;
   border: 1px solid var(--border-color);
   border-radius: 12px;
   background: var(--background-white);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 
-  /* Zvýraznění */
+
   border-top: 3px solid var(--admin-primary-color);
-  width: 100%; /* Natáhnout přes celý actions slot */
+  width: 100%;
 }
 
 .admin-actions h4 {
-  /* Použijeme stejné stylování jako ostatní h3 */
+
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -409,7 +446,7 @@
 }
 
 .admin-cta-button {
-  /* Vypůjčeno z admin-page.component.css */
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -422,8 +459,8 @@
   font-weight: 600;
   transition: all 0.2s ease;
 
-  flex-grow: 1; /* Tlačítka se rovnoměrně roztáhnou */
-  min-width: 180px; /* Minimální šířka pro tlačítko */
+  flex-grow: 1;
+  min-width: 180px;
 }
 
 .admin-cta-button mat-spinner {
@@ -444,10 +481,24 @@
   color: #fff;
 }
 .admin-cta-button.close:hover:not(:disabled) {
-  background: #c0392b; /* Tmavší červená */
+  background: #c0392b;
 }
 
 .admin-cta-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.feedback-note.admin-note {
+
+  background: #f0f6ff;
+  border: 1px solid var(--admin-primary-color);
+}
+
+.feedback-note.admin-note h4 {
+  color: var(--admin-primary-color);
+}
+
+:host ::ng-deep .feedback-note.admin-note h4 mat-icon {
+  color: var(--admin-primary-color);
 }

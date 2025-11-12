@@ -98,3 +98,11 @@ security:
     - path: /projects/*/feedback
       method: GET
       roles: [ ADMINISTRATOR, CUSTOMER, TRANSLATOR ]
+
+    # --------------------
+    # Mail ENDPOINTS
+    # --------------------
+
+    - path: /mails
+      method: POST
+      roles: [ ADMINISTRATOR ]

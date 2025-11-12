@@ -8,7 +8,8 @@
     "success": "Success",
     "error": "Error",
     "required": "Required",
-    "rejected": "Rejected"
+    "rejected": "Rejected",
+    "cancel": "Cancel"
   },
   "projectStatus": {
     "created": "Created",
@@ -150,8 +151,10 @@
     "notifications": {
       "translatedFileNotAvailable": "The translated file is not available at this time.",
       "downloadSuccess": "File {{fileName}} was downloaded successfully!",
-      "downloadError": "Error downloading file. Please try again."
+      "downloadError": "Error downloading file. Please try again.",
+      "idCopySuccess": "Project ID copied to clipboard!"
     },
+    "adminFeedbackTitle": "Feedback from customer",
     "projectDetails": "Project Details",
     "targetLanguageLabel": "Target Language",
     "noTranslatorAssigned": "No translator has been assigned.",
@@ -261,7 +264,9 @@
       "hasFeedback": "With Feedback",
       "noFeedback": "No Feedback"
     },
-    "filterTitle": "Filter Projects"
+    "filterTitle": "Filter Projects",
+    "toastCloseSuccess": "Project closed successfully",
+    "toastCloseError": "Failed to close project."
   },
   "adminActionModal": {
     "title": "Administrator Actions",
@@ -278,11 +283,11 @@
     "messageTemplate": "Message regarding Project ID: {{projectId}}\n\n",
     "toastSendSuccess": "Message sent to {{target}} (simulation).",
     "toastSendError": "Failed to send message.",
-    "toastCloseSuccess": "Project closed successfully (simulation).",
-    "toastCloseError": "Failed to close project.",
     "targetBoth": "both parties",
     "targetCustomer": "the customer",
-    "targetTranslator": "the translator"
+    "targetTranslator": "the translator",
+    "tabSend": "Send E-mail to Participants",
+    "toastLoadError": "Error loading project details. Please try again."
   }
 
 }

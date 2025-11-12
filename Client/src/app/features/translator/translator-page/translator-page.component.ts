@@ -33,7 +33,6 @@ export class TranslatorPageComponent implements OnInit {
   isLoading = false;
   readonly listTranslatorProjectsMutation = useListProjectsMutation();
   currentView: 'action' | 'waiting' | 'history' = 'action';
-  protected readonly ProjectStatusDomain = ProjectStatusDomain;
 
   constructor(
     public dialog: MatDialog,
@@ -109,6 +108,8 @@ export class TranslatorPageComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result === 'submitted') {
         this.fetchTranslatorProjects();
+
+        this.currentView = 'waiting';
       }
     });
   }

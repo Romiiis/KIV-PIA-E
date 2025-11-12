@@ -9,7 +9,6 @@ servers:
 security:
   - bearerAuth: [ ]
   - cookieAuth: [ ]
-
 tags:
   - name: Auth
     description: API endpoints used for authentication and user registration.
@@ -25,6 +24,8 @@ tags:
     description: API endpoints used for management of project feedback.
   - name: ProjectsWorkflow
     description: API endpoints used for managing project workflow (assignments, state transitions).
+  - name: Mails
+    description: API endpoints used for sending various notification emails.
 paths:
 
   # ----- Auth Endpoints -----
@@ -706,6 +707,32 @@ paths:
           description: Server error.
 
 
+  # ------ Mail Endpoints
+  /mails:
+    post:
+      tags:
+        - Mails
+      summary: Send a test email to the current user
+      description: >
+        Sends an email to the user / users address (only ADMIN can access this endpoint.)
+      operationId: sendEmail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailRequest'
+      responses:
+        '200':
+          description: Email sent successfully
+        '400':
+          description: Invalid input data.
+        '401':
+          description: Unauthorized - no valid authentication token provided.
+        '403':
+          description: Forbidden - insufficient permissions to access this resource.
+        '500':
+          description: Server error.
 
 
 
@@ -955,5 +982,34 @@ components:
         text:
           type: string
           example: "This is horrible"
+
+
+
+    #------ Mail Schemas -----
+    SendEmailRequest:
+      type: object
+      description: Request payload to send an email
+      required: [ projectId, customer, translator, text ]
+      properties:
+        projectId:
+          type: string
+          format: uuid
+          example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          description: ID of the project related to the email
+        customer:
+          type: boolean
+          example: true
+          description: Whether to send email to customer
+        translator:
+          type: boolean
+          example: false
+          description: Whether to send email to translator
+        text:
+          type: string
+          example: "Your project has been updated."
+          description: Body text of the email
+
+
+
 
 

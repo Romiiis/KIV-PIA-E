@@ -8,7 +8,8 @@
     "success": "Úspěch",
     "error": "Chyba",
     "required": "Povinné",
-    "rejected": "Odmítnuto"
+    "rejected": "Odmítnuto",
+    "cancel": "Zrušit"
   },
   "projectStatus": {
     "created": "Vytvořeno",
@@ -150,8 +151,11 @@
     "notifications": {
       "translatedFileNotAvailable": "Přeložený soubor není momentálně k dispozici.",
       "downloadSuccess": "Soubor {{fileName}} byl úspěšně stažen!",
-      "downloadError": "Chyba při stahování souboru. Zkuste to prosím znovu."
+      "downloadError": "Chyba při stahování souboru. Zkuste to prosím znovu.",
+      "idCopySuccess": "Project ID copied to clipboard!"
+
     },
+    "adminFeedbackTitle": "Zpětná vazba od zákazníka",
     "projectDetails": "Detaily projektu",
     "targetLanguageLabel": "Cílový jazyk",
     "noTranslatorAssigned": "Překladatel nebyl přiřazen.",
@@ -261,7 +265,9 @@
       "hasFeedback": "S feedbackem",
       "noFeedback": "Bez feedbacku"
     },
-    "filterTitle": "Filtrovat projekty"
+    "filterTitle": "Filtrovat projekty",
+    "toastCloseSuccess": "Projekt byl úspěšně uzavřen.",
+    "toastCloseError": "Uzavření projektu selhalo."
   },
   "adminActionModal": {
     "title": "Administrátorské akce",
@@ -278,10 +284,10 @@
     "messageTemplate": "Zpráva k projektu ID: {{projectId}}\n\n",
     "toastSendSuccess": "Zpráva byla odeslána {{target}} (simulace).",
     "toastSendError": "Odeslání zprávy selhalo.",
-    "toastCloseSuccess": "Projekt byl úspěšně uzavřen (simulace).",
-    "toastCloseError": "Uzavření projektu selhalo.",
     "targetBoth": "oběma stranám",
     "targetCustomer": "zákazníkovi",
-    "targetTranslator": "překladateli"
+    "targetTranslator": "překladateli",
+    "tabSend": "Odeslat zprávu účastníkům",
+    "toastLoadError": "Chyba při načítání detailů projektu."
   }
 }

@@ -74,10 +74,14 @@ public class DefaultProjectServiceImpl implements IProjectService {
             projectRepository.save(newProject);
             log.info("Assigned translator with ID {} to project ID {}", bestTranslator.getId(), newProject.getId());
 
+            // TODO - send notification to translator about new assignment
+
+
         } catch (UserNotFoundException ex) {
-            log.warn("No suitable translator found for project ID - closing {}", newProject.getId());
-            newProject.close();
+            log.warn("No suitable translator found for project ID {}", newProject.getId());
+            // TODO - send notification to customer about no available translators
         }
+
 
         return newProject;
 

@@ -5,6 +5,37 @@
       <div class="header-left">
         <h1>{{ "adminPage.title" | translate }}</h1>
       </div>
+      <div class="project-status-legend">
+        <div class="legend-item">
+          <span class="color-swatch state-created"></span>
+          <span>{{ "customerPage.legend.created" | translate }}</span>
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-assigned"></span>
+          <span>{{ "customerPage.legend.assigned" | translate }}</span>
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-rework"></span>
+          {{ "customerPage.legend.rework" | translate }}
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-completed"></span>
+          {{ "customerPage.legend.completed" | translate }}
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-approved"></span>
+          {{ "customerPage.legend.approved" | translate }}
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-canceled"></span>
+          {{ "customerPage.legend.canceled" | translate }}
+        </div>
+        <div class="legend-item">
+          <span class="color-swatch state-closed"></span>
+          {{ "customerPage.legend.closed" | translate }}
+        </div>
+      </div>
+
     </header>
 
     <div class="filter-bar-wrapper">
@@ -47,8 +78,7 @@
       }
     </div>
 
-    <div class="project-status-legend">
-    </div>
+
 
     <div class="project-grid">
       @if (isLoading) {
@@ -57,7 +87,7 @@
         </div>
       } @else {
         @for (p of filteredProjects; track p.id) {
-          <div class="project-card" [class]="'status-badge-' + p.getStatusClass()">
+          <div class="project-card" [id]="'project-card-' + p.id" [class]="'status-badge-' + p.getStatusClass()">
             <div class="card-content">
 
               <div class="status-box">

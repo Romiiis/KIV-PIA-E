@@ -1,10 +1,4 @@
-import { Routes } from '@angular/router';
-import { LayoutComponent } from './layout/layout.component';
-import { AuthPageComponent } from '@features/auth/auth-page/auth-page.component';
-import { CustomerPageComponent } from '@features/customer/customer-page/customer-page.component';
-import { TranslatorPageComponent } from '@features/translator/translator-page/translator-page.component';
-import { AdminPageComponent } from '@features/admin/admin-page/admin-page.component';
-import { InitUserComponent } from '@features/init-user/init-user.component';
+import {Routes} from '@angular/router';
 import {RoleRedirectGuard} from '@core/auth/role.guard';
 
 export const routes: Routes = [
@@ -19,17 +13,26 @@ export const routes: Routes = [
   // Layout with role-based children
   {
     path: '',
-    component: LayoutComponent,
+    loadComponent: () => import('./layout/layout.component').then(m => m.LayoutComponent),
     canActivate: [RoleRedirectGuard],
     children: [
-      { path: 'customer', component: CustomerPageComponent },
-      { path: 'translator', component: TranslatorPageComponent },
-      { path: 'admin', component: AdminPageComponent },
+      {
+        path: 'customer',
+        loadComponent: () => import('@features/customer/customer-page/customer-page.component').then(m => m.CustomerPageComponent)
+      },
+      {
+        path: 'translator',
+        loadComponent: () => import('@features/translator/translator-page/translator-page.component').then(m => m.TranslatorPageComponent)
+      },
+      {
+        path: 'admin',
+        loadComponent: () => import('@features/admin/admin-page/admin-page.component').then(m => m.AdminPageComponent)
+      },
     ],
   },
   {
     path: 'init',
-    component: InitUserComponent,
+    loadComponent: () => import('@features/init-user/init-user.component').then(m => m.InitUserComponent),
     canActivate: [RoleRedirectGuard],
   },
 
@@ -37,7 +40,7 @@ export const routes: Routes = [
   {
     path: 'auth',
     canActivate: [RoleRedirectGuard],
-    component: AuthPageComponent,
+    loadComponent: () => import('@features/auth/auth-page/auth-page.component').then(m => m.AuthPageComponent),
   },
 
   // FALLBACK route - redirect based on role

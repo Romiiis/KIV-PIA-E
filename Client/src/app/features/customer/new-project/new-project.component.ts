@@ -68,18 +68,15 @@ export class NewProjectComponent implements OnInit {
 
     try {
 
-      const mutationPromises = targetLang.map((langCode: string) =>
-        this.createMutation.mutateAsync({
-          languageCode: langCode,
-          file: file
-        })
-      );
 
-      await Promise.all(mutationPromises);
+      let project = await this.createMutation.mutateAsync({
+        languageCode: targetLang,
+        file: file
+      });
 
       let projectCreatedSuccessText = this.translationService.instant('createProjectModal.notifications.projectCreatedSuccess')
       this.toastr.success(projectCreatedSuccessText);
-      this.dialogRef.close('created');
+      this.dialogRef.close({result:'created', project: project});
 
     } catch (error) {
       let projectCreatedErrorText = this.translationService.instant('createProjectModal.notifications.projectCreatedError')
