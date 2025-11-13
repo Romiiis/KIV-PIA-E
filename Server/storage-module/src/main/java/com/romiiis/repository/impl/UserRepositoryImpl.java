@@ -167,4 +167,12 @@ public class UserRepositoryImpl implements IUserRepository {
     public void deleteAll() {
        mongoRepo.deleteAll();
     }
+
+    @Override
+    public boolean loggedUsingOAuth(String email) {
+        // Check if user with given email exists and his password hash is null
+        Query query = new Query(Criteria.where("emailAddress").is(email)
+                .and("hashedPassword").is(null));
+        return mongoTemplate.exists(query, UserDB.class);
+    }
 }

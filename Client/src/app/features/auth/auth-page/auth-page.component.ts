@@ -175,4 +175,8 @@ export class AuthPageComponent implements OnInit {
       });
     }
   }
+
+  callOAuth() {
+    window.location.href = 'http://localhost:8080/login/oauth2/code/github';
+  }
 }

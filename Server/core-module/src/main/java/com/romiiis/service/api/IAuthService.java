@@ -14,7 +14,27 @@ import com.romiiis.exception.UserNotFoundException;
  */
 public interface IAuthService {
 
+    /**
+     * Finds an existing user by email or creates a new one after OAuth authentication.
+     *
+     * @param email Email of the user
+     * @param name  Name of the user
+     * @return The found or newly created User
+     */
+    User findOrCreateUserAfterOauth(String email, String name);
 
+
+    /**
+     * Registers a new user with the given details.
+     *
+     * @param name     Name of the user
+     * @param email    Email of the user
+     * @param password Plain text password of the user
+     * @return The newly registered User
+     * @throws InvalidAuthCredentialsException if the provided credentials are invalid
+     * @throws EmailInUseException              if the email is already in use
+     * @throws UserNotFoundException            if there is an issue creating the user
+     */
     User registerUser(String name, String email, String password) throws InvalidAuthCredentialsException, EmailInUseException, UserNotFoundException;
 
     /**

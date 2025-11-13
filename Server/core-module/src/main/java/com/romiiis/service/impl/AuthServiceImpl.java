@@ -3,6 +3,7 @@ package com.romiiis.service.impl;
 import com.romiiis.domain.User;
 import com.romiiis.exception.EmailInUseException;
 import com.romiiis.exception.InvalidAuthCredentialsException;
+import com.romiiis.exception.LoggedByDifferentMethodException;
 import com.romiiis.exception.UserNotFoundException;
 import com.romiiis.repository.IUserRepository;
 import com.romiiis.port.IExecutionContextProvider;
@@ -86,6 +87,15 @@ public class AuthServiceImpl implements IAuthService {
      */
     private void validateEmailUsage(String email) throws EmailInUseException {
         if (userRepository.emailInUse(email)) {
+
+            if (userRepository.loggedUsingOAuth(email)) {
+                log.info("Registration failed: Email {} is already in use by OAuth user", email);
+                throw new LoggedByDifferentMethodException("Email is registered using OAuth provider");
+            } else {
+                log.info("Registration failed: Email {} is already in use", email);
+            }
+
+
             log.warn("Registration failed: Email {} is already in use", email);
             throw new EmailInUseException();
         }
@@ -101,6 +111,28 @@ public class AuthServiceImpl implements IAuthService {
         String hashPassword = passwordHasher.hash(password);
 
         return userService.createNewUser(name, email, hashPassword);
+
+    }
+
+    @Override
+    public User findOrCreateUserAfterOauth(String email, String name) {
+
+        Optional<User> user = userRepository.getUserByEmail(email);
+
+        if (user.isPresent() && !userRepository.loggedUsingOAuth(email)) {
+            log.info("OAuth login failed: Email {} is registered using standard authentication", email);
+            throw new LoggedByDifferentMethodException("Email is registered using standard authentication");
+        }
+
+        return user.orElseGet(() -> {
+            try {
+                log.info("Creating new user after OAuth login for email {}", email);
+                return userService.createNewUser(name, email, null);
+            } catch (UserNotFoundException e) {
+                log.error("Failed to create new user after OAuth login for email {}", email, e);
+                throw new RuntimeException(e);
+            }
+        });
 
     }
 }

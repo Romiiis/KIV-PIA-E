@@ -86,4 +86,13 @@ public interface IUserRepository {
      * Deletes all users from the repository
      */
     void deleteAll();
+
+
+    /**
+     * Checks if the user logged in using OAuth.
+     *
+     * @param email the email of the user
+     * @return true if the user logged in using OAuth, false otherwise
+     */
+    boolean loggedUsingOAuth(String email);
 }

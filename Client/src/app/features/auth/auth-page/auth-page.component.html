@@ -30,7 +30,7 @@
     <h2>{{ "authPage.login.title" | translate }}</h2>
 
     <div class="oauth">
-      <button type="button" class="oauth-btn google">
+      <button type="button" class="oauth-btn google" (click)="callOAuth()">
         <img ngSrc="/google.svg" alt="Google" height="48" width="48"/>
         {{ "authPage.login.oauth" | translate }}
       </button>

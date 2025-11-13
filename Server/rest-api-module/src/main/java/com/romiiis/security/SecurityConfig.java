@@ -30,6 +30,8 @@ public class SecurityConfig {
     private final ExecutionContextFilter executionContextFilter;
     private final SecurityRulesLoader rulesLoader;
 
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
     /**
      * Security filter chain configured based on external security rules.
      */
@@ -46,6 +48,7 @@ public class SecurityConfig {
 
                     for (SecurityRulesLoader.SecurityRule rule : rulesLoader.getRules()) {
 
+                        auth.requestMatchers("/login/oauth2/**", "/oauth2/**").permitAll();
                         String path = rule.getPath();
                         String methodStr = rule.getMethod();
                         HttpMethod method = null;
@@ -77,6 +80,9 @@ public class SecurityConfig {
 
                     // Deny any request not matched by above rules
                     auth.anyRequest().denyAll();
+                })
+                .oauth2Login(oauth2 -> {
+                    oauth2.successHandler(oAuth2LoginSuccessHandler);
                 })
                 .build();
     }
