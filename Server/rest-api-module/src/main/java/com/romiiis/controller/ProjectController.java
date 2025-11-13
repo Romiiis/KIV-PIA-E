@@ -7,7 +7,7 @@ import com.romiiis.mapper.CommonMapper;
 import com.romiiis.mapper.ProjectMapper;
 import com.romiiis.model.ProjectDTO;
 import com.romiiis.model.ProjectStateDTO;
-import com.romiiis.service.interfaces.IProjectService;
+import com.romiiis.service.api.IProjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -26,7 +26,7 @@ import java.util.UUID;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-public class ProjectController implements ProjectsApi {
+public class ProjectController extends AbstractController implements ProjectsApi {
 
     /**
      * Services

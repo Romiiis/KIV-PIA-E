@@ -4,7 +4,7 @@ import com.romiiis.configuration.ResourceHeader;
 import com.romiiis.mapper.ProjectMapper;
 import com.romiiis.model.ProjectDTO;
 import com.romiiis.model.ProjectFeedbackRequestDTO;
-import com.romiiis.service.interfaces.IProjectWFService;
+import com.romiiis.service.api.IProjectWFService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @RestController
-public class ProjectsWFController implements ProjectsWorkflowApi {
+public class ProjectsWFController extends AbstractController implements ProjectsWorkflowApi {
 
 
     private final IProjectWFService projectWorkflowService;

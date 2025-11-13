@@ -70,7 +70,7 @@
       } @else {
         @for (p of projectsForCurrentView; track p.id) {
 
-          <div class="project-card" [class]="'status-badge-' + p.getStatusClass()">
+          <div class="project-card" [class]="'color-swatch.state-' + p.getStatusClass() | lowercase">
             <div class="card-content">
 
               <div class="status-box">

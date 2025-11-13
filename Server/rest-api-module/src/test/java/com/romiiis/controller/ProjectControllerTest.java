@@ -3,15 +3,10 @@ package com.romiiis.controller;
 import com.romiiis.domain.Project;
 import com.romiiis.domain.User;
 import com.romiiis.filter.ProjectsFilter;
-import com.romiiis.model.ProjectDTO;
-import com.romiiis.model.ProjectStateDTO;
 import com.romiiis.repository.IProjectRepository;
 import com.romiiis.repository.IUserRepository;
-import com.romiiis.repository.mongo.MongoProjectRepository;
-import com.romiiis.repository.mongo.MongoUserRepository;
-import com.romiiis.security.CallerContextProvider;
-import com.romiiis.service.interfaces.IProjectService;
-import com.romiiis.service.interfaces.IUserService;
+import com.romiiis.port.IExecutionContextProvider;
+import com.romiiis.service.api.IUserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -61,7 +56,7 @@ class ProjectControllerTest {
     private IUserService userService;
 
     @Autowired
-    private CallerContextProvider callerContextProvider;
+    private IExecutionContextProvider callerContextProvider;
 
     private User customer;
     private UUID customerId;

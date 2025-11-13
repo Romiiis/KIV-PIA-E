@@ -1,11 +1,10 @@
 package com.romiiis.controller;
 
 import com.romiiis.domain.User;
-import com.romiiis.domain.UserRole;
 import com.romiiis.filter.UsersFilter;
 import com.romiiis.repository.IUserRepository;
-import com.romiiis.security.CallerContextProvider;
-import com.romiiis.service.interfaces.IUserService;
+import com.romiiis.port.IExecutionContextProvider;
+import com.romiiis.service.api.IUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,7 +44,7 @@ class UserControllerTest {
     private IUserRepository userRepository;
 
     @Autowired
-    private CallerContextProvider callerContextProvider;
+    private IExecutionContextProvider callerContextProvider;
 
     private User adminUser;
     private UUID adminId;

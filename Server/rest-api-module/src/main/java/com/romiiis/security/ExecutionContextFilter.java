@@ -1,7 +1,7 @@
 package com.romiiis.security;
 
-import com.romiiis.domain.User;
-import com.romiiis.service.interfaces.IUserService;
+import com.romiiis.port.IExecutionContextProvider;
+import com.romiiis.service.api.IUserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.nio.file.attribute.UserPrincipal;
 import java.util.UUID;
 
 @Component
@@ -22,7 +21,7 @@ import java.util.UUID;
 @Slf4j
 public class ExecutionContextFilter extends OncePerRequestFilter {
 
-    private final CallerContextProvider callerContextProvider;
+    private final IExecutionContextProvider callerContextProvider;
     private final IUserService userService;
 
     @Override

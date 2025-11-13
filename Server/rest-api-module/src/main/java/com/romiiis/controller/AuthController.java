@@ -6,10 +6,9 @@ import com.romiiis.mapper.CommonMapper;
 import com.romiiis.model.AuthJWTResponseDTO;
 import com.romiiis.model.LoginUserRequestDTO;
 import com.romiiis.model.RegisterUserRequestDTO;
-import com.romiiis.security.TokenPair;
-import com.romiiis.service.interfaces.IAuthService;
-import com.romiiis.service.interfaces.IJwtService;
-import com.romiiis.util.CookiesUtil;
+import com.romiiis.port.IJwtService;
+import com.romiiis.service.api.IAuthService;
+import com.romiiis.util.AuthCookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -37,15 +33,14 @@ import java.util.UUID;
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-public class AuthController implements AuthApi {
+public class AuthController extends AbstractController implements AuthApi {
 
     /**
      * Services & Mappers
      */
     private final IAuthService authService;
     private final IJwtService jwtService;
-    private final CookiesUtil cookiesUtil;
-
+    private final AuthCookieUtil cookiesUtil;
 
 
     /**
@@ -62,7 +57,7 @@ public class AuthController implements AuthApi {
                 loginUserRequestDTO.getPassword()
         );
 
-        var tokens = generateTokenPair(user.getId());
+        var tokens = jwtService.generateTokenPair(user.getId());
 
         HttpServletResponse response = getCurrentResponse();
         cookiesUtil.setCookies(response, tokens);
@@ -95,7 +90,7 @@ public class AuthController implements AuthApi {
                 registerUserRequestDTO.getPassword()
         );
 
-        var tokens = generateTokenPair(user.getId());
+        var tokens = jwtService.generateTokenPair(user.getId());
 
         HttpServletResponse response = getCurrentResponse();
         cookiesUtil.setCookies(response, tokens);
@@ -125,7 +120,7 @@ public class AuthController implements AuthApi {
 
         UUID userId = UUID.fromString(jwtService.getSubjectFromToken(refreshToken));
 
-        var tokens = generateTokenPair(userId);
+        var tokens = jwtService.generateTokenPair(userId);
 
         cookiesUtil.setCookies(response, tokens);
 
@@ -144,6 +139,7 @@ public class AuthController implements AuthApi {
      */
     @Override
     public ResponseEntity<Void> logoutUser() {
+
         HttpServletRequest request = getCurrentRequest();
         HttpServletResponse response = getCurrentResponse();
 
@@ -156,46 +152,6 @@ public class AuthController implements AuthApi {
         cookiesUtil.clearCookies(response);
 
         return ResponseEntity.noContent().build();
-    }
-
-
-    /**
-     * Generates a pair of access and refresh tokens for the given user ID and role.
-     *
-     * @param userId UUID of the user
-     * @return TokenPair containing access and refresh tokens
-     */
-    public TokenPair generateTokenPair(UUID userId) {
-        String accessToken = jwtService.generateToken(userId);
-        String refreshToken = jwtService.generateRefreshToken(userId);
-
-        return new TokenPair(accessToken, refreshToken);
-    }
-
-
-    /**
-     * Retrieves the current HTTP response from the request context.
-     *
-     * @return the current HttpServletResponse
-     * @throws IllegalStateException if there is no active HTTP request context
-     */
-    private HttpServletResponse getCurrentResponse() {
-        ServletRequestAttributes attrs =
-                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attrs == null) {
-            throw new IllegalStateException("No active HTTP request context");
-        }
-        return attrs.getResponse();
-    }
-
-    /**
-     * Retrieves the current HTTP request from the request context.
-     *
-     * @return the current HttpServletRequest
-     * @throws IllegalStateException if there is no active HTTP request context
-     */
-    private HttpServletRequest getCurrentRequest() {
-        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
     }
 
 

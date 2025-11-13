@@ -5,10 +5,10 @@ import com.romiiis.domain.Project;
 import com.romiiis.domain.User;
 import com.romiiis.repository.IProjectRepository;
 import com.romiiis.repository.IUserRepository;
-import com.romiiis.security.CallerContextProvider;
-import com.romiiis.service.interfaces.IProjectService;
-import com.romiiis.service.interfaces.IProjectWFService;
-import com.romiiis.service.interfaces.IUserService;
+import com.romiiis.port.IExecutionContextProvider;
+import com.romiiis.service.api.IProjectService;
+import com.romiiis.service.api.IProjectWFService;
+import com.romiiis.service.api.IUserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,8 +27,6 @@ import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Set;
@@ -64,7 +62,7 @@ class ProjectsWFControllerTest {
     private IProjectWFService projectWFService;
 
     @Autowired
-    private CallerContextProvider callerContextProvider;
+    private IExecutionContextProvider callerContextProvider;
 
 
     private User customer;

@@ -1,7 +1,7 @@
 package com.romiiis.security;
 
 import com.romiiis.domain.UserRole;
-import com.romiiis.service.interfaces.IJwtService;
+import com.romiiis.port.IJwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,9 +33,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Value("${accesstoken.name}")
     private String accessTokenCookieName;
-
-    @Value("${refreshtoken.name}")
-    private String refreshTokenCookieName;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {

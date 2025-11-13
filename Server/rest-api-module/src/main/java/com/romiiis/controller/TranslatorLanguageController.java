@@ -1,7 +1,7 @@
 package com.romiiis.controller;
 
 import com.romiiis.mapper.CommonMapper;
-import com.romiiis.service.interfaces.IUserService;
+import com.romiiis.service.api.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-public class TranslatorLanguageController implements TranslatorsLanguageApi {
+public class TranslatorLanguageController extends AbstractController implements TranslatorsLanguageApi {
 
     /**
      * Services

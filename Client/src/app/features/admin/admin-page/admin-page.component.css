@@ -402,10 +402,9 @@
     padding: 0.75rem 1rem;
   }
 
-  /* TOTO JE TO KLÍČOVÉ PRAVIDLO:
-    Mřížka se na mobilu roztáhne na plnou šířku (1 sloupec)
-  */
-  .card-footer-grid {
+
+  .card-footer-grid,
+  .card-footer-grid.three-buttons {
     grid-template-columns: 1fr;
   }
 

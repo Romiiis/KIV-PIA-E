@@ -7,7 +7,7 @@ import com.romiiis.mapper.UserMapper;
 import com.romiiis.model.InitializeUserRequestDTO;
 import com.romiiis.model.UserDTO;
 import com.romiiis.model.UserRoleDTO;
-import com.romiiis.service.interfaces.IUserService;
+import com.romiiis.service.api.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,7 +22,7 @@ import java.util.UUID;
  */
 @Controller
 @RequiredArgsConstructor
-public class UserController implements UsersApi {
+public class UserController extends AbstractController implements UsersApi {
 
     private final IUserService userService;
     private final UserMapper userMapper;

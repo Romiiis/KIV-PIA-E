@@ -2,7 +2,7 @@ package com.romiiis.controller;
 
 import com.romiiis.mapper.FeedbackMapper;
 import com.romiiis.model.ProjectFeedbackDTO;
-import com.romiiis.service.interfaces.IFeedbackService;
+import com.romiiis.service.api.IFeedbackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class ProjectFeedbackController implements ProjectsFeedbackApi {
+public class ProjectFeedbackController extends AbstractController implements ProjectsFeedbackApi {
 
     private final IFeedbackService feedbackService;
     private final FeedbackMapper feedbackMapper;

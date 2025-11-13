@@ -1,44 +1,25 @@
 package com.romiiis.controller;
 
-import com.romiiis.configuration.ServiceConfiguration;
 import com.romiiis.domain.User;
-import com.romiiis.domain.UserRole;
-import com.romiiis.mapper.UserMapper;
-import com.romiiis.model.UserDTO;
-import com.romiiis.model.UserRoleDTO;
 import com.romiiis.repository.IUserRepository;
-import com.romiiis.repository.impl.UserRepositoryImpl;
-import com.romiiis.repository.mongo.MongoUserRepository;
-import com.romiiis.security.CallerContextProvider;
-import com.romiiis.security.SecurityConfig;
-import com.romiiis.service.interfaces.IFileSystemService;
-import com.romiiis.service.interfaces.IUserService;
+import com.romiiis.port.IExecutionContextProvider;
+import com.romiiis.service.api.IUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -57,7 +38,7 @@ class MeControllerTest {
     IUserRepository userRepository;
 
     @Autowired
-    CallerContextProvider callerContextProvider;
+    IExecutionContextProvider callerContextProvider;
 
     @Autowired
     private MockMvc mockMvc;

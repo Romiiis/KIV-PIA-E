@@ -7,10 +7,10 @@ import com.romiiis.domain.User;
 import com.romiiis.repository.IFeedbackRepository;
 import com.romiiis.repository.IProjectRepository;
 import com.romiiis.repository.IUserRepository;
-import com.romiiis.security.CallerContextProvider;
-import com.romiiis.service.interfaces.IProjectService;
-import com.romiiis.service.interfaces.IProjectWFService;
-import com.romiiis.service.interfaces.IUserService;
+import com.romiiis.port.IExecutionContextProvider;
+import com.romiiis.service.api.IProjectService;
+import com.romiiis.service.api.IProjectWFService;
+import com.romiiis.service.api.IUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ class ProjectFeedbackControllerTest {
     private IFeedbackRepository feedbackRepository;
 
     @Autowired
-    private CallerContextProvider callerContextProvider;
+    private IExecutionContextProvider callerContextProvider;
 
     private User customer;
     private Project project;

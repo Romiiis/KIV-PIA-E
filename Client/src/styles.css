@@ -18,7 +18,7 @@
   --color-yellow-bg: #fef9c3;
   --color-yellow-text: #c99633;
   --color-blue-bg: #11488f;
-  --color-blue-text: #ffffff;
+  --color-blue-text: #e9ebff;
   --color-green-bg: #dcfce7;
   --color-green-text: #155e2b;
   --color-light-gray-bg: #bdbdbd;
@@ -78,8 +78,8 @@ body { font-family: Roboto, "Helvetica Neue", sans-serif; }
   color: var(--color-yellow-text);
 }
 .status-badge-COMPLETED {
-  background-color: var(--color-blue-bg);
-  color: var(--color-blue-text);
+  background-color:var(--color-blue-text);
+  color: var(--color-blue-bg);
 }
 .status-badge-APPROVED {
   background-color: var(--color-green-bg);
