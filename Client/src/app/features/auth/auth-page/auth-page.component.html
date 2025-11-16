@@ -54,7 +54,7 @@
     <h2>{{ "authPage.register.title" | translate }}</h2>
 
     <div class="oauth">
-      <button type="button" class="oauth-btn google">
+      <button type="button" class="oauth-btn google" (click)="callOAuth()">
         <img src="/google.svg" alt="Google"/>
         {{ "authPage.register.oauth" | translate }}
       </button>

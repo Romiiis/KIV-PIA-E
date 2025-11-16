@@ -19,6 +19,12 @@ public class MailHogEmailService implements IMailService {
 
     @Override
     public void sendEmailToCustomer(Project project, String subject, String text) {
+
+        if (project.getCustomer() == null) {
+            log.warn("No customer assigned to project with id {}. Email not sent.", project.getId());
+            return;
+        }
+
         log.info("Sending email to customer with subject {}", subject);
         String customerEmail = project.getCustomer().getEmailAddress();
         sendEmail(customerEmail, subject, text);
@@ -26,6 +32,12 @@ public class MailHogEmailService implements IMailService {
 
     @Override
     public void sendEmailToTranslator(Project project, String subject, String text) {
+
+        if (project.getTranslator() == null) {
+            log.warn("No translator assigned to project with id {}. Email not sent.", project.getId());
+            return;
+        }
+
         log.info("Sending email to translator with subject {}", subject);
         String translatorEmail = project.getTranslator().getEmailAddress();
         sendEmail(translatorEmail, subject, text);

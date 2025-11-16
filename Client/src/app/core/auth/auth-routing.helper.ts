@@ -1,4 +1,4 @@
-import {Router, UrlTree} from '@angular/router';
+import {Params, Router, UrlTree} from '@angular/router';
 import {UserRoleDomain} from '@core/models/userRole.model';
 
 /**
@@ -35,8 +35,8 @@ export class AuthRoutingHelper {
   /**
    * Redirect to login (FOR GUARDS).
    */
-  static redirectToAuth(router: Router): UrlTree {
-    return router.parseUrl(AuthRoutingHelper.AUTH_PATH);
+  static redirectToAuth(router: Router, queryParams?: Params): UrlTree {
+    return router.createUrlTree([AuthRoutingHelper.AUTH_PATH], {queryParams});
   }
 
   /**

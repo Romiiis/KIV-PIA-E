@@ -42,6 +42,9 @@ export class AuthPageComponent implements OnInit {
    * Sets up reactive forms for login and registration with validation.
    */
   ngOnInit(): void {
+    this.handleOAuth2Error();
+
+
     this.loginForm = this.fb.group({
 
       // Login form with validation rules.
@@ -148,9 +151,9 @@ export class AuthPageComponent implements OnInit {
     if (this.registerForm.valid) {
       // Call the AuthManager to register.
       this.auth.register(
+        this.registerForm.value.fullname,
         this.registerForm.value.email,
-        this.registerForm.value.password,
-        this.registerForm.value.fullname
+        this.registerForm.value.password
       )
         // Handle successful registration.
         .then(() => {
@@ -176,7 +179,46 @@ export class AuthPageComponent implements OnInit {
     }
   }
 
+
+  private handleOAuth2Error(): void {
+    const params = new URLSearchParams(window.location.search);
+    const errorCode = params.get('error');
+
+    if (errorCode) {
+      console.log('OAuth2 Error Code received:', errorCode);
+
+      let errorMessageKey: string;
+
+      switch (errorCode) {
+        case 'email_missing':
+          errorMessageKey = 'authPage.notifications.oauthEmailMissing_text';
+          break;
+        case 'internal_error':
+          errorMessageKey = 'authPage.notifications.oauthInternalError_text';
+          break;
+        case 'different_auth_method':
+          errorMessageKey = 'authPage.notifications.oauthDifferentAuthMethod_text';
+          break;
+        default:
+          errorMessageKey = 'authPage.notifications.oauthGenericError_text';
+          break;
+      }
+
+      const translatedMessage = this.translateService.instant(errorMessageKey);
+      this.toastr.error(translatedMessage);
+
+      params.delete('error');
+      params.delete('redirect_uri');
+
+      const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+      this.router.navigateByUrl(newUrl, { replaceUrl: true });
+    }
+  }
+
+
+
   callOAuth() {
-    window.location.href = 'http://localhost:8080/login/oauth2/code/github';
+    const backendUrl = 'http://localhost:8080';
+    window.location.href = backendUrl + '/oauth2/authorization/google';
   }
 }

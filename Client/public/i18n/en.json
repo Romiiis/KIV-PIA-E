@@ -9,7 +9,8 @@
     "error": "Error",
     "required": "Required",
     "rejected": "Rejected",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "FILE_TOO_LARGE": "The selected file exceeds the maximum allowed size of {{maxSize}} MB."
   },
   "projectStatus": {
     "created": "Created",
@@ -77,7 +78,11 @@
       "loginNoUser_text": "Unable to retrieve user information.",
       "loginError_text": "Login failed. Please check your credentials.",
       "registerSuccess_text": "Registration Successful",
-      "registerError_text": "Registration failed. Please try again."
+      "registerError_text": "Registration failed. Please try again.",
+      "oauthEmailMissing_text": "Authentication failed: We couldn't get your email address from the provider. Try another account.",
+      "oauthInternalError_text": "Authentication failed due to an internal server error. Please try again later.",
+      "oauthGenericError_text": "Authentication failed. Please try logging in again.",
+      "oauthDifferentAuthMethod_text": "Authentication failed: An account with this email already exists using a different sign-in method."
     }
   },
   "languageSelect": {
@@ -120,7 +125,7 @@
     "title": "Create New Translation Project",
     "subtitle": "Upload your source document in English and specify the required target language. We'll handle the assignment.",
     "uploadLabel": "1. Upload Your Document",
-    "dragDrop": "Drag and drop your file here or click to select (Max 5MB)",
+    "dragDrop": "Click to select (Max 5MB)",
     "sourceRequired": "Document is required.",
     "targetLanguageLabel": "2. Select Target Language",
     "languagePlaceholder": "Select one target language",
@@ -187,6 +192,7 @@
       "submissionError": "Error submitting translation. Please try again.",
       "fileRequired": "Please upload the translated document."
     },
+    "feedbackTitle": "Feedback from customer",
     "submitTitle": "Submit Translated Document",
     "resubmitTitle": "Resubmit Translated Document",
     "feedbackSubtitle": "The customer has requested revisions. Please review the feedback, download the original file, and upload the corrected version.",
@@ -197,8 +203,8 @@
     "downloadTitle": "Download",
     "step2UploadCorrected": "Step 2: Upload Corrected File",
     "step2UploadTranslated": "Step 2: Upload Translated File",
-    "dragDropCorrected": "Drag & Drop Corrected File (Max 5MB)",
-    "dragDropTranslated": "Drag & Drop Translated File (Max 5MB)",
+    "dragDropCorrected": "Click to upload corrected File (Max 5MB)",
+    "dragDropTranslated": "Click to upload translated File (Max 5MB)",
     "correctedFileError": "Corrected file is required.",
     "submitCorrectionButton": "Submit Correction",
     "submitTranslationButton": "Submit Translation"
@@ -218,7 +224,7 @@
     "waitingForReview": "Waiting for Review",
     "closedHistory": "Closed History",
     "loadingProjects": "Loading projects...",
-    "uploadTranslationButton": "Upload Translation",
+    "uploadTranslationButton": "Instructions & Upload Translation",
     "resubmitTranslationButton": "Resubmit Translation",
     "viewStatusButton": "View Status",
     "viewApprovedButton": "View project Details",
@@ -243,6 +249,7 @@
     "cancelButton": "Cancel"
   },
   "adminPage": {
+    "unassigned": "Not Assigned",
     "detailButton": "View Details",
     "mailButton": "Mail",
     "closeButton": "Close",

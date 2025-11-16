@@ -6,6 +6,7 @@ import com.romiiis.domain.Project;
 import com.romiiis.domain.User;
 import com.romiiis.exception.NoAccessToOperateException;
 import com.romiiis.exception.ProjectNotFoundException;
+import com.romiiis.port.IDomainEventPublisher;
 import com.romiiis.port.IExecutionContextProvider;
 import com.romiiis.service.api.IFeedbackService;
 import com.romiiis.port.IFileSystemService;
@@ -30,6 +31,9 @@ class ProjectWFServiceImplTest {
     private IFeedbackService feedbackService;
     @Mock
     private IExecutionContextProvider callerContextProvider;
+
+    @Mock
+    private IDomainEventPublisher eventPublisher;
 
     @InjectMocks
     private ProjectWFServiceImpl wfService;

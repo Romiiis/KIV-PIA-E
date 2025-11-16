@@ -14,6 +14,10 @@ import localeEn from '@angular/common/locales/en';
 })
 export class App {
   protected readonly title = signal('Client');
+
+  static readonly MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+
+
   constructor(private langService: LanguageService) {
 
     registerLocaleData(localeCs);

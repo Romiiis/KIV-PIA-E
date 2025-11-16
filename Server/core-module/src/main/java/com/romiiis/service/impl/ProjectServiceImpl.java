@@ -3,8 +3,11 @@ package com.romiiis.service.impl;
 
 import com.romiiis.configuration.ResourceHeader;
 import com.romiiis.domain.*;
+import com.romiiis.event.NoTranslatorAssignedToProjectEvent;
+import com.romiiis.event.TranslatorAssignedToProjectEvent;
 import com.romiiis.exception.*;
 import com.romiiis.filter.ProjectsFilter;
+import com.romiiis.port.IDomainEventPublisher;
 import com.romiiis.repository.IFeedbackRepository;
 import com.romiiis.repository.IProjectRepository;
 import com.romiiis.port.IExecutionContextProvider;
@@ -37,6 +40,7 @@ public class ProjectServiceImpl implements IProjectService {
     private final IFeedbackRepository feedbackRepository;
     private final IFileSystemService fsService;
     private final IExecutionContextProvider callerContextProvider;
+    private final IDomainEventPublisher eventPublisher;
 
 
     /**
@@ -73,12 +77,13 @@ public class ProjectServiceImpl implements IProjectService {
             projectRepository.save(newProject);
             log.info("Assigned translator with ID {} to project ID {}", bestTranslator.getId(), newProject.getId());
 
-            // TODO - send notification to translator about new assignment
+            eventPublisher.publish(new TranslatorAssignedToProjectEvent(newProject));
+
 
 
         } catch (UserNotFoundException ex) {
             log.warn("No suitable translator found for project ID {}", newProject.getId());
-            // TODO - send notification to customer about no available translators
+            eventPublisher.publish(new NoTranslatorAssignedToProjectEvent(newProject));
         }
 
 

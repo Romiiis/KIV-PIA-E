@@ -1,7 +1,7 @@
 /** @type {import('orval').Config} */
 module.exports = {
   api: {
-    input: '../Server/rest-api-module/src/main/resources/static/openapi.yaml',
+    input: '../openapi.yaml',
     output: {
       target: './src/generatedAPI/index.ts',
       schemas: './src/generatedAPI/models',

@@ -50,8 +50,8 @@ public class ServiceConfiguration {
     }
 
     @Bean
-    public IProjectService projectService(IUserService userService, IProjectRepository projectRepository, IFileSystemService fsService, IExecutionContextProvider callerContextProvider, IFeedbackRepository feedbackRepository) {
-        return new ProjectServiceImpl(userService, projectRepository, feedbackRepository, fsService,  callerContextProvider);
+    public IProjectService projectService(IUserService userService, IProjectRepository projectRepository, IFileSystemService fsService, IExecutionContextProvider callerContextProvider, IFeedbackRepository feedbackRepository, IDomainEventPublisher domainEventPublisher) {
+        return new ProjectServiceImpl(userService, projectRepository, feedbackRepository, fsService,  callerContextProvider, domainEventPublisher);
     }
 
     @Bean

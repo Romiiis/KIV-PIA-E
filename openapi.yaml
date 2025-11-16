@@ -55,10 +55,6 @@ paths:
                 The access_token and refresh_token cookies are set on successful login.
               schema:
                 type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthJWTResponse'
         '400':
           description: Invalid request body
         '401':
@@ -91,10 +87,6 @@ paths:
                 The access_token and refresh_token cookies are set on successful registration.
               schema:
                 type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthJWTResponse'
         '400':
           description: Request body invalid or incomplete
         '409':
@@ -122,10 +114,6 @@ paths:
                 The new access_token and refresh_token cookies are returned.
               schema:
                 type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthJWTResponse'
         '401':
           description: Invalid or expired refresh token
         '500':

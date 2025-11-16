@@ -50,6 +50,25 @@ public class ProjectNotificationListener {
     private String closedBodyTemplate;
 
 
+    @Value("${mail.template.translator-assigned.subject}")
+    private String translatorAssignedSubjectTemplate;
+
+    @Value("${mail.template.translator-assigned.body}")
+    private String translatorAssignedBodyTemplate;
+
+    @Value("${mail.template.newproject.customer.subject}")
+    private String newProjectCustomerSubjectTemplate;
+
+    @Value("${mail.template.newproject.customer.body}")
+    private String newProjectCustomerBodyTemplate;
+
+    @Value("${mail.template.newproject.notransalator.subject}")
+    private String newProjectNoTranslatorSubjectTemplate;
+
+    @Value("${mail.template.newproject.notransalator.body}")
+    private String newProjectNoTranslatorBodyTemplate;
+
+
     /**
      * Handles the AdminMessageEvent by sending emails to the customer and/or translator based on the event details.
      *
@@ -143,6 +162,38 @@ public class ProjectNotificationListener {
         emailService.sendEmailToCustomer(event.project(), subject, body);
         emailService.sendEmailToTranslator(event.project(), subject, body);
     }
+
+
+    @Async
+    @EventListener
+    public void handleProjectCreationSuccess(TranslatorAssignedToProjectEvent event) {
+        String subject = String.format(translatorAssignedSubjectTemplate, event.project().getOriginalFileName());
+        String body = String.format(translatorAssignedBodyTemplate, event.project().getOriginalFileName());
+
+        log.info("Sending new project assignment email for project id: {}", event.project().getId());
+
+        emailService.sendEmailToTranslator(event.project(), subject, body);
+
+
+        String customerSubject = String.format(newProjectCustomerSubjectTemplate, event.project().getOriginalFileName());
+        String customerBody = String.format(newProjectCustomerBodyTemplate, event.project().getOriginalFileName());
+
+        emailService.sendEmailToCustomer(event.project(), customerSubject, customerBody);
+
+
+    }
+
+    @Async
+    @EventListener
+    public void handleProjectCreationNoTranslator(NoTranslatorAssignedToProjectEvent event) {
+        String subject = String.format(newProjectNoTranslatorSubjectTemplate, event.project().getOriginalFileName());
+        String body = String.format(newProjectNoTranslatorBodyTemplate, event.project().getOriginalFileName());
+
+        log.info("Sending new project (no translator) email for project id: {}", event.project().getId());
+
+        emailService.sendEmailToCustomer(event.project(), subject, body);
+    }
+
 
 
 

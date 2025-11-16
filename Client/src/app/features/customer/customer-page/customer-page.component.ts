@@ -71,7 +71,7 @@ export class CustomerPageComponent implements OnInit {
         );
       case 'history':
         return this.projects.filter(p =>
-          p.getStatusClass() === 'APPROVED' || p.getStatusClass() === 'CLOSED' || p.getStatusClass() === 'CANCELED'
+          p.getStatusClass() === 'APPROVED' || p.getStatusClass() === 'CLOSED' || p.getStatusClass() === 'CANCELED' || p.getStatusClass() === 'CREATED'
         );
       default:
         return [];

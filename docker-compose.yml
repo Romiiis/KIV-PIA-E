@@ -23,7 +23,6 @@ services:
             mongorestore --drop --db piadb /mongo-dump/piadb;
             echo '✅ Restore finished.';
 
-            # Keep container alive
             wait
           "
         volumes:
@@ -39,6 +38,33 @@ services:
         ports:
           - "1025:1025"
           - "8025:8025"
+          
+          
+    backend:
+        container_name: backend
+        environment:
+            - MONGO_HOST=mongo
+            - MAIL_HOST=mailhog
+        build:
+            context: .
+            dockerfile: Server/Dockerfile
+        ports:
+          - "8080:8080"
+        depends_on:
+          - mongo
+          - mailhog
+    frontend:
+        container_name: frontend
+        build:
+          context: .
+          dockerfile: Client/Dockerfile
+        ports:
+          - "4200:80"
+        depends_on:
+          - backend
+        restart: on-failure
+    
+    
 volumes:
   mongo-data:
     driver: local

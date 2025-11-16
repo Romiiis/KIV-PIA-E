@@ -50,7 +50,8 @@
             <mat-form-field appearance="outline" class="filter-select">
               <mat-label>{{ "adminPage.filter.status" | translate }}</mat-label>
               <mat-icon matPrefix>layers</mat-icon>
-              <mat-select [(ngModel)]="filterStatus" (ngModelChange)="onFilterChange()" panelClass="admin-filter-overlay">
+              <mat-select [(ngModel)]="filterStatus" (ngModelChange)="onFilterChange()"
+                          panelClass="admin-filter-overlay">
                 <mat-option value="all">{{ "adminPage.filter.allStatuses" | translate }}</mat-option>
                 @for (status of allStatuses; track status) {
                   <mat-option [value]="status">
@@ -79,7 +80,6 @@
     </div>
 
 
-
     <div class="project-grid">
       @if (isLoading) {
         <div class="loading-indicator">
@@ -87,7 +87,7 @@
         </div>
       } @else {
         @for (p of filteredProjects; track p.id) {
-          <div class="project-card" [id]="'project-card-' + p.id" [class]="'status-badge-' + p.getStatusClass()">
+          <div class="project-card" [id]="'project-card-' + p.id" [ngClass]="'status-badge-' + p.getStatusClass()">
             <div class="card-content">
 
               <div class="status-box">
@@ -99,19 +99,23 @@
               <div class="project-meta">
                 <span class="meta-item">
                   <span class="icon">📅</span>
-                  <span><strong>{{ "adminPage.created" | translate }}:</strong> {{ p.createdAt | date: 'mediumDate' }}</span>
+                  <span><strong>{{ "adminPage.created" | translate }}
+                    :</strong> {{ p.createdAt | date: 'mediumDate' }}</span>
                 </span>
                 <span class="meta-item">
                   <span class="icon">↔️</span>
-                  <span><strong>{{ (this.langList.getLanguageName("en")) }} →</strong> {{ this.langList.getLanguageName(p.targetLanguage) }}</span>
+                  <span><strong>{{ (this.langList.getLanguageName("en")) }}
+                    →</strong> {{ this.langList.getLanguageName(p.targetLanguage) }}</span>
                 </span>
                 <span class="meta-item">
                   <span class="icon">👤</span>
-                  <span><strong>{{ ("adminPage.customerLabel" | translate) | slice: 0 : 3 }}:</strong> {{ p.customer.name}}</span>
+                  <span><strong>{{ ("adminPage.customerLabel" | translate) | slice: 0 : 3 }}
+                    :</strong> {{ p.customer.name }}</span>
                 </span>
                 <span class="meta-item">
                   <span class="icon">✍️</span>
-                  <span><strong>{{ "adminPage.translatorLabel" | translate | slice: 0 : 3  }}:</strong> {{ p.translator?.name ?? 'Not Assigned' }}</span>
+                  <span><strong>{{ "adminPage.translatorLabel" | translate | slice: 0 : 3 }}
+                    :</strong> {{ p.translator?.name ?? "adminPage.unassigned" | translate }}</span>
                 </span>
               </div>
               @if (p.feedback && p.feedback.text.length > 0) {

@@ -12,6 +12,7 @@ import {useDownloadOriginalMutation} from '@api/queries/project.query';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {useUploadTranslatedMutation} from '@api/queries/workflow.query';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {App} from '../../../app';
 
 
 export interface ProjectSubmissionData {
@@ -64,11 +65,28 @@ export class ProjectSubmissionComponent implements OnInit {
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
+
+    const file = input.files ? input.files[0] : null;
+
+    if (file) {
+
+      if (file.size > App.MAX_FILE_SIZE_BYTES) {
+
+        const maxSizeMB = App.MAX_FILE_SIZE_BYTES / (1024 * 1024);
+
+        this.toastr.error(
+          this.translationService.instant('global.FILE_TOO_LARGE', {maxSize: maxSizeMB.toFixed(0)})
+        );
+
+        this.uploadForm.get('file')?.setValue(null);
+        input.value = '';
+
+        return;
+      }
 
       this.uploadForm.patchValue({file: file});
-      this.uploadForm.get('file')?.markAsTouched();
+      this.uploadForm.get('file')?.updateValueAndValidity();
+
     }
   }
 

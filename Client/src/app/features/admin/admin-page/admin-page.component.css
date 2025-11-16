@@ -3,20 +3,8 @@
   --admin-primary-hover: #0d3a70;
   --color-reject: #e74c3c; /* Přidáno pro Close tlačítko */
   --text-dark: #2c3e50;
-  --admin-primary-color-rgb: 17, 72, 143;
 }
 
-.project-card.highlighted-card {
-  /* Dočasně přebije :hover efekt */
-  transform: translateY(-8px) scale(1.02);
-
-  /* Použijeme výrazný stín v barvě admin rozhraní */
-  box-shadow: 0 12px 28px rgba(var(--admin-primary-color-rgb), 0.35);
-
-  /* Zajistíme, aby vyskočila nad ostatní karty */
-  position: relative;
-  z-index: 10;
-}
 
 .page-content {
   background-color: var(--background-page);

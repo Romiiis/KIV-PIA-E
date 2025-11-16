@@ -9,7 +9,8 @@
     "error": "Chyba",
     "required": "Povinné",
     "rejected": "Odmítnuto",
-    "cancel": "Zrušit"
+    "cancel": "Zrušit",
+    "FILE_TOO_LARGE": "Soubor je příliš velký. Maximální povolená velikost je {{maxSize}} MB."
   },
   "projectStatus": {
     "created": "Vytvořeno",
@@ -77,7 +78,11 @@
       "loginNoUser_text": "Nelze načíst informace o uživateli.",
       "loginError_text": "Přihlášení se nezdařilo. Zkontrolujte prosím své údaje.",
       "registerSuccess_text": "Registrace byla úspěšná",
-      "registerError_text": "Registrace se nezdařila. Zkuste to prosím znovu."
+      "registerError_text": "Registrace se nezdařila. Zkuste to prosím znovu.",
+      "oauthEmailMissing_text": "E-mailová adresa není k dispozici. Prosím ujistěte se, že jste povolili přístup k e-mailu ve svém účtu Google.",
+      "oauthInternalError_text": "Nastala interní chyba během zpracování OAuth přihlášení.",
+      "oauthGenericError_text": "Nastala chyba během OAuth přihlášení. Zkuste to prosím znovu.",
+      "oauthDifferentAuthMethod_text": "Pro tento e-mail již existuje účet s jinou metodou ověřování. Použijte prosím původní metodu přihlášení."
     }
   },
   "customerPage": {
@@ -115,7 +120,7 @@
     "title": "Vytvořit nový překladatelský projekt",
     "subtitle": "Nahrajte dokument v anglickém jazyce a vyberte cílový jazyk pro překlad. O zbytek se postaráme my!",
     "uploadLabel": "1. Nahrajte svůj dokument",
-    "dragDrop": "Přetáhněte soubor sem nebo klikněte pro výběr (Max 5MB)",
+    "dragDrop": "Klikněte pro výběr (Max 5MB)",
     "sourceRequired": "Dokument je povinný.",
     "targetLanguageLabel": "2. Vyberte cílový jazyk",
     "languagePlaceholder": "Vyberte jeden cílový jazyk",
@@ -188,6 +193,7 @@
       "submissionError": "Chyba při odesílání překladu. Zkuste to prosím znovu.",
       "fileRequired": "Nahrajte prosím přeložený dokument."
     },
+    "feedbackTitle": "Zpětná vazba od zákazníka",
     "submitTitle": "Odeslat přeložený dokument",
     "resubmitTitle": "Znovu odeslat přeložený dokument",
     "feedbackSubtitle": "Zákazník požádal o revize. Projděte si prosím zpětnou vazbu, stáhněte si původní soubor a nahrajte opravenou verzi.",
@@ -198,8 +204,8 @@
     "downloadTitle": "Stáhnout",
     "step2UploadCorrected": "Krok 2: Nahrání opraveného souboru",
     "step2UploadTranslated": "Krok 2: Nahrání přeloženého souboru",
-    "dragDropCorrected": "Přetáhněte opravený soubor (Max 5MB)",
-    "dragDropTranslated": "Přetáhněte přeložený soubor (Max 5MB)",
+    "dragDropCorrected": "Klikněte pro nahrání opraveného souboru (Max 5MB)",
+    "dragDropTranslated": "Klikněte pro nahrání přeloženého souboru (Max 5MB)",
     "correctedFileError": "Je vyžadován opravený soubor.",
     "submitCorrectionButton": "Odeslat opravu",
     "submitTranslationButton": "Odeslat překlad"
@@ -219,7 +225,7 @@
     "waitingForReview": "Čeká na kontrolu",
     "closedHistory": "Uzavřená historie",
     "loadingProjects": "Načítání projektů...",
-    "uploadTranslationButton": "Nahrát překlad",
+    "uploadTranslationButton": "Instrukce pro nahrání překladu",
     "resubmitTranslationButton": "Znovu odeslat překlad",
     "viewStatusButton": "Zobrazit stav projektu",
     "viewApprovedButton": "Zobrazit detail projektu",
@@ -244,6 +250,7 @@
     "cancelButton": "Zrušit"
   },
   "adminPage": {
+    "unassigned": "Nepřiřazen",
     "detailButton": "Detaily projektu",
     "mailButton": "Mail",
     "closeButton": "Uzavřít",
@@ -252,7 +259,7 @@
     "title": "Správa projektů",
     "loadingProjects": "Načítám všechny projekty...",
     "created": "Vytvořeno",
-    "feedbackSubmitted": "S feedbackem",
+    "feedbackSubmitted": "Se zpětnou vazbou",
     "manageButton": "Spravovat projekt",
     "noProjectsFound": "Nebyly nalezeny žádné projekty odpovídající filtrům.",
     "customerLabel": "Zákazník",
@@ -260,10 +267,10 @@
     "filter": {
       "status": "Filtrovat podle stavu",
       "allStatuses": "Všechny stavy",
-      "feedback": "Filtrovat podle feedbacku",
-      "allFeedback": "Veškerý feedback",
-      "hasFeedback": "S feedbackem",
-      "noFeedback": "Bez feedbacku"
+      "feedback": "Filtrovat podle zpětné vazby",
+      "allFeedback": "Všechna zpětná vazba",
+      "hasFeedback": "Se zpětnou vazbou",
+      "noFeedback": "Bez zpětné vazby"
     },
     "filterTitle": "Filtrovat projekty",
     "toastCloseSuccess": "Projekt byl úspěšně uzavřen.",

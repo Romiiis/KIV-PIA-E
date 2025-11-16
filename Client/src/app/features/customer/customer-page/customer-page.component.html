@@ -123,6 +123,12 @@
                         <span class="label">{{ "customerPage.downloadButton" | translate }} </span>
                       </button>
                     }
+                    @case (ProjectStatusDomain.CREATED) {
+                      <button class="cta-button ghost" (click)="openProjectDetails(p)">
+                        <span class="icon">⬇️</span>
+                        <span class="label">{{ "customerPage.downloadButton" | translate }} </span>
+                      </button>
+                    }
                     @case (ProjectStatusDomain.CLOSED) {
                       <button class="cta-button ghost" (click)="openProjectDetails(p)">
                         <span class="icon">📂</span>

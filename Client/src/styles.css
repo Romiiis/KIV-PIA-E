@@ -150,10 +150,6 @@ project-view-toggle {
 }
 
 .admin-filter-overlay {
-  /*
-   * Nastavte zde číslo, které je zaručeně vyšší
-   * než z-index vašeho hlavního navbaru.
-   */
   z-index: 9999 !important;
 }
 

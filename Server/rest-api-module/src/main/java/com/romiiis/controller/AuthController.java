@@ -50,7 +50,7 @@ public class AuthController extends AbstractController implements AuthApi {
      * @return a ResponseEntity containing the login response with a JWT token if successful
      */
     @Override
-    public ResponseEntity<AuthJWTResponseDTO> loginUser(LoginUserRequestDTO loginUserRequestDTO) {
+    public ResponseEntity<Void> loginUser(LoginUserRequestDTO loginUserRequestDTO) {
 
         User user = authService.login(
                 loginUserRequestDTO.getEmailAddress(),
@@ -63,11 +63,7 @@ public class AuthController extends AbstractController implements AuthApi {
         cookiesUtil.setCookies(response, tokens);
 
 
-        var responseDTO = new AuthJWTResponseDTO()
-                .accessToken(tokens.accessToken())
-                .refreshToken(tokens.refreshToken());
-
-        return ResponseEntity.ok(responseDTO);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -83,7 +79,7 @@ public class AuthController extends AbstractController implements AuthApi {
      * or an error status if registration fails
      */
     @Override
-    public ResponseEntity<AuthJWTResponseDTO> registerUser(RegisterUserRequestDTO registerUserRequestDTO) {
+    public ResponseEntity<Void> registerUser(RegisterUserRequestDTO registerUserRequestDTO) {
         User user = authService.registerUser(
                 registerUserRequestDTO.getName(),
                 registerUserRequestDTO.getEmailAddress(),
@@ -95,11 +91,8 @@ public class AuthController extends AbstractController implements AuthApi {
         HttpServletResponse response = getCurrentResponse();
         cookiesUtil.setCookies(response, tokens);
 
-        var responseDTO = new AuthJWTResponseDTO()
-                .accessToken(tokens.accessToken())
-                .refreshToken(tokens.refreshToken());
 
-        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     /**
@@ -109,7 +102,7 @@ public class AuthController extends AbstractController implements AuthApi {
      * or an unauthorized status if the refresh token is invalid
      */
     @Override
-    public ResponseEntity<AuthJWTResponseDTO> refreshToken() {
+    public ResponseEntity<Void> refreshToken() {
         HttpServletRequest request = getCurrentRequest();
         HttpServletResponse response = getCurrentResponse();
 
@@ -124,11 +117,8 @@ public class AuthController extends AbstractController implements AuthApi {
 
         cookiesUtil.setCookies(response, tokens);
 
-        var dto = new AuthJWTResponseDTO()
-                .accessToken(tokens.accessToken())
-                .refreshToken(tokens.refreshToken());
 
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok().build();
     }
 
 

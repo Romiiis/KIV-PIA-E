@@ -59,8 +59,6 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.accessToken").exists())
-                .andExpect(jsonPath("$.refreshToken").exists())
                 .andReturn();
 
         var response = result.getResponse();
@@ -95,8 +93,6 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.accessToken").exists())
-                .andExpect(jsonPath("$.refreshToken").exists())
                 .andReturn();
 
 
@@ -113,7 +109,6 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").exists())
                 .andReturn();
 
         Cookie[] cookies = result.getResponse().getCookies();
@@ -145,8 +140,6 @@ class AuthControllerTest {
         MvcResult refreshResult = mockMvc.perform(post("/auth/refresh")
                         .cookie(initialCookies))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").exists())
-                .andExpect(jsonPath("$.refreshToken").exists())
                 .andReturn();
 
         Cookie[] refreshedCookies = refreshResult.getResponse().getCookies();

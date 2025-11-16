@@ -9,6 +9,7 @@ import {CommonModule} from '@angular/common';
 import {LanguageSelectComponent} from '@shared/language-select/language-select.component';
 import {useCreateProjectMutation} from '@api/queries/project.query';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {App} from '../../../app';
 
 @Component({
   selector: 'app-customer-new-project',
@@ -49,8 +50,28 @@ export class NewProjectComponent implements OnInit {
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.projectForm.patchValue({file: input.files[0]});
+
+    const file = input.files ? input.files[0] : null;
+
+    if (file) {
+
+      if (file.size > App.MAX_FILE_SIZE_BYTES) {
+
+        const maxSizeMB = App.MAX_FILE_SIZE_BYTES / (1024 * 1024);
+
+        this.toastr.error(
+          this.translationService.instant('global.FILE_TOO_LARGE', {maxSize: maxSizeMB.toFixed(0)})
+        );
+
+        this.projectForm.get('file')?.setValue(null);
+        input.value = '';
+
+        return;
+      }
+
+      this.projectForm.patchValue({file: file});
+      this.projectForm.get('file')?.updateValueAndValidity();
+
     }
   }
 

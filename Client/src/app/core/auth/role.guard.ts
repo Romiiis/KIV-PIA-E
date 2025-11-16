@@ -11,16 +11,20 @@ export class RoleRedirectGuard implements CanActivate {
 
   async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
     const {isLoggedIn, user} = this.auth;
+    const currentUrl = state.url;
 
     // Not logged in → auth
     if (!isLoggedIn()) {
 
-      // already on auth path
-      if (state.url === AuthRoutingHelper.AUTH_PATH) {
+      const isAuthPath = currentUrl.startsWith(AuthRoutingHelper.AUTH_PATH);
+
+      if (isAuthPath) {
         return true;
       }
-      // redirect to auth
-      return AuthRoutingHelper.redirectToAuth(this.router);
+      const urlTree = this.router.parseUrl(currentUrl);
+      const queryParams = urlTree.queryParams;
+
+      return AuthRoutingHelper.redirectToAuth(this.router, queryParams);
     }
 
     const role = user()?.role;
