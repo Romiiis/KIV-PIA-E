@@ -62,7 +62,11 @@ public class AuthServiceImpl implements IAuthService {
             log.warn("Auth failed: Invalid credentials for email {}", email);
             throw new InvalidAuthCredentialsException();
         } else {
-            return callerContextProvider.runAsSystem(()-> userService.getUserByEmail(email));
+
+            return userRepository.getUserByEmail(email).orElseThrow(() -> {
+                log.error("Auth failed: User with email {} not found after successful password verification", email);
+                return new InvalidAuthCredentialsException();
+            });
         }
     }
 

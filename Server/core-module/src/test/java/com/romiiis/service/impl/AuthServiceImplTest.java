@@ -54,11 +54,6 @@ class AuthServiceImplTest {
         MockitoAnnotations.openMocks(this);
         mockCustomer = User.createCustomer("Roman", email).withHashedPassword(hashed);
         mockTranslator = User.createTranslator("Eva", "eva@example.com", Set.of(Locale.ENGLISH)).withHashedPassword(hashed);
-
-        when(callerContextProvider.runAsSystem(any())).thenAnswer(invocation -> {
-            Supplier<?> s = invocation.getArgument(0);
-            return s.get();
-        });
     }
 
 
@@ -67,7 +62,7 @@ class AuthServiceImplTest {
     void login_shouldReturnJwtToken_whenCredentialsValid() {
         when(userRepository.getUserPasswordHash(email)).thenReturn(Optional.of(hashed));
         when(passwordHasher.verify(password, hashed)).thenReturn(true);
-        when(userService.getUserByEmail(email)).thenReturn(mockCustomer);
+        when(userRepository.getUserByEmail(email)).thenReturn(Optional.of(mockCustomer));
         when(jwtService.generateToken(mockCustomer.getId())).thenReturn(jwtToken);
 
         User result = authService.login(email, password);

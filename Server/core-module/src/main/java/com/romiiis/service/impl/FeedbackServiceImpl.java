@@ -165,11 +165,6 @@ public class FeedbackServiceImpl implements IFeedbackService {
     @Transactional(readOnly = true)
     public List<Feedback> getAllFeedbacksByProjectIds(List<UUID> projectIds) throws UserNotFoundException, ProjectNotFoundException {
 
-        if (!callerContextProvider.isSystem()) {
-            log.error("Only system context can access all feedbacks by project IDs");
-            throw new NoAccessToOperateException("Only system context can access all feedbacks by project IDs");
-        }
-
         log.info("Fetching all feedbacks for project IDs: {}", projectIds);
         return feedbackRepository.getAllFeedbackForProjectIds(projectIds);
 

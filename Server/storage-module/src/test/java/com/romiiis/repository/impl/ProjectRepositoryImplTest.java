@@ -1,129 +1,174 @@
 package com.romiiis.repository.impl;
 
 import com.romiiis.domain.Project;
+import com.romiiis.domain.User;
 import com.romiiis.mapper.MongoProjectMapper;
+import com.romiiis.model.ProjectDB;
+import com.romiiis.model.UserDB;
+import com.romiiis.model.UserRoleDB;
 import com.romiiis.repository.mongo.MongoProjectRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-@DataMongoTest
-@EnableMongoRepositories(basePackageClasses = MongoProjectRepository.class)
-@Testcontainers
-@Import({ProjectRepositoryImpl.class, MongoProjectMapper.class, MongoProjectRepository.class}) // Důležité: Importujeme impl a mapper, protože @DataMongoTest skenuje jen repository
+@DataMongoTest(
+        excludeAutoConfiguration = MongoRepositoriesAutoConfiguration.class
+)@Import({ProjectRepositoryImpl.class, ProjectRepositoryImplTest.IntegrationConfig.class})
 class ProjectRepositoryImplTest {
-
-    @Container
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:6.0");
-
-    @DynamicPropertySource
-    static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
-    }
 
     @Autowired
     private ProjectRepositoryImpl projectRepository;
 
+    @Autowired @Lazy
+    private MongoProjectRepository mongoRepo;
+
     @Autowired
-    private MongoProjectRepository mongoProjectRepository;
+    private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private MongoProjectMapper mapper;
+
+    private UUID translatorId;
+    private UserDB translatorDB;
+    private UserDB customerDB;
+    private Project projectDomain;
+
+
+    @Configuration
+    @Lazy
+    @EnableMongoRepositories(basePackages = "com.romiiis.repository.mongo")
+    static class IntegrationConfig {
+
+        @Bean
+        MongoProjectMapper mongoProjectMapper() {
+            return Mockito.mock(MongoProjectMapper.class);
+        }
+    }
 
     @BeforeEach
     void setUp() {
-        mongoProjectRepository.deleteAll();
-    }
+        mongoTemplate.getDb().drop();
 
-    @AfterEach
-    void tearDown() {
-        mongoProjectRepository.deleteAll();
-    }
-
-    @Test
-    void shouldSaveAndFindProjectById() {
-        // Arrange
+        UUID customerId = UUID.randomUUID();
+        translatorId = UUID.randomUUID();
         UUID projectId = UUID.randomUUID();
-        Project newProject = createDummyProject(projectId);
 
-        // Act
-        projectRepository.save(newProject);
-        Project foundProject = projectRepository.findById(projectId);
+        customerDB = new UserDB();
+        customerDB.setId(customerId);
+        customerDB.setRole(UserRoleDB.CUSTOMER);
+        mongoTemplate.save(customerDB);
 
-        // Assert
-        assertThat(foundProject).isNotNull();
-        assertThat(foundProject.getId()).isEqualTo(projectId);
-        // Zde můžeš přidat další asserty pro kontrolu mapování polí
+        translatorDB = new UserDB();
+        translatorDB.setId(translatorId);
+        translatorDB.setRole(UserRoleDB.TRANSLATOR);
+        mongoTemplate.save(translatorDB);
+
+        User customerDomain = new User(customerId);
+        User translatorDomain = new User(translatorId);
+
+        projectDomain = Project.builder()
+                .id(projectId)
+                .customer(customerDomain)
+                .translator(translatorDomain)
+                .targetLanguage(Locale.GERMAN)
+                .build();
     }
 
+    @DisplayName("save() should persist Project to MongoDB")
     @Test
-    void shouldCountProjectsWithTranslator() {
-        // Tento test ověřuje tvou query: "{ 'translator.$id': ?0 }"
+    void save_shouldPersistProjectToMongo() {
+        ProjectDB projectDB = new ProjectDB();
+        projectDB.setId(projectDomain.getId());
+        projectDB.setTranslator(translatorDB);
+        when(mapper.mapDomainToDB(any(Project.class))).thenReturn(projectDB);
 
-        // Arrange
-        UUID translatorId1 = UUID.randomUUID();
-        UUID translatorId2 = UUID.randomUUID();
+        projectRepository.save(projectDomain);
 
-        Project project1 = createDummyProject(UUID.randomUUID());
-        setTranslatorId(project1, translatorId1); // Předpokládaná metoda na doménovém objektu
-
-        Project project2 = createDummyProject(UUID.randomUUID());
-        setTranslatorId(project2, translatorId1);
-
-        Project project3 = createDummyProject(UUID.randomUUID());
-        setTranslatorId(project3, translatorId2); // Jiný překladatel
-
-        projectRepository.save(project1);
-        projectRepository.save(project2);
-        projectRepository.save(project3);
-
-        // Act
-        int count = projectRepository.countProjectsWithTranslator(translatorId1);
-
-        // Assert
-        assertThat(count).isEqualTo(2);
+        ProjectDB savedEntity = mongoRepo.findById(projectDomain.getId()).orElse(null);
+        assertThat(savedEntity).isNotNull();
+        assertThat(savedEntity.getTranslator().getId()).isEqualTo(translatorId);
     }
 
+    @DisplayName("findById() should return Domain Project when exists")
     @Test
-    void shouldGetAllProjectIdsAsString() {
-        // Tento test ověřuje query: @Query(value = "{}", fields = "{ '_id' : 1 }")
+    void findById_shouldReturnDomainProject_whenExists() {
+        ProjectDB projectDB = new ProjectDB();
+        projectDB.setId(projectDomain.getId());
+        projectDB.setCustomer(customerDB);
+        projectDB.setTranslator(translatorDB);
+        projectDB.setTargetLanguage(Locale.ITALIAN);
+        mongoRepo.save(projectDB);
 
-        // Arrange
-        UUID id1 = UUID.randomUUID();
-        UUID id2 = UUID.randomUUID();
+        when(mapper.mapDBToDomain(any(ProjectDB.class))).thenReturn(projectDomain);
 
-        projectRepository.save(createDummyProject(id1));
-        projectRepository.save(createDummyProject(id2));
+        Project result = projectRepository.findById(projectDomain.getId());
 
-        // Act
+        assertThat(result).isEqualTo(projectDomain);
+    }
+
+    @DisplayName("countProjectsWithTranslator() should return correct count")
+    @Test
+    void countProjectsWithTranslator_shouldReturnCorrectCount() {
+        ProjectDB p1 = new ProjectDB();
+        p1.setId(UUID.randomUUID());
+        p1.setTranslator(translatorDB);
+        mongoRepo.save(p1);
+
+        UserDB otherTranslator = new UserDB();
+        otherTranslator.setId(UUID.randomUUID());
+        otherTranslator.setRole(UserRoleDB.TRANSLATOR);
+        mongoTemplate.save(otherTranslator);
+
+        ProjectDB p2 = new ProjectDB();
+        p2.setId(UUID.randomUUID());
+        p2.setTranslator(otherTranslator);
+        mongoRepo.save(p2);
+
+        int count = projectRepository.countProjectsWithTranslator(translatorId);
+
+        assertThat(count).isEqualTo(1);
+    }
+
+    @DisplayName("getAllProjectIdsAsString() should return all project IDs as strings")
+    @Test
+    void getAllProjectIdsAsString_shouldReturnAllIds() {
+        ProjectDB p1 = new ProjectDB(); p1.setId(UUID.randomUUID());
+        ProjectDB p2 = new ProjectDB(); p2.setId(UUID.randomUUID());
+        mongoRepo.saveAll(List.of(p1, p2));
+
         List<String> ids = projectRepository.getAllProjectIdsAsString();
 
-        // Assert
         assertThat(ids).hasSize(2);
-        assertThat(ids).containsExactlyInAnyOrder(id1.toString(), id2.toString());
+        assertThat(ids).containsExactlyInAnyOrder(p1.getId().toString(), p2.getId().toString());
     }
 
-    // --- Pomocné metody pro vytváření dat (uprav dle své třídy Project) ---
+    @DisplayName("deleteAll() should clear all projects")
+    @Test
+    void deleteAll_shouldClearAllProjects() {
+        ProjectDB p1 = new ProjectDB(); p1.setId(UUID.randomUUID());
+        mongoRepo.save(p1);
+        assertThat(mongoRepo.count()).isEqualTo(1);
 
-    private Project createDummyProject(UUID id) {
-        return Project.builder().id(id)
-    }
+        projectRepository.deleteAll();
 
-    private void setTranslatorId(Project project, UUID translatorId) {
-        // Předpokládaná metoda pro nastavení ID překladatele v objektu Project
-        // Uprav dle své implementace
-        // Například:
-
+        assertThat(mongoRepo.count()).isEqualTo(0);
     }
 }

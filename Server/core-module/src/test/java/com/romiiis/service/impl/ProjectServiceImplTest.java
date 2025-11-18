@@ -55,13 +55,9 @@ class ProjectServiceImplTest {
     }
 
     private void asUser(User user) {
-        when(callerContextProvider.isSystem()).thenReturn(false);
         when(callerContextProvider.getCaller()).thenReturn(user);
     }
 
-    private void asSystem() {
-        when(callerContextProvider.isSystem()).thenReturn(true);
-    }
 
     // ---------------------------------------------------------
     // getProjectById
@@ -104,16 +100,6 @@ class ProjectServiceImplTest {
     @Test
     void adminCanGetAnyProject() throws Exception {
         asUser(admin);
-        when(projectRepository.findById(project.getId())).thenReturn(project);
-
-        Project result = projectService.getProjectById(project.getId());
-        assert result.equals(project);
-    }
-
-    @DisplayName("System can get any project (bypass checks)")
-    @Test
-    void systemCanGetAnyProject() throws Exception {
-        asSystem();
         when(projectRepository.findById(project.getId())).thenReturn(project);
 
         Project result = projectService.getProjectById(project.getId());

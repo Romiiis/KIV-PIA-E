@@ -5,6 +5,7 @@ import com.romiiis.domain.UserRole;
 import com.romiiis.infrastructure.security.config.JwtProperties;
 import com.romiiis.port.IExecutionContextProvider;
 import com.romiiis.port.IJwtService;
+import com.romiiis.repository.IUserRepository;
 import com.romiiis.security.TokenPair;
 import com.romiiis.service.api.IUserService;
 import io.jsonwebtoken.*;
@@ -32,6 +33,7 @@ public class JwtServiceImpl implements IJwtService {
     private final SecretKey secretKey;
     private final JwtProperties props;
     private final IUserService userService;
+    private final IUserRepository userRepository;
     private final IExecutionContextProvider callerContextProvider;
 
     /**
@@ -43,9 +45,10 @@ public class JwtServiceImpl implements IJwtService {
      *
      * @param props JWT properties
      */
-    public JwtServiceImpl(JwtProperties props, IUserService userService, IExecutionContextProvider callerContextProvider) {
+    public JwtServiceImpl(JwtProperties props, IUserService userService, IUserRepository userRepository, IExecutionContextProvider callerContextProvider) {
         this.callerContextProvider = callerContextProvider;
         this.userService = userService;
+        this.userRepository = userRepository;
         this.props = props;
         this.secretKey = Keys.hmacShaKeyFor(props.getSecret().getBytes(StandardCharsets.UTF_8));
     }
@@ -190,8 +193,8 @@ public class JwtServiceImpl implements IJwtService {
      */
     public Optional<UserRole> getRoleFromToken(String token) {
         String userId = getSubjectFromToken(token);
-        User user = callerContextProvider.runAsSystem(() -> userService.getUserById(UUID.fromString(userId)));
-        return Optional.ofNullable(user.getRole());
+        Optional<User> user = userRepository.getUserById(UUID.fromString(userId));
+        return user.map(User::getRole);
     }
 
 

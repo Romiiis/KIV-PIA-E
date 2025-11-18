@@ -14,10 +14,6 @@ public interface IExecutionContextProvider {
      */
     void setCaller(User user);
 
-    /**
-     * Sets the current caller as system (privileged).
-     */
-    void setSystem();
 
     /**
      * @return the current caller user, or null if running as system
@@ -26,18 +22,9 @@ public interface IExecutionContextProvider {
 
 
     /**
-     * @return true if execution runs with system privileges
-     */
-    boolean isSystem();
-
-    /**
      * Clears the current caller context.
      */
     void clear();
 
-    /**
-     * Execute block of code as system (privileged).
-     */
-    <T> T runAsSystem(java.util.function.Supplier<T> action);
 }
 

@@ -50,8 +50,8 @@ public class ServiceConfiguration {
     }
 
     @Bean
-    public IProjectService projectService(IUserService userService, IProjectRepository projectRepository, IFileSystemService fsService, IExecutionContextProvider callerContextProvider, IFeedbackRepository feedbackRepository, IDomainEventPublisher domainEventPublisher) {
-        return new ProjectServiceImpl(userService, projectRepository, feedbackRepository, fsService,  callerContextProvider, domainEventPublisher);
+    public IProjectService projectService(IUserRepository userRepository, IProjectRepository projectRepository, IFileSystemService fsService, IExecutionContextProvider callerContextProvider, IFeedbackRepository feedbackRepository, IDomainEventPublisher domainEventPublisher) {
+        return new ProjectServiceImpl(projectRepository, feedbackRepository,userRepository, fsService,  callerContextProvider, domainEventPublisher);
     }
 
     @Bean
@@ -71,8 +71,8 @@ public class ServiceConfiguration {
     }
 
     @Bean
-    public IJwtService jwtService(JwtProperties props, IUserService userService, IExecutionContextProvider callerContextProvider) {
-        return new JwtServiceImpl(props, userService, callerContextProvider);
+    public IJwtService jwtService(JwtProperties props, IUserService userService, IExecutionContextProvider callerContextProvider, IUserRepository userRepository) {
+        return new JwtServiceImpl(props, userService, userRepository, callerContextProvider);
     }
 
     @Bean

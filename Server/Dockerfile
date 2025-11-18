@@ -5,7 +5,7 @@ WORKDIR /app
 copy Server .
 copy Server/pom.xml ./pom.xml
 COPY ../openapi.yaml ../openapi.yaml
-RUN mvn clean verify package -DskipTests
+RUN mvn clean verify package
 
 
 FROM eclipse-temurin:21-jre-jammy AS final

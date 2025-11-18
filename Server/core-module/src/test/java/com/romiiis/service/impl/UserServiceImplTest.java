@@ -43,14 +43,8 @@ class UserServiceImplTest {
                 .withHashedPassword("hashed321");
     }
 
-    // === Pomocné metody ===
-
-    private void asSystem() {
-        when(callerContextProvider.isSystem()).thenReturn(true);
-    }
 
     private void asUser(User user) {
-        when(callerContextProvider.isSystem()).thenReturn(false);
         when(callerContextProvider.getCaller()).thenReturn(user);
     }
 
@@ -93,16 +87,6 @@ class UserServiceImplTest {
         }
     }
 
-    @DisplayName("SYSTEM mode bypasses access checks")
-    @Test
-    void systemModeBypassesAccessChecks() {
-        asSystem();
-        when(userRepository.getUserByEmail(customer.getEmailAddress()))
-                .thenReturn(Optional.of(customer));
-
-        var result = userService.getUserByEmail(customer.getEmailAddress());
-        assert result.equals(customer);
-    }
 
     // === TESTY getAllUsers ===
 
@@ -131,16 +115,6 @@ class UserServiceImplTest {
         }
     }
 
-    @DisplayName("SYSTEM can get all users")
-    @Test
-    void systemCanGetAllUsers() {
-        asSystem();
-        var filter = new UsersFilter();
-        when(userRepository.getAllUsers(filter)).thenReturn(List.of(admin, customer));
-
-        var result = userService.getAllUsers(filter);
-        assert result.size() == 2;
-    }
 
     // === TESTY getUsersLanguages ===
 
@@ -246,21 +220,6 @@ class UserServiceImplTest {
         }
     }
 
-    @DisplayName("System mode can update any user's languages")
-    @Test
-    void systemModeCanUpdateLanguages() {
-        asSystem();
-        UUID id = translator.getId();
-        var newLangs = Set.of(Locale.GERMAN);
-        User updatedUser = translator;
-        updatedUser.setLanguages(newLangs);
-
-        when(userRepository.getUserById(id)).thenReturn(Optional.of(translator))
-                .thenReturn(Optional.of(updatedUser));
-
-        var result = userService.updateUserLanguages(id, newLangs);
-        assert result.equals(newLangs);
-    }
 
 
 
@@ -320,22 +279,6 @@ class UserServiceImplTest {
         verify(userRepository, never()).save(any());
     }
 
-    @DisplayName("System mode cannot initialize user (not owner)")
-    @Test
-    void systemCannotInitializeUser() {
-        asSystem();
-        UUID id = customer.getId();
-        when(userRepository.getUserById(id)).thenReturn(Optional.of(customer));
-
-        try {
-            userService.initializeUser(id, UserRole.CUSTOMER, Set.of(Locale.ENGLISH));
-            assert false;
-        } catch (Exception e) {
-            assert e instanceof NoAccessToOperateException;
-        }
-
-        verify(userRepository, never()).save(any());
-    }
 
     @DisplayName("User can initialize self without languages CUSTOMER")
     @Test

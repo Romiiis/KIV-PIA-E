@@ -7,8 +7,8 @@ import com.romiiis.exception.MyIllegalParametersException;
 import com.romiiis.exception.NoAccessToOperateException;
 import com.romiiis.exception.UserNotFoundException;
 import com.romiiis.filter.UsersFilter;
-import com.romiiis.repository.IUserRepository;
 import com.romiiis.port.IExecutionContextProvider;
+import com.romiiis.repository.IUserRepository;
 import com.romiiis.service.api.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,20 +40,17 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional(readOnly = false)
     public User getUserByEmail(String email) throws UserNotFoundException, NoAccessToOperateException {
-        if (!callerContextProvider.isSystem()) {
 
-            User caller = fetchUserFromContext();
+        User caller = fetchUserFromContext();
+        if (caller.getRole() != UserRole.ADMINISTRATOR) {
 
-            if (caller.getRole() != UserRole.ADMINISTRATOR) {
-
-                // Non-admin users can only fetch their own data and translators can fetch data of customers assigned to their projects
-                if (!caller.getEmailAddress().equalsIgnoreCase(email)) {
-                    log.error("User with email {} is not authorized to access data of email {}", caller.getEmailAddress(), email);
-                    throw new NoAccessToOperateException("User is not authorized to access data of email " + email);
-                }
+            // Non-admin users can only fetch their own data and translators can fetch data of customers assigned to their projects
+            if (!caller.getEmailAddress().equalsIgnoreCase(email)) {
+                log.error("User with email {} is not authorized to access data of email {}", caller.getEmailAddress(), email);
+                throw new NoAccessToOperateException("User is not authorized to access data of email " + email);
             }
-
         }
+
 
         Optional<User> userOpt = userRepository.getUserByEmail(email);
 
@@ -123,19 +120,16 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional(readOnly = true)
     public User getUserById(UUID userId) {
-        if (!callerContextProvider.isSystem()) {
 
-            User caller = fetchUserFromContext();
+        User caller = fetchUserFromContext();
 
-            if (caller.getRole() != UserRole.ADMINISTRATOR) {
+        if (caller.getRole() != UserRole.ADMINISTRATOR) {
 
-                // Non-admin users can only fetch their own data
-                if (!caller.getId().equals(userId)) {
-                    log.error("User with ID {} is not authorized to access data of user ID {}", caller.getId(), userId);
-                    throw new NoAccessToOperateException("User is not authorized to access data of user ID " + userId);
-                }
+            // Non-admin users can only fetch their own data
+            if (!caller.getId().equals(userId)) {
+                log.error("User with ID {} is not authorized to access data of user ID {}", caller.getId(), userId);
+                throw new NoAccessToOperateException("User is not authorized to access data of user ID " + userId);
             }
-
         }
 
         Optional<User> userOpt = userRepository.getUserById(userId);
@@ -157,13 +151,11 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional(readOnly = true)
     public List<User> getAllUsers(UsersFilter filter) {
-        if (!callerContextProvider.isSystem()) {
-            User caller = fetchUserFromContext();
+        User caller = fetchUserFromContext();
 
-            if (caller.getRole() != UserRole.ADMINISTRATOR) {
-                log.error("User with ID {} is not authorized to fetch all users", caller.getId());
-                throw new NoAccessToOperateException("User is not authorized to fetch all users");
-            }
+        if (caller.getRole() != UserRole.ADMINISTRATOR) {
+            log.error("User with ID {} is not authorized to fetch all users", caller.getId());
+            throw new NoAccessToOperateException("User is not authorized to fetch all users");
         }
         return userRepository.getAllUsers(filter);
     }
@@ -178,13 +170,11 @@ public class UserServiceImpl implements IUserService {
     @Transactional(readOnly = true)
     public List<Locale> getUsersLanguages(UUID userId) throws UserNotFoundException {
 
-        if (!callerContextProvider.isSystem()) {
-            User caller = fetchUserFromContext();
+        User caller = fetchUserFromContext();
 
-            if (caller.getRole() != UserRole.ADMINISTRATOR && !caller.getId().equals(userId)) {
-                log.error("User with ID {} is not authorized to access languages of user ID {}", caller.getId(), userId);
-                throw new NoAccessToOperateException("User is not authorized to access languages of user ID " + userId);
-            }
+        if (caller.getRole() != UserRole.ADMINISTRATOR && !caller.getId().equals(userId)) {
+            log.error("User with ID {} is not authorized to access languages of user ID {}", caller.getId(), userId);
+            throw new NoAccessToOperateException("User is not authorized to access languages of user ID " + userId);
         }
 
         if (userRepository.getRoleById(userId) != UserRole.TRANSLATOR) {
@@ -208,14 +198,13 @@ public class UserServiceImpl implements IUserService {
     public Set<Locale> updateUserLanguages(UUID userId, Set<Locale> languages) throws UserNotFoundException {
 
         // Only translator themselves
-        if (!callerContextProvider.isSystem()) {
-            User caller = fetchUserFromContext();
+        User caller = fetchUserFromContext();
 
-            if (caller.getRole() != UserRole.TRANSLATOR || !caller.getId().equals(userId)) {
-                log.error("User with ID {} is not authorized to update languages of user ID {}", caller.getId(), userId);
-                throw new NoAccessToOperateException("User is not authorized to update languages of user ID " + userId);
-            }
+        if (caller.getRole() != UserRole.TRANSLATOR || !caller.getId().equals(userId)) {
+            log.error("User with ID {} is not authorized to update languages of user ID {}", caller.getId(), userId);
+            throw new NoAccessToOperateException("User is not authorized to update languages of user ID " + userId);
         }
+
 
         if (languages == null || languages.isEmpty()) {
             log.error("Languages set cannot be null or empty for user ID {}", userId);
@@ -302,10 +291,6 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional(readOnly = false)
     public User initializeUser(UUID userId, UserRole role, Set<Locale> langs) throws UserNotFoundException {
-        if (callerContextProvider.isSystem()) {
-            log.error("System context is not authorized to initialize user data");
-            throw new NoAccessToOperateException("System context is not authorized to initialize user data");
-        }
 
         User caller = fetchUserFromContext();
         User user = getUserById(userId);

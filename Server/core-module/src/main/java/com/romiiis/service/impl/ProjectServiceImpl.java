@@ -8,20 +8,18 @@ import com.romiiis.event.TranslatorAssignedToProjectEvent;
 import com.romiiis.exception.*;
 import com.romiiis.filter.ProjectsFilter;
 import com.romiiis.port.IDomainEventPublisher;
-import com.romiiis.repository.IFeedbackRepository;
-import com.romiiis.repository.IProjectRepository;
 import com.romiiis.port.IExecutionContextProvider;
 import com.romiiis.port.IFileSystemService;
+import com.romiiis.repository.IFeedbackRepository;
+import com.romiiis.repository.IProjectRepository;
+import com.romiiis.repository.IUserRepository;
 import com.romiiis.service.api.IProjectService;
 import com.romiiis.service.api.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Default implementation of the IProjectService interface.
@@ -36,9 +34,10 @@ public class ProjectServiceImpl implements IProjectService {
     /**
      * Repositories & Services
      */
-    private final IUserService userService;
+
     private final IProjectRepository projectRepository;
     private final IFeedbackRepository feedbackRepository;
+    private final IUserRepository userRepository;
     private final IFileSystemService fsService;
     private final IExecutionContextProvider callerContextProvider;
     private final IDomainEventPublisher eventPublisher;
@@ -82,7 +81,6 @@ public class ProjectServiceImpl implements IProjectService {
             eventPublisher.publish(new TranslatorAssignedToProjectEvent(newProject));
 
 
-
         } catch (UserNotFoundException ex) {
             log.warn("No suitable translator found for project ID {}", newProject.getId());
             eventPublisher.publish(new NoTranslatorAssignedToProjectEvent(newProject));
@@ -103,12 +101,10 @@ public class ProjectServiceImpl implements IProjectService {
     @Transactional(readOnly = true)
     public List<Project> getAllProjects(ProjectsFilter filter) {
         User caller = fetchUserFromContext();
-        if (!callerContextProvider.isSystem()) {
-            if (caller.getRole() == UserRole.CUSTOMER) {
-                filter.setCustomerId(caller.getId());
-            } else if (caller.getRole() == UserRole.TRANSLATOR) {
-                filter.setTranslatorId(caller.getId());
-            }
+        if (caller.getRole() == UserRole.CUSTOMER) {
+            filter.setCustomerId(caller.getId());
+        } else if (caller.getRole() == UserRole.TRANSLATOR) {
+            filter.setTranslatorId(caller.getId());
         }
         return projectRepository.getAll(filter);
     }
@@ -125,7 +121,7 @@ public class ProjectServiceImpl implements IProjectService {
     public Project getProjectById(UUID projectId) throws ProjectNotFoundException, NoAccessToOperateException {
 
         // If caller is not system, check access rights
-        if (!callerContextProvider.isSystem()) {
+
 
             User caller = fetchUserFromContext();
             Project project = fetchProject(projectId);
@@ -136,7 +132,7 @@ public class ProjectServiceImpl implements IProjectService {
                 log.error("User with ID {} is not authorized to access project ID: {}", caller.getId(), projectId);
                 throw new NoAccessToOperateException("User is not authorized to access this project");
             }
-        }
+
 
 
         return this.fetchProject(projectId);
@@ -156,7 +152,6 @@ public class ProjectServiceImpl implements IProjectService {
         Project project = fetchProject(projectId);
 
         // Original file can be accessed by customer who owns the project or the assigned translator or admin
-        if (!callerContextProvider.isSystem()) {
             boolean isProjectOwner = project.getCustomer().getId().equals(caller.getId());
             boolean isAssignedTranslator = project.getTranslator() != null &&
                     project.getTranslator().getId().equals(caller.getId());
@@ -164,7 +159,7 @@ public class ProjectServiceImpl implements IProjectService {
                 log.error("User with ID {} is not authorized to access original file for project ID: {}", caller.getId(), projectId);
                 throw new NoAccessToOperateException("User is not authorized to access original file for this project");
             }
-        }
+
 
         if (project.getOriginalFileName() == null || project.getOriginalFileName().isEmpty()) {
             log.error("Original file for project ID {} not found", projectId);
@@ -182,7 +177,6 @@ public class ProjectServiceImpl implements IProjectService {
         User caller = fetchUserFromContext();
 
         // Translated file can be accessed by customer who owns the project or the assigned translator or admin
-        if (!callerContextProvider.isSystem()) {
             boolean isProjectOwner = project.getCustomer().getId().equals(caller.getId());
             boolean isAssignedTranslator = project.getTranslator() != null &&
                     project.getTranslator().getId().equals(caller.getId());
@@ -190,7 +184,7 @@ public class ProjectServiceImpl implements IProjectService {
                 log.error("User with ID {} is not authorized to access translated file for project ID: {}", caller.getId(), projectId);
                 throw new NoAccessToOperateException("User is not authorized to access translated file for this project");
             }
-        }
+
 
         if (project.getTranslatedFileName() == null || project.getTranslatedFileName().isEmpty()) {
             log.error("Translated file for project ID {} not found", projectId);
@@ -242,7 +236,8 @@ public class ProjectServiceImpl implements IProjectService {
         Locale targetLanguage = project.getTargetLanguage();
 
         // Then get all translators who know this language
-        List<UUID> translators = userService.getTranslatorIdsByLanguage(targetLanguage);
+
+        List<UUID> translators = userRepository.getTranslatorsIdsByLanguage(targetLanguage);
 
         // Find the translator with the least number of assigned projects
         UUID bestTranslatorId = null;
@@ -259,10 +254,12 @@ public class ProjectServiceImpl implements IProjectService {
         if (bestTranslatorId != null) {
             try {
                 UUID finalBestTranslatorId = bestTranslatorId;
-                return callerContextProvider.runAsSystem(() ->
-                        userService.getUserById(finalBestTranslatorId)
-                );
-
+                // Fetch the user by Id from repositor
+                Optional<User> userOpt = userRepository.getUserById(finalBestTranslatorId);
+                if (userOpt.isPresent()) {
+                    return userOpt.get();
+                }
+                throw new UserNotFoundException("Best translator not found");
 
             } catch (UserNotFoundException e) {
                 log.error("Best translator with ID {} not found", bestTranslatorId);
@@ -300,22 +297,20 @@ public class ProjectServiceImpl implements IProjectService {
     @Transactional(readOnly = true)
     public List<WrapperProjectFeedback> getAllProjectsWithFeedback(ProjectsFilter filter) {
         User caller = fetchUserFromContext();
-        if (!callerContextProvider.isSystem()) {
             if (caller.getRole() == UserRole.CUSTOMER) {
                 filter.setCustomerId(caller.getId());
             } else if (caller.getRole() == UserRole.TRANSLATOR) {
                 filter.setTranslatorId(caller.getId());
             }
-        }
+
 
 
         // Get all projects based on the filter
         List<Project> projects = projectRepository.getAll(filter);
 
         // For each project, get its feedback wrapper
-        List<Feedback> feedbacks = callerContextProvider.runAsSystem(() -> feedbackRepository.getAllFeedbackForProjectIds(
-                projects.stream().map(Project::getId).toList()
-        ));
+        List<Feedback> feedbacks = feedbackRepository.getAllFeedbackForProjectIds(
+                projects.stream().map(Project::getId).toList());
 
 
         List<WrapperProjectFeedback> wrapperProjectFeedbacks = new ArrayList<>();
