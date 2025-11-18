@@ -12,6 +12,7 @@ import com.romiiis.port.IExecutionContextProvider;
 import com.romiiis.service.api.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -37,6 +38,7 @@ public class UserServiceImpl implements IUserService {
      * @return the User with the given email, or null if not found
      */
     @Override
+    @Transactional(readOnly = false)
     public User getUserByEmail(String email) throws UserNotFoundException, NoAccessToOperateException {
         if (!callerContextProvider.isSystem()) {
 
@@ -64,6 +66,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public User createNewUser(String name, String email, String password) throws UserNotFoundException {
         User newUser = User.createUser(name, email, password);
         userRepository.save(newUser);
@@ -81,6 +84,7 @@ public class UserServiceImpl implements IUserService {
      * @return the created User object
      */
     @Override
+    @Transactional(readOnly = false)
     public User createNewCustomer(String name, String email, String password) throws UserNotFoundException {
 
         User newUser = User.createCustomer(name, email).withHashedPassword(password);
@@ -101,6 +105,7 @@ public class UserServiceImpl implements IUserService {
      * @return the created User object
      */
     @Override
+    @Transactional(readOnly = false)
     public User createNewTranslator(String name, String email, Set<Locale> langs, String password) throws UserNotFoundException {
         User newUser = User.createTranslator(name, email, langs).withHashedPassword(password);
         userRepository.save(newUser);
@@ -116,6 +121,7 @@ public class UserServiceImpl implements IUserService {
      * @return the User with the given ID, or null if not found
      */
     @Override
+    @Transactional(readOnly = true)
     public User getUserById(UUID userId) {
         if (!callerContextProvider.isSystem()) {
 
@@ -149,6 +155,7 @@ public class UserServiceImpl implements IUserService {
      * @return a list of users matching the filter criteria
      */
     @Override
+    @Transactional(readOnly = true)
     public List<User> getAllUsers(UsersFilter filter) {
         if (!callerContextProvider.isSystem()) {
             User caller = fetchUserFromContext();
@@ -168,6 +175,7 @@ public class UserServiceImpl implements IUserService {
      * @return a list of language codes associated with the user
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Locale> getUsersLanguages(UUID userId) throws UserNotFoundException {
 
         if (!callerContextProvider.isSystem()) {
@@ -196,6 +204,7 @@ public class UserServiceImpl implements IUserService {
      * @throws UserNotFoundException if the user with the given ID does not exist
      */
     @Override
+    @Transactional(readOnly = false)
     public Set<Locale> updateUserLanguages(UUID userId, Set<Locale> languages) throws UserNotFoundException {
 
         // Only translator themselves
@@ -230,6 +239,7 @@ public class UserServiceImpl implements IUserService {
      * @return a list of translator UUIDs proficient in the specified language
      */
     @Override
+    @Transactional(readOnly = true)
     public List<UUID> getTranslatorIdsByLanguage(Locale language) {
         return userRepository.getTranslatorsIdsByLanguage(language);
     }
@@ -241,6 +251,7 @@ public class UserServiceImpl implements IUserService {
      * @return the UserRole of the user
      */
     @Override
+    @Transactional(readOnly = true)
     public UserRole getUserRole(UUID userId) throws UserNotFoundException {
         return userRepository.getRoleById(userId);
     }
@@ -271,6 +282,7 @@ public class UserServiceImpl implements IUserService {
      * @return the created User object
      */
     @Override
+    @Transactional(readOnly = false)
     public User createNewAdmin(String name, String email, String password) throws UserNotFoundException {
         User newUser = User.createAdmin(name, email).withHashedPassword(password);
         userRepository.save(newUser);
@@ -288,6 +300,7 @@ public class UserServiceImpl implements IUserService {
      * @throws UserNotFoundException if the user with the given ID does not exist
      */
     @Override
+    @Transactional(readOnly = false)
     public User initializeUser(UUID userId, UserRole role, Set<Locale> langs) throws UserNotFoundException {
         if (callerContextProvider.isSystem()) {
             log.error("System context is not authorized to initialize user data");

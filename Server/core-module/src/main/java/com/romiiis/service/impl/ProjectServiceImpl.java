@@ -16,6 +16,7 @@ import com.romiiis.service.api.IProjectService;
 import com.romiiis.service.api.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,7 @@ public class ProjectServiceImpl implements IProjectService {
      * @return newly created project
      */
     @Override
+    @Transactional(readOnly = false)
     public Project createProject(Locale targetLanguage, ResourceHeader sourceFile) throws ProjectNotFoundException, UserNotFoundException, FileStorageException, NoAccessToOperateException {
 
         User customer = this.fetchUserFromContext();
@@ -98,6 +100,7 @@ public class ProjectServiceImpl implements IProjectService {
      * @return a list of projects matching the filter criteria
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Project> getAllProjects(ProjectsFilter filter) {
         User caller = fetchUserFromContext();
         if (!callerContextProvider.isSystem()) {
@@ -118,6 +121,7 @@ public class ProjectServiceImpl implements IProjectService {
      * @throws ProjectNotFoundException if the project is not found
      */
     @Override
+    @Transactional(readOnly = true)
     public Project getProjectById(UUID projectId) throws ProjectNotFoundException, NoAccessToOperateException {
 
         // If caller is not system, check access rights
@@ -146,6 +150,7 @@ public class ProjectServiceImpl implements IProjectService {
      * @return The byte array of the original file data.
      */
     @Override
+    @Transactional(readOnly = true)
     public ResourceHeader getOriginalFile(UUID projectId) throws ProjectNotFoundException, FileStorageException, NoAccessToOperateException {
         User caller = fetchUserFromContext();
         Project project = fetchProject(projectId);
@@ -170,6 +175,7 @@ public class ProjectServiceImpl implements IProjectService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResourceHeader getTranslatedFile(UUID projectId) throws ProjectNotFoundException, FileStorageException, FileNotFoundException, NoAccessToOperateException {
 
         Project project = fetchProject(projectId);
@@ -206,6 +212,7 @@ public class ProjectServiceImpl implements IProjectService {
      * @throws ProjectNotFoundException if the project is not found
      */
     @Override
+    @Transactional(readOnly = false)
     public void updateProject(Project project) throws ProjectNotFoundException {
         //
         projectRepository.save(project);
@@ -217,6 +224,7 @@ public class ProjectServiceImpl implements IProjectService {
      * @return a list of all project IDs in string format
      */
     @Override
+    @Transactional(readOnly = true)
     public List<String> getAllProjectIdsAsString() {
         return projectRepository.getAllProjectIdsAsString();
     }
@@ -289,6 +297,7 @@ public class ProjectServiceImpl implements IProjectService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<WrapperProjectFeedback> getAllProjectsWithFeedback(ProjectsFilter filter) {
         User caller = fetchUserFromContext();
         if (!callerContextProvider.isSystem()) {
@@ -331,6 +340,7 @@ public class ProjectServiceImpl implements IProjectService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public WrapperProjectFeedback getProjectFeedback(UUID projectId) throws ProjectNotFoundException {
         Project project = fetchProject(projectId);
         Feedback feedback = feedbackRepository.getFeedbackByProjectId(projectId);

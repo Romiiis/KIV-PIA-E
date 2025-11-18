@@ -10,7 +10,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 @Slf4j
 @RequiredArgsConstructor
-public class MailHogEmailService implements IMailService {
+public class EmailService implements IMailService {
 
 
     private final JavaMailSender emailSender;

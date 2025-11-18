@@ -14,6 +14,7 @@ import com.romiiis.service.api.IFeedbackService;
 import com.romiiis.service.api.IProjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,6 +36,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
      * @throws FeedbackNotFoundException if no feedback is found for the given project ID
      */
     @Override
+    @Transactional(readOnly = true)
     public Feedback getFeedbackByProjectId(UUID projectId) throws FeedbackNotFoundException, UserNotFoundException, ProjectNotFoundException {
 
         User caller = fetchUserFromContext();
@@ -67,6 +69,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
      * @param feedback the Feedback to save
      */
     @Override
+    @Transactional(readOnly = false)
     public void saveFeedback(Feedback feedback) throws UserNotFoundException, ProjectNotFoundException {
 
         User user = fetchUserFromContext();
@@ -91,6 +94,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
      * @param projectId ID of the project whose feedback is to be deleted
      */
     @Override
+    @Transactional(readOnly = false)
     public void deleteProjectFeedbackByProjectId(UUID projectId) throws UserNotFoundException, ProjectNotFoundException {
 
         User user = fetchUserFromContext();
@@ -158,6 +162,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
      * @throws ProjectNotFoundException     if any of the projects are not found
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Feedback> getAllFeedbacksByProjectIds(List<UUID> projectIds) throws UserNotFoundException, ProjectNotFoundException {
 
         if (!callerContextProvider.isSystem()) {

@@ -1,7 +1,7 @@
 package com.romiiis.configuration;
 
 import com.romiiis.infrastructure.file.FileSystemServiceImpl;
-import com.romiiis.infrastructure.mail.MailHogEmailService;
+import com.romiiis.infrastructure.mail.EmailService;
 import com.romiiis.infrastructure.security.JwtServiceImpl;
 import com.romiiis.infrastructure.security.PasswordHasherImpl;
 import com.romiiis.infrastructure.security.config.JwtProperties;
@@ -77,7 +77,7 @@ public class ServiceConfiguration {
 
     @Bean
     public IMailService mailService(JavaMailSender mailSender) {
-        return new MailHogEmailService(mailSender);
+        return new EmailService(mailSender);
     }
 
 

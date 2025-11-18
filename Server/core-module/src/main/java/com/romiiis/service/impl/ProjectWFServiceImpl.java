@@ -17,6 +17,7 @@ import com.romiiis.port.IExecutionContextProvider;
 import com.romiiis.service.api.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -39,6 +40,7 @@ public class ProjectWFServiceImpl implements IProjectWFService {
      * @return the updated Project with the uploaded translated file
      */
     @Override
+    @Transactional(readOnly = false)
     public Project uploadTranslatedFile(UUID projectId, ResourceHeader resHeader) throws NoAccessToOperateException {
 
         User user = fetchUserFromContext();
@@ -78,6 +80,7 @@ public class ProjectWFServiceImpl implements IProjectWFService {
      * @return the closed Project
      */
     @Override
+    @Transactional(readOnly = false)
     public Project closeProject(UUID projectId) throws NoAccessToOperateException {
 
         User user = fetchUserFromContext();
@@ -109,6 +112,7 @@ public class ProjectWFServiceImpl implements IProjectWFService {
      * @return the approved Project
      */
     @Override
+    @Transactional(readOnly = false)
     public Project approveProject(UUID projectId) throws NoAccessToOperateException {
 
         User user = fetchUserFromContext();
@@ -140,6 +144,7 @@ public class ProjectWFServiceImpl implements IProjectWFService {
      * @return the rejected Project
      */
     @Override
+    @Transactional(readOnly = false)
     public Project rejectProject(UUID projectId, String feedback) throws NoAccessToOperateException {
 
         User user = fetchUserFromContext();

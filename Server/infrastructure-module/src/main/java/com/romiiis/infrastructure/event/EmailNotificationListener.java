@@ -8,15 +8,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProjectNotificationListener {
+public class EmailNotificationListener {
 
     // Services
     private final IMailService emailService;
-
 
     // Email templates
     @Value("${mail.template.approved.subject}")
@@ -75,7 +75,7 @@ public class ProjectNotificationListener {
      * @param event the AdminMessageEvent containing project and message details
      */
     @Async
-    @EventListener
+    @TransactionalEventListener
     public void handleAdminMessageEvent(AdminMessageEvent event) {
 
         // Prepare subject and body using templates
@@ -112,7 +112,7 @@ public class ProjectNotificationListener {
      * @param event the ProjectApprovedEvent containing project details
      */
     @Async
-    @EventListener
+    @TransactionalEventListener
     public void handleProjectApproved(ProjectApprovedEvent event) {
         String subject = String.format(approvedSubjectTemplate, event.project().getOriginalFileName());
         String body = String.format(approvedBodyTemplate, event.project().getOriginalFileName());
@@ -129,7 +129,7 @@ public class ProjectNotificationListener {
      * @param event the ProjectRejectedEvent containing project details
      */
     @Async
-    @EventListener
+    @TransactionalEventListener
     public void handleProjectRejected(ProjectRejectedEvent event) {
         String subject = String.format(rejectedSubjectTemplate, event.project().getOriginalFileName());
         String body = String.format(rejectedBodyTemplate, event.project().getOriginalFileName(), event.reason());
@@ -140,7 +140,7 @@ public class ProjectNotificationListener {
     }
 
     @Async
-    @EventListener
+    @TransactionalEventListener
     public void handleProjectCompleted(ProjectCompletedEvent event) {
         String subject = String.format(completedSubjectTemplate, event.project().getOriginalFileName());
         String body = String.format(completedBodyTemplate, event.project().getOriginalFileName());
@@ -152,7 +152,7 @@ public class ProjectNotificationListener {
 
 
     @Async
-    @EventListener
+    @TransactionalEventListener
     public void handleProjectClosed(ProjectClosedEvent event) {
         String subject = String.format(closedSubjectTemplate, event.project().getOriginalFileName());
         String body = String.format(closedBodyTemplate, event.project().getOriginalFileName());
@@ -165,7 +165,7 @@ public class ProjectNotificationListener {
 
 
     @Async
-    @EventListener
+    @TransactionalEventListener
     public void handleProjectCreationSuccess(TranslatorAssignedToProjectEvent event) {
         String subject = String.format(translatorAssignedSubjectTemplate, event.project().getOriginalFileName());
         String body = String.format(translatorAssignedBodyTemplate, event.project().getOriginalFileName());
@@ -184,7 +184,7 @@ public class ProjectNotificationListener {
     }
 
     @Async
-    @EventListener
+    @TransactionalEventListener
     public void handleProjectCreationNoTranslator(NoTranslatorAssignedToProjectEvent event) {
         String subject = String.format(newProjectNoTranslatorSubjectTemplate, event.project().getOriginalFileName());
         String body = String.format(newProjectNoTranslatorBodyTemplate, event.project().getOriginalFileName());

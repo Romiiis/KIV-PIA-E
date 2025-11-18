@@ -12,6 +12,7 @@ import com.romiiis.port.IPasswordHasher;
 import com.romiiis.service.api.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -42,6 +43,7 @@ public class AuthServiceImpl implements IAuthService {
      * @throws EmailInUseException             if the email is already in use
      */
     @Override
+    @Transactional(readOnly = true)
     public User login(String email, String password) throws EmailInUseException {
 
         // validate credentials
@@ -103,6 +105,7 @@ public class AuthServiceImpl implements IAuthService {
 
 
     @Override
+    @Transactional(readOnly = false)
     public User registerUser(String name, String email, String password) throws InvalidAuthCredentialsException, EmailInUseException, UserNotFoundException {
         validateEmailForm(email);
         validateEmailUsage(email);
@@ -115,6 +118,7 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public User findOrCreateUserAfterOauth(String email, String name) {
 
         Optional<User> user = userRepository.getUserByEmail(email);
