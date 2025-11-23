@@ -42,6 +42,5 @@ public interface MongoFeedbackRepository extends MongoRepository<FeedbackDB, UUI
      */
     @Query("{ 'projectId': { $in: ?0 } }")
     List<FeedbackDB> findByProjectIdIn(List<UUID> projectIds);
-
 }
 

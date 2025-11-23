@@ -34,7 +34,7 @@ public class UserRepositoryImpl implements IUserRepository {
     private final MongoUserRepository mongoRepo;
     private final MongoUserMapper mapper;
     private final MongoTemplate mongoTemplate;
-    private final MongoClient mongo;
+
 
 
     /**

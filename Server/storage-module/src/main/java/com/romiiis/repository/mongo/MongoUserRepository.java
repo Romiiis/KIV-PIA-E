@@ -1,8 +1,7 @@
 package com.romiiis.repository.mongo;
 
-import com.romiiis.domain.User;
+import com.mongodb.lang.NonNullApi;
 import com.romiiis.model.UserDB;
-import com.romiiis.model.UserRoleDB;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -42,6 +41,5 @@ public interface MongoUserRepository extends MongoRepository<UserDB, UUID> {
      * @return an Optional containing the UserDB if found, or empty if not found
      */
     Optional<UserDB> findByEmailAddress(String email);
-
 
 }
